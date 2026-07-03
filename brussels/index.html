@@ -2532,8 +2532,60 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
 .price-tag.free{ background:var(--acid); }
 .pick,.evc-genres .evc-gtag{ border-radius:0; }
 
+/* ═══ BESPOKE PAGES (fp-* namespace, scoped — no collision with app classes) ═══ */
+/* shared bespoke primitives */
+.fp-sec{ border:3px solid var(--ink); border-radius:0; margin-top:30px; background:var(--bg); }
+.fp-sech{ display:flex; justify-content:space-between; align-items:center; gap:12px; padding:12px 16px; border-bottom:3px solid var(--ink); background:var(--ink); color:var(--bg); font:800 17px var(--head); text-transform:uppercase; letter-spacing:-0.02em; }
+.fp-sech span{ color:var(--acid); font:700 11px var(--font-mono); letter-spacing:.14em; text-transform:uppercase; }
+.fp-cols{ display:grid; grid-template-columns:1fr 1fr; gap:26px; margin-top:26px; }
+@media(max-width:720px){ .fp-cols{ grid-template-columns:1fr; } }
+.fp-row{ display:flex; align-items:center; gap:14px; padding:11px 16px; border-bottom:2px solid var(--ink); font:700 13px var(--font-mono); cursor:pointer; }
+.fp-row:last-child{ border-bottom:0; } .fp-row:hover{ background:var(--acid); }
+.fp-row b{ font:800 16px var(--head); text-transform:uppercase; letter-spacing:-0.02em; flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.fp-row .fp-y{ color:var(--muted); white-space:nowrap; }
+
+/* ── ARTIST ── */
+.fp-artist .fp-hero{ display:grid; grid-template-columns:340px 1fr; border:3px solid var(--ink); }
+@media(max-width:720px){ .fp-artist .fp-hero{ grid-template-columns:1fr; } }
+.fp-photo{ position:relative; border-right:3px solid var(--ink); aspect-ratio:1; overflow:hidden; }
+@media(max-width:720px){ .fp-photo{ border-right:0; border-bottom:3px solid var(--ink); } }
+.fp-photo img{ width:100%; height:100%; object-fit:cover; display:block; }
+.fp-press-gen{ position:absolute; inset:0; }
+.fp-origin{ position:absolute; left:-8px; bottom:16px; transform:rotate(-4deg); background:var(--acid); border:3px solid var(--ink); font:800 11px var(--head); letter-spacing:.06em; text-transform:uppercase; padding:7px 11px; }
+.fp-hx{ padding:24px 26px 0; min-width:0; }
+.fp-kick{ font:700 12px var(--font-mono); letter-spacing:.12em; text-transform:uppercase; color:var(--accent); }
+.fp-kick .fp-foll{ background:var(--ink); color:var(--acid); padding:1px 7px; margin-left:8px; }
+.fp-h1{ font:800 clamp(52px,8vw,100px)/0.85 var(--head); letter-spacing:-0.05em; text-transform:uppercase; margin:14px 0 10px; }
+.fp-bio{ font:400 15.5px/1.55 Georgia,serif; max-width:52ch; margin:0 0 18px; }
+.fp-socials{ display:flex; gap:16px; margin-bottom:18px; }
+.fp-socials a,.fp-socials .sl{ font:800 11px var(--font-mono); letter-spacing:.1em; text-transform:uppercase; border-bottom:2px solid var(--accent); color:var(--ink); text-decoration:none; padding-bottom:2px; }
+.fp-acts{ display:flex; border:3px solid var(--ink); margin:0 -26px; border-left:0; border-right:0; }
+.fp-ab{ flex:1; border-right:3px solid var(--ink); background:var(--bg); font:800 13px var(--head); letter-spacing:.04em; text-transform:uppercase; padding:16px 8px; cursor:pointer; color:var(--ink); display:inline-flex; align-items:center; justify-content:center; gap:6px; }
+.fp-ab:last-child{ border-right:0; } .fp-ab.go{ background:var(--ink); color:var(--acid); flex:1.4; }
+.fp-ab.on{ background:var(--accent); color:var(--accent-ink); } .fp-ab:hover{ background:var(--accent); color:var(--accent-ink); }
+/* tour-dates table */
+.fp-tr{ display:grid; grid-template-columns:118px 1fr 240px 116px 54px; align-items:center; border-bottom:2px solid var(--ink); cursor:pointer; }
+.fp-tr:last-child{ border-bottom:0; } .fp-tr:hover{ background:rgba(200,245,66,.4); }
+.fp-td{ padding:13px 16px; min-width:0; overflow:hidden; text-overflow:ellipsis; }
+.fp-dt{ font:800 14px var(--font-mono); color:var(--accent); }
+.fp-ev{ font:800 19px var(--head); text-transform:uppercase; letter-spacing:-0.03em; white-space:nowrap; }
+.fp-wv{ font:700 11px var(--font-mono); letter-spacing:.06em; text-transform:uppercase; color:var(--muted); white-space:nowrap; }
+.fp-ct{ font:800 11px var(--font-mono); letter-spacing:.1em; text-transform:uppercase; }
+.fp-ct i{ font-style:normal; background:var(--bg); border:2px solid var(--ink); padding:3px 7px; }
+.fp-pl{ width:100%; min-height:48px; border:0; border-left:2px solid var(--ink); background:var(--bg); font-size:14px; cursor:pointer; }
+.fp-pl:hover{ background:var(--ink); color:var(--acid); }
+@media(max-width:620px){ .fp-tr{ grid-template-columns:70px 1fr 44px; } .fp-tr .fp-wv,.fp-tr .fp-ct{ display:none; } }
+/* more-like rail */
+.fp-more{ display:grid; grid-template-columns:repeat(5,1fr); }
+@media(max-width:620px){ .fp-more{ grid-template-columns:repeat(2,1fr); } }
+.fp-mk{ border-right:3px solid var(--ink); cursor:pointer; }
+.fp-mk:last-child{ border-right:0; } .fp-mk:hover{ background:var(--acid); }
+.fp-mk .fp-mph{ aspect-ratio:1; border-bottom:3px solid var(--ink); background-size:cover; background-position:center; }
+.fp-mk i{ display:block; font:800 13px var(--head); font-style:normal; text-transform:uppercase; letter-spacing:-0.02em; padding:10px 12px 3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.fp-mk s{ display:block; text-decoration:none; font:700 10px var(--font-mono); letter-spacing:.08em; text-transform:uppercase; color:var(--accent); padding:0 12px 12px; }
+
 </style>
-<meta name="sc-build" content="flyposter-1783113330829">
+<meta name="sc-build" content="flyposter-1783115106311">
 <meta name="robots" content="noindex">
 </head>
 <body>
@@ -7609,5 +7661,157 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
       handleRoute();
     }
   </script>
+<script>
+/* FLYPOSTER bespoke renderers */
+/* ═══════════════════════════════════════════════════════════════════════════
+   FLYPOSTER bespoke page renderers (next.soundcheck.club only).
+   Injected after the main app script; reassigns the global render functions to
+   emit the bespoke mock layouts, wired to the SAME live data + the SAME global
+   helpers the originals use. Markup is namespaced fp-* to avoid class collisions.
+   Pure preview layer — production never loads this file.
+   ═══════════════════════════════════════════════════════════════════════════ */
+(function(){
+  if (typeof openArtist !== 'function') return;
+  var E = window.esc || function(s){ return String(s==null?'':s); };
+  function foll(n){ n=+n||0; return n>=1000 ? (n/1000).toFixed(n>=10000?0:1).replace(/\.0$/,'')+'K' : (n||''); }
+  function share(url, title){
+    try{ if(navigator.share){ navigator.share({title:title||'soundcheck', url:url}); return; } }catch(_){}
+    try{ navigator.clipboard.writeText(url); if(typeof showToast==='function') showToast('Link copied'); }catch(_){}
+  }
+
+  // ── ARTIST ──────────────────────────────────────────────────────────────
+  window.openArtist = async function(slug){
+    setRoute('dj/'+slug); if(typeof trackView==='function') trackView('artist', slug);
+    openPanel(pageSkeleton());
+    try{
+      var r = await authedFetch('/api/artist?slug='+encodeURIComponent(slug));
+      var a = await r.json();
+      var mine = (typeof artStatus==='function') ? artStatus(slug) : null;
+      var nextGig = (a.upcoming && a.upcoming[0]) || null;
+      var img = a.image
+        ? '<img loading="lazy" decoding="async" src="'+imgUrl(a.image,600)+'" alt="" onerror="this.remove()">'
+        : '';
+      var kick = [(a.genres&&a.genres[0])||'', a.country||''].filter(Boolean).map(E).join(' · ');
+      if (a.followers) kick += (kick?' ':'')+'<b class="fp-foll">'+foll(a.followers)+' followers</b>';
+      var bio = a.bio || a.description || '';
+      var socials = (typeof socialLinksHTML==='function') ? socialLinksHTML({ soundcloud:a.soundcloud, instagram:a.instagram, website:a.website }) : '';
+
+      var h = '<div class="fp-artist">'
+        + '<div class="fp-hero">'
+          + '<div class="fp-photo">'
+            + (a.image ? img : '<span class="fp-press-gen" style="background:'+((typeof avatarBg==='function')?avatarBg(slug,null):'#ccc')+'"></span>')
+            + (a.country ? '<div class="fp-origin">'+E(a.country)+'</div>' : '')
+          + '</div>'
+          + '<div class="fp-hx">'
+            + '<div class="fp-kick">'+kick+'</div>'
+            + '<h1 class="fp-h1">'+E(a.name||slug)+'</h1>'
+            + (bio ? '<p class="fp-bio">'+E(bio)+'</p>' : '')
+            + (socials ? '<div class="fp-socials">'+socials+'</div>' : '')
+            + '<div class="fp-acts">'
+              + '<button class="fp-ab go" id="fp-tunein" type="button">▶ Tune in</button>'
+              + '<button class="fp-ab'+(mine==='wanna_see'?' on':'')+'" id="fp-wanna" type="button">♥ Wanna see</button>'
+              + '<button class="fp-ab'+(mine==='seen'?' on':'')+'" id="fp-seen" type="button">✓ Seen live</button>'
+              + '<button class="fp-ab" id="fp-share" type="button">Share</button>'
+            + '</div>'
+          + '</div>'
+        + '</div>';
+
+      var up = a.upcoming || [];
+      if (up.length){
+        h += '<div class="fp-sec"><div class="fp-sech">Tour dates <span>'+up.length+' upcoming · ▶ previews the sound</span></div>'
+          + up.map(function(g){
+              var d = fmtDateLabel(String(g.event_date).slice(0,10));
+              return '<div class="fp-tr" data-ev="'+E(String(g.id))+'">'
+                + '<div class="fp-td fp-dt">'+E(d)+'</div>'
+                + '<div class="fp-td fp-ev">'+E(g.title||g.venue||'Show')+'</div>'
+                + '<div class="fp-td fp-wv">'+E(g.venue||'')+'</div>'
+                + '<div class="fp-td fp-ct">'+(g.city?'<i>'+E(cityLabel(g.city))+'</i>':'')+'</div>'
+                + '<button class="fp-pl" type="button" data-play="'+E(String(g.id))+'">▶</button>'
+              + '</div>';
+            }).join('')
+          + '</div>';
+      }
+
+      var col1='', col2='';
+      if ((a.history||[]).length){
+        col1 = '<div class="fp-sec"><div class="fp-sech">Past sets <span>logged by the scene</span></div>'
+          + a.history.map(function(g){
+              var d = fmtDateLabel(String(g.event_date).slice(0,10));
+              return '<div class="fp-row" data-ev="'+E(String(g.id))+'"><b>'+E(g.title||g.venue||'Set')+'</b><span class="fp-y">'+E(d)+(g.city?' · '+E(cityLabel(g.city)):'')+'</span></div>';
+            }).join('')
+          + '</div>';
+      }
+      if ((a.alongside||[]).length){
+        col2 = '<div class="fp-sec"><div class="fp-sech">Plays alongside <span>from real bills</span></div>'
+          + a.alongside.slice(0,6).map(function(x){
+              return '<div class="fp-row" data-artist="'+E(x.slug)+'"><b>'+E(x.name)+'</b><span class="fp-y">shared bills</span></div>';
+            }).join('')
+          + '</div>';
+      }
+      if (col1 || col2) h += '<div class="fp-cols">'+(col1||'')+(col2||'')+'</div>';
+
+      if ((a.alongside||[]).length) h += '<div class="fp-sec"><div class="fp-sech">More like '+E(a.name||slug)+' <span>same lane · next dates</span></div><div class="fp-more" id="fp-morelike"></div></div>';
+
+      h += '</div>';
+      openPanel(h);
+
+      var _canon = location.origin + SC_BASE + 'dj/' + slug + '/';
+      if (typeof setSeo==='function') setSeo((a.name||slug)+' — gigs & upcoming shows | soundcheck', a.description||'', { "@context":"https://schema.org","@type":"MusicGroup", name:(a.name||slug), url:_canon, description:a.description||'' }, _canon);
+
+      // wire — reuse the app's exact play mechanism
+      var tune = document.getElementById('fp-tunein');
+      if (tune){
+        tune.dataset.slug = slug; tune.dataset.name = a.name||slug;
+        if (a.image) tune.dataset.poster = a.image;
+        if (nextGig && nextGig.venue){ tune.dataset.venue = nextGig.venue; tune.dataset.city = nextGig.city||''; }
+        if (typeof prefetchYt==='function') tune.addEventListener('pointerdown', function(){ prefetchYt(tune); }, {passive:true});
+        tune.addEventListener('click', function(){ if(typeof handleYtClick==='function') handleYtClick(tune); });
+        if (typeof armSticky==='function') armSticky(a.name||slug, function(){ tune.click(); }, tune);
+      }
+      var w = document.getElementById('fp-wanna');
+      if (w) w.addEventListener('click', function(){ if(typeof toggleArtist==='function') toggleArtist(slug,{name:a.name}); w.classList.toggle('on'); });
+      var s = document.getElementById('fp-seen');
+      if (s) s.addEventListener('click', function(){ if(typeof toggleSeen==='function') toggleSeen(slug,{name:a.name}); s.classList.toggle('on'); });
+      var sh = document.getElementById('fp-share');
+      if (sh) sh.addEventListener('click', function(){ share(_canon, a.name||slug); });
+
+      // tour-date rows: whole row → the event; ▶ → play that night's lineup queue
+      document.querySelectorAll('#page-body .fp-tr[data-ev]').forEach(function(tr){
+        tr.addEventListener('click', function(){ openEvent(tr.dataset.ev); });
+      });
+      document.querySelectorAll('#page-body .fp-pl[data-play]').forEach(function(pl){
+        var g = up.filter(function(x){ return String(x.id)===pl.dataset.play; })[0];
+        var q = (g && g.lineup || []).map(function(x){ return { slug:x.slug, name:x.name, poster:g.poster_url }; }).filter(function(x){ return x.slug; });
+        pl.addEventListener('click', function(e){ e.stopPropagation(); if(q.length && typeof playYtList==='function') playYtList(q,0); else openEvent(pl.dataset.play); });
+      });
+      // ledgers
+      document.querySelectorAll('#page-body .fp-row[data-ev]').forEach(function(row){ row.addEventListener('click', function(){ openEvent(row.dataset.ev); }); });
+      document.querySelectorAll('#page-body .fp-row[data-artist]').forEach(function(row){ row.addEventListener('click', function(){ openArtist(row.dataset.artist); }); });
+
+      // more-like rail (async) — bespoke rectangular tiles
+      var rail = document.getElementById('fp-morelike');
+      if (rail){
+        var render = function(list){
+          if(!list.length){ rail.closest('.fp-sec').style.display='none'; return; }
+          rail.innerHTML = list.slice(0,5).map(function(x){
+            var nd = x.nextDate ? fmtDateLabel(String(x.nextDate).slice(0,10)) : '';
+            var sub = [nd, x.nextCity?cityLabel(x.nextCity):''].filter(Boolean).join(' · ') || 'archive sets';
+            var bg = x.image ? 'url('+imgUrl(x.image,300)+')' : ((typeof avatarBg==='function')?avatarBg(x.slug,null):'#ccc');
+            return '<div class="fp-mk" data-artist="'+E(x.slug)+'"><div class="fp-mph" style="background-image:'+ (x.image?bg:'none') +';background:'+(x.image?bg:((typeof avatarBg==='function')?avatarBg(x.slug,null):'#ccc'))+'"></div><i>'+E(x.name)+'</i><s>'+E(sub)+'</s></div>';
+          }).join('');
+          rail.querySelectorAll('.fp-mk[data-artist]').forEach(function(t){ t.addEventListener('click', function(){ openArtist(t.dataset.artist); }); });
+        };
+        var fallback = (a.alongside||[]).map(function(x){ return { slug:x.slug, name:x.name, image:x.image_url }; });
+        authedFetch('/api/artist/similar?slug='+encodeURIComponent(slug)).then(function(r){ return r.json(); }).then(function(j){
+          var sim = (j && j.similar) || [];
+          render(sim.length ? sim.map(function(s){ return { slug:s.slug, name:s.name, image:s.image, nextDate:(s.next&&s.next.event_date)||null, nextCity:(s.next&&s.next.city)||null }; }) : fallback);
+        }).catch(function(){ render(fallback); });
+      }
+    }catch(_){ openPanel('<div class="empty">Couldn&rsquo;t load that artist.</div>'); }
+  };
+
+})();
+
+</script>
 </body>
 </html>
