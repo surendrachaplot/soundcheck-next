@@ -2584,8 +2584,66 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
 .fp-mk i{ display:block; font:800 13px var(--head); font-style:normal; text-transform:uppercase; letter-spacing:-0.02em; padding:10px 12px 3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .fp-mk s{ display:block; text-decoration:none; font:700 10px var(--font-mono); letter-spacing:.08em; text-transform:uppercase; color:var(--accent); padding:0 12px 12px; }
 
+/* ── EVENT ── */
+.fp-event .fp-ev-hero{ display:grid; grid-template-columns:390px 1fr; border:3px solid var(--ink); }
+@media(max-width:720px){ .fp-event .fp-ev-hero{ grid-template-columns:1fr; } }
+.fp-ev-pcol{ border-right:3px solid var(--ink); position:relative; }
+@media(max-width:720px){ .fp-ev-pcol{ border-right:0; border-bottom:3px solid var(--ink); } }
+.fp-ev-poster{ aspect-ratio:3/4; background-size:cover; background-position:center; position:relative; }
+@media(max-width:720px){ .fp-ev-poster{ aspect-ratio:16/10; } }
+.fp-ev-stamp{ position:absolute; top:14px; right:-8px; transform:rotate(6deg); background:var(--acid); color:var(--ink); border:3px solid var(--ink); font:800 12px var(--head); text-transform:uppercase; letter-spacing:.06em; padding:8px 12px; z-index:2; }
+.fp-ev-price{ position:absolute; left:0; bottom:0; background:var(--ink); color:var(--bg); font:800 15px var(--font-mono); padding:9px 14px; }
+.fp-ev-main{ padding:26px 28px; min-width:0; }
+.fp-event .fp-kick{ font:700 13px var(--font-mono); letter-spacing:.12em; text-transform:uppercase; color:var(--accent); }
+.fp-ev-title{ font:800 clamp(38px,5vw,60px)/0.9 var(--head); letter-spacing:-0.045em; text-transform:uppercase; margin:12px 0 6px; }
+.fp-ev-venue{ font:800 26px var(--head); text-transform:uppercase; letter-spacing:-0.03em; margin:6px 0 2px; }
+.fp-ev-venue .venue-link{ background:var(--ink); color:var(--acid); padding:2px 8px; cursor:pointer; border:0; font:inherit; }
+.fp-ev-meta{ font:700 12px var(--font-mono); letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin:8px 0 18px; }
+.fp-ev-playbar{ display:flex; border:3px solid var(--ink); margin:0 -28px 18px; border-left:0; border-right:0; flex-wrap:wrap; }
+.fp-pb{ border-right:3px solid var(--ink); background:var(--bg); font:800 13px var(--head); letter-spacing:.05em; text-transform:uppercase; padding:15px 20px; cursor:pointer; color:var(--ink); text-decoration:none; display:inline-flex; align-items:center; gap:7px; }
+.fp-pb.go{ background:var(--ink); color:var(--acid); flex:1.3; }
+.fp-pb.on{ background:var(--accent); color:var(--accent-ink); } .fp-pb:hover{ background:var(--accent); color:var(--accent-ink); }
+.fp-ev-gline{ display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap; }
+.fp-ev-gtag{ background:var(--bg); border:3px solid var(--ink); font:800 10px var(--font-mono); letter-spacing:.1em; text-transform:uppercase; padding:5px 8px; }
+.fp-ev-blurb{ font:400 16px/1.55 Georgia,serif; max-width:58ch; margin:0; }
+/* lineup rows */
+.fp-lu{ display:flex; align-items:center; gap:16px; padding:13px 16px; border-bottom:2px solid var(--ink); }
+.fp-lu:last-child{ border-bottom:0; }
+.fp-lu-n{ font:800 15px var(--font-mono); color:var(--accent); width:30px; flex:none; }
+.fp-lu-face{ width:52px; height:52px; border:3px solid var(--ink); flex:none; background-size:cover; background-position:center; }
+.fp-lu-tx{ flex:1; min-width:0; cursor:pointer; }
+.fp-lu-nm{ font:800 21px var(--head); text-transform:uppercase; letter-spacing:-0.03em; }
+.fp-lu-why{ font:600 12px var(--font-mono); color:var(--muted); margin-top:3px; }
+.fp-lu-tag{ background:var(--acid); border:2px solid var(--ink); font:800 10px var(--font-mono); letter-spacing:.1em; text-transform:uppercase; padding:4px 7px; flex:none; }
+.fp-lu-tag.mid{ background:var(--bg); }
+.fp-lu-pl{ width:40px; height:40px; border:3px solid var(--ink); background:var(--bg); font-size:14px; cursor:pointer; flex:none; }
+.fp-lu-pl:hover{ background:var(--ink); color:var(--acid); }
+/* location */
+.fp-ev-loc{ display:grid; grid-template-columns:1fr 380px; }
+@media(max-width:720px){ .fp-ev-loc{ grid-template-columns:1fr; } }
+.fp-ev-loc-l{ padding:18px; border-right:3px solid var(--ink); }
+@media(max-width:720px){ .fp-ev-loc-l{ border-right:0; border-bottom:3px solid var(--ink); } }
+.fp-ev-loc-v{ display:flex; align-items:center; gap:14px; margin-bottom:8px; flex-wrap:wrap; }
+.fp-ev-loc-v b{ font:800 24px var(--head); text-transform:uppercase; letter-spacing:-0.03em; }
+.fp-ev-follow{ border:3px solid var(--ink); background:var(--bg); font:800 11px var(--head); letter-spacing:.06em; text-transform:uppercase; padding:9px 14px; cursor:pointer; }
+.fp-ev-follow.on{ background:var(--accent); color:var(--accent-ink); } .fp-ev-follow:hover{ background:var(--ink); color:var(--acid); }
+.fp-ev-addr{ font:700 12px var(--font-mono); letter-spacing:.06em; text-transform:uppercase; color:var(--muted); margin-bottom:10px; }
+.fp-ev-dir{ font:800 12px var(--head); letter-spacing:.06em; text-transform:uppercase; color:var(--accent); cursor:pointer; text-decoration:none; }
+.fp-ev-map{ min-height:190px; background:repeating-linear-gradient(45deg,transparent,transparent 7px,rgba(17,16,20,.12) 7px,rgba(17,16,20,.12) 8px); }
+.fp-ev-map .leaflet-container{ height:100%; min-height:190px; }
+/* also-on cells */
+.fp-ao{ display:grid; grid-template-columns:repeat(3,1fr); }
+@media(max-width:620px){ .fp-ao{ grid-template-columns:1fr; } }
+.fp-ao-cell{ border-right:3px solid var(--ink); padding:14px 16px; cursor:pointer; }
+.fp-ao-cell:last-child{ border-right:0; } .fp-ao-cell:hover{ background:var(--acid); }
+.fp-ao-when{ font:800 11px var(--font-mono); letter-spacing:.1em; text-transform:uppercase; color:var(--accent); }
+.fp-ao-t{ font:800 17px var(--head); text-transform:uppercase; letter-spacing:-0.03em; margin:6px 0 3px; }
+.fp-ao-w{ font:700 11px var(--font-mono); letter-spacing:.06em; text-transform:uppercase; color:var(--muted); }
+.fp-morev{ display:block; width:100%; margin-top:26px; border:3px solid var(--ink); background:var(--ink); color:var(--bg); font:800 15px var(--head); letter-spacing:.04em; text-transform:uppercase; padding:16px; cursor:pointer; text-align:center; }
+.fp-morev:hover{ color:var(--acid); }
+
 </style>
-<meta name="sc-build" content="flyposter-1783115106311">
+<meta name="sc-build" content="flyposter-1783115464510">
 <meta name="robots" content="noindex">
 </head>
 <body>
@@ -7808,6 +7866,118 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
         }).catch(function(){ render(fallback); });
       }
     }catch(_){ openPanel('<div class="empty">Couldn&rsquo;t load that artist.</div>'); }
+  };
+
+  // ── EVENT ───────────────────────────────────────────────────────────────
+  window.openEvent = async function(id){
+    id = (typeof eventIdOf==='function') ? eventIdOf(id) : id;
+    if (typeof trackView==='function') trackView('event', id);
+    if (((currentRoute().match(/^e\/(\d+)/)||[])[1])!==id) setRoute('e/'+id);
+    openPanel(pageSkeleton());
+    try{
+      var r = await authedFetch('/api/event?id='+encodeURIComponent(id));
+      if (!r.ok) throw 0;
+      var ev = mapEventDetail(await r.json());
+      if (((currentRoute().match(/^e\/(\d+)/)||[])[1])!==id) return;
+      var _who = ev.title || ((ev.artists||[])[0]||{}).name || '';
+      history.replaceState({sc:1},'', SC_BASE+eventPath(id,_who,ev.venue)+'/');
+
+      var today = (typeof todayISO==='function') ? todayISO() : '0000';
+      var isPast = ev.event_date && String(ev.event_date).slice(0,10) < today;
+      var when = [(ev._day||(ev.event_date?fmtDateLabel(String(ev.event_date).slice(0,10)):'')), formatTimeRange(ev.startTime,ev.endTime,ev._time)].filter(Boolean).join(' · ');
+      var price = (typeof formatPrice==='function') ? formatPrice(ev.minPrice, ev.maxPrice, ev.currency) : '';
+      var posterBg = ev.poster ? 'background-image:url('+imgUrl(ev.poster,1000)+')' : 'background:linear-gradient(150deg,#ff5a45,#8438ff)';
+      var stamp = (typeof isPickVenue==='function' && isPickVenue(ev.venue)) ? '<div class="fp-ev-stamp">Pick</div>' : '';
+      var blurb = ev.content || ev.description || '';
+      var evPicked = (typeof isEventPicked==='function' && isEventPicked(id));
+
+      var h = '<div class="fp-event">'
+        + '<div class="fp-ev-hero">'
+          + '<div class="fp-ev-pcol"><div class="fp-ev-poster" style="'+posterBg+'">'+stamp+(price?'<div class="fp-ev-price">'+E(price)+'</div>':'')+'</div></div>'
+          + '<div class="fp-ev-main">'
+            + '<div class="fp-kick">'+E(when)+'</div>'
+            + '<h1 class="fp-ev-title">'+E(ev.title||'Event')+'</h1>'
+            + '<div class="fp-ev-venue">at <button class="venue-link" type="button" data-venue="'+E(ev.venue||'')+'">'+E(ev.venue||'TBA')+'</button></div>'
+            + '<div class="fp-ev-meta">'+[ev.city?cityLabel(ev.city):'', (ev.genres||[]).slice(0,3).join(' / ')].filter(Boolean).map(E).join(' · ')+'</div>'
+            + '<div class="fp-ev-playbar">'
+              + ((ev.artists||[]).length?'<button class="fp-pb go" id="fp-ev-play" type="button">▶ Play the bill</button>':'')
+              + (isPast?'':'<button class="fp-pb'+(evPicked?' on':'')+'" id="fp-ev-save" type="button">'+(evPicked?'Saved':'Save')+'</button>')
+              + (isPast?'':'<a class="fp-pb" href="https://www.google.com/search?q='+encodeURIComponent((ev.title||'')+' tickets')+'" target="_blank" rel="noopener">Tickets ↗</a>')
+              + '<button class="fp-pb" id="fp-ev-share" type="button">Share</button>'
+            + '</div>'
+            + ((ev.genres||[]).length?'<div class="fp-ev-gline">'+(ev.genres||[]).slice(0,4).map(function(g){ return '<span class="fp-ev-gtag">'+E(g)+'</span>'; }).join('')+'</div>':'')
+            + (blurb?'<p class="fp-ev-blurb">'+E(blurb)+'</p>':'')
+          + '</div>'
+        + '</div>'
+        + '<div class="fp-sec"><div class="fp-sech">Lineup <span>'+(ev.artists||[]).length+' acts · plays as one queue</span></div><div id="fp-lineup"></div></div>';
+
+      if (ev.venueLat!=null && ev.venueLng!=null){
+        h += '<div class="fp-sec"><div class="fp-sech">Location <span>'+E((ev.venueAddress||'').split(',').pop().trim())+'</span></div>'
+          + '<div class="fp-ev-loc"><div class="fp-ev-loc-l">'
+            + '<div class="fp-ev-loc-v"><b>'+E(ev.venue||'Venue')+'</b>'+(ev.venue_slug?'<button class="fp-ev-follow'+(ev.venueFollowing?' on':'')+'" id="fp-ev-follow" type="button">'+(ev.venueFollowing?'Following':'+ Follow venue')+'</button>':'')+'</div>'
+            + (ev.venueAddress?'<div class="fp-ev-addr">'+E(ev.venueAddress)+'</div>':'')
+            + '<a class="fp-ev-dir" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query='+ev.venueLat+','+ev.venueLng+'">Directions →</a>'
+            + '</div><div class="fp-ev-map" id="fp-ev-map"></div></div></div>';
+      }
+      if ((ev.alsoOn||[]).length){
+        h += '<div class="fp-sec"><div class="fp-sech">Also on that night <span>same city · same date</span></div><div class="fp-ao">'
+          + ev.alsoOn.slice(0,3).map(function(g){ var t=(typeof formatTimeRange==='function')?formatTimeRange(g.start_time,g.end_time,''):''; return '<div class="fp-ao-cell" data-ev="'+E(String(g.id))+'"><div class="fp-ao-when">'+E(t||fmtDateLabel(String(g.event_date).slice(0,10)))+'</div><div class="fp-ao-t">'+E(g.title||'Event')+'</div><div class="fp-ao-w">'+E(g.venue||'')+'</div></div>'; }).join('')
+          + '</div></div>';
+      }
+      if (ev.venue) h += '<button class="fp-morev venue-link" type="button" data-venue="'+E(ev.venue)+'">More nights at '+E(ev.venue)+' →</button>';
+      h += '</div>';
+      openPanel(h);
+
+      var _canon = location.origin+SC_BASE+eventPath(id,_who,ev.venue)+'/';
+      if (typeof setSeo==='function') setSeo((ev.title||'Event')+' · '+(ev.venue||'')+' | soundcheck', ev.description||'', null, _canon);
+      if (typeof armEventSticky==='function') armEventSticky(ev.title||'');
+
+      var save = document.getElementById('fp-ev-save');
+      if (save) save.addEventListener('click', function(){ if(typeof toggleEvent==='function') toggleEvent(id,{title:ev.title,venue:ev.venue,day:ev._day}); save.classList.toggle('on'); save.innerHTML=(save.classList.contains('on')?'Saved':'Save'); });
+      var shr = document.getElementById('fp-ev-share');
+      if (shr) shr.addEventListener('click', function(){ if(typeof shareEvent==='function') shareEvent(id, ev.title, ev.venue); else share(_canon, ev.title); });
+      var fol = document.getElementById('fp-ev-follow');
+      if (fol) fol.addEventListener('click', function(){ if(typeof toggleVenueFollow==='function') toggleVenueFollow({slug:ev.venue_slug,name:ev.venue,following:ev.venueFollowing}, fol); });
+      document.querySelectorAll('#page-body .fp-ao-cell[data-ev]').forEach(function(c){ c.addEventListener('click', function(){ openEvent(c.dataset.ev); }); });
+
+      if (ev.venueLat!=null && ev.venueLng!=null && typeof loadLeaflet==='function'){
+        loadLeaflet(function(){
+          var el=document.getElementById('fp-ev-map'); if(!el||currentRoute().indexOf('e/')!==0) return;
+          try{
+            var map=L.map(el,{scrollWheelZoom:false}).setView([ev.venueLat,ev.venueLng],15);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{ subdomains:'abcd', maxZoom:19 }).addTo(map);
+            L.circleMarker([ev.venueLat,ev.venueLng],{ radius:9, color:'#111014', weight:3, fillColor:'#ff5a45', fillOpacity:1 }).addTo(map);
+            setTimeout(function(){ map.invalidateSize(); },120);
+          }catch(_){}
+        });
+      }
+
+      // lineup — instant from ev.artists, then upgraded to the ranked bill
+      var lineupBox = document.getElementById('fp-lineup');
+      var imgBy={}; (ev.artists||[]).forEach(function(a){ var s=(a.contentUrl||'').split('/').filter(Boolean).pop(); if(s) imgBy[s]=a.image; });
+      function renderLineup(items){
+        if(!lineupBox) return;
+        if(!items.length){ lineupBox.innerHTML='<div style="padding:14px 16px;color:var(--muted);font:600 13px var(--font-mono)">To be announced.</div>'; return; }
+        lineupBox.innerHTML = items.map(function(a,i){
+          var face = a.image?'background-image:url('+imgUrl(a.image,120)+')':'';
+          var badge = a.tier?'<span class="fp-lu-tag'+(a.tier==='Do not miss'?'':' mid')+'">'+E(a.tier)+'</span>':'';
+          var why = a.reason?'<div class="fp-lu-why">'+E(a.reason)+'</div>':'';
+          return '<div class="fp-lu"><div class="fp-lu-n">'+String(i+1).padStart(2,'0')+'</div><div class="fp-lu-face" style="'+face+'"></div><div class="fp-lu-tx" data-artist="'+E(a.slug||'')+'"><div class="fp-lu-nm">'+E(a.name)+'</div>'+why+'</div>'+badge+'<button class="fp-lu-pl" type="button" data-i="'+i+'">▶</button></div>';
+        }).join('');
+        var lq = items.map(function(a){ return { slug:a.slug, name:a.name, poster:a.image }; }).filter(function(x){ return x.slug; });
+        lineupBox.querySelectorAll('.fp-lu-tx[data-artist]').forEach(function(t){ t.addEventListener('click', function(){ if(t.dataset.artist) openArtist(t.dataset.artist); }); });
+        lineupBox.querySelectorAll('.fp-lu-pl[data-i]').forEach(function(b){ b.addEventListener('click', function(){ if(lq.length) playYtList(lq, +b.dataset.i); }); });
+        var pb=document.getElementById('fp-ev-play'); if(pb && lq.length) pb.onclick=function(){ playYtList(lq,0); };
+      }
+      var instant = (ev.artists||[]).map(function(a){ var s=(a.contentUrl||'').split('/').filter(Boolean).pop(); return { slug:s, name:a.name, image:a.image }; }).filter(function(x){ return x.name; });
+      renderLineup(instant);
+      if (!isPast && instant.length>=2){
+        authedFetch('/api/event/lineup?id='+encodeURIComponent(id)).then(function(r){ return r.json(); }).then(function(j){
+          if(!j) return; var ranked=(j.highlights||[]).concat(j.more||[]); if(!ranked.length) return;
+          renderLineup(ranked.map(function(t){ return { slug:t.slug, name:t.name, image:imgBy[t.slug], tier:t.tier||null, reason:t.reason||null }; }));
+        }).catch(function(){});
+      }
+    }catch(_){ openPanel('<div class="empty">Couldn&rsquo;t load that event.</div>'); }
   };
 
 })();
