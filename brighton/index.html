@@ -2642,8 +2642,49 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
 .fp-morev{ display:block; width:100%; margin-top:26px; border:3px solid var(--ink); background:var(--ink); color:var(--bg); font:800 15px var(--head); letter-spacing:.04em; text-transform:uppercase; padding:16px; cursor:pointer; text-align:center; }
 .fp-morev:hover{ color:var(--acid); }
 
+/* ── PROFILE — membership card + stat strip (top); sections reuse the app fills ── */
+.fp-card{ display:grid; grid-template-columns:190px 1fr 300px; border:3px solid var(--ink); background:var(--bg); }
+@media(max-width:760px){ .fp-card{ grid-template-columns:1fr; } }
+.fp-card-av{ position:relative; border-right:3px solid var(--ink); aspect-ratio:1; background-size:cover; background-position:center; }
+@media(max-width:760px){ .fp-card-av{ border-right:0; border-bottom:3px solid var(--ink); aspect-ratio:16/10; } }
+.fp-card-av::after{ content:"MEMBER"; position:absolute; left:-3px; bottom:-3px; background:var(--acid); border:3px solid var(--ink); font:800 10px var(--head); letter-spacing:.1em; padding:5px 9px; }
+.fp-card-id{ padding:22px 26px; min-width:0; }
+.fp-card-kick{ font:700 12px var(--font-mono); letter-spacing:.14em; text-transform:uppercase; color:var(--accent); }
+.fp-card-h{ font:800 clamp(38px,5vw,58px)/0.9 var(--head); letter-spacing:-0.045em; text-transform:uppercase; margin:10px 0 6px; word-break:break-word; }
+.fp-card-since{ font:700 12px var(--font-mono); letter-spacing:.1em; text-transform:uppercase; color:var(--muted); }
+.fp-card-since b{ background:var(--ink); color:var(--acid); padding:1px 6px; }
+.fp-card-r{ border-left:3px solid var(--ink); display:flex; flex-direction:column; }
+@media(max-width:760px){ .fp-card-r{ border-left:0; border-top:3px solid var(--ink); } }
+.fp-card-qr{ flex:1; display:flex; align-items:center; justify-content:center; border-bottom:3px solid var(--ink); min-height:130px; background:repeating-linear-gradient(90deg,transparent,transparent 4px,rgba(17,16,20,.6) 4px,rgba(17,16,20,.6) 6px); }
+.fp-card-qr span{ background:var(--bg); border:3px solid var(--ink); font:800 10px var(--font-mono); letter-spacing:.14em; text-transform:uppercase; padding:7px 10px; }
+.fp-card-btns{ display:flex; }
+.fp-card-btns .pf-btn{ flex:1; border:0!important; border-right:3px solid var(--ink)!important; background:var(--ink)!important; color:var(--acid)!important; border-radius:0; height:auto; padding:14px 0; margin:0; }
+.fp-card-btns .pf-btn:last-child{ border-right:0!important; background:var(--bg)!important; color:var(--ink)!important; }
+.fp-card-btns .pf-btn:hover{ background:var(--accent)!important; color:var(--accent-ink)!important; }
+.fp-card-btns .pf-btn.primary.follow{ background:var(--accent)!important; color:var(--accent-ink)!important; }
+.fp-stats{ display:grid; grid-template-columns:repeat(4,1fr); border:3px solid var(--ink); border-top:0; margin-bottom:8px; }
+@media(max-width:620px){ .fp-stats{ grid-template-columns:repeat(2,1fr); } }
+.fp-stat{ border-right:3px solid var(--ink); padding:14px 18px; }
+.fp-stat:last-child{ border-right:0; }
+@media(max-width:620px){ .fp-stat:nth-child(2n){ border-right:0; } .fp-stat:nth-child(1),.fp-stat:nth-child(2){ border-bottom:3px solid var(--ink); } }
+.fp-stat b{ display:block; font:800 34px var(--head); letter-spacing:-0.04em; }
+.fp-stat span{ font:800 10px var(--font-mono); letter-spacing:.16em; text-transform:uppercase; color:var(--muted); }
+
+/* ── HOME card: CTA-cell footer (PLAY THE BILL / SAVE), keeps evc hooks ── */
+.gcard.evc.fp-c{ display:flex; flex-direction:column; }
+.fp-c .evc-body{ padding:14px 13px 12px; }
+/* the sole play button now lives in the footer as a full-width cell (not the overlay FAB) */
+.fp-c-cta .evc-play.fp-c-play{ position:static; width:auto; height:auto; border-radius:0; box-shadow:none; }
+.fp-c-cta{ display:flex; border-top:3px solid var(--ink); margin-top:auto; }
+.fp-c-cta button{ flex:1; border:0; border-right:3px solid var(--ink); background:var(--bg); color:var(--ink); font:800 12px var(--head); letter-spacing:.05em; text-transform:uppercase; padding:12px 6px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:6px; }
+.fp-c-cta button:last-child{ border-right:0; }
+.fp-c-cta .fp-c-play{ flex:1.5; background:var(--ink); color:var(--acid); }
+.fp-c-cta button:hover{ background:var(--accent); color:var(--accent-ink); }
+.fp-c-cta .heart.on{ background:var(--accent); color:var(--accent-ink); }
+.fp-c-cta .heart svg{ display:none; }                   /* text-only cell */
+
 </style>
-<meta name="sc-build" content="flyposter-1783115464510">
+<meta name="sc-build" content="flyposter-1783115944643">
 <meta name="robots" content="noindex">
 </head>
 <body>
@@ -7979,6 +8020,86 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
       }
     }catch(_){ openPanel('<div class="empty">Couldn&rsquo;t load that event.</div>'); }
   };
+
+  // ── PROFILE ─────────────────────────────────────────────────────────────
+  // Override just the TOP (membership card + stat strip). The section boxes keep
+  // their original ids (pf-diary/pf-seen/pf-wanna/pf-venues/pf-coming) + button ids
+  // (pb-share/pb-edit/follow-btn), so the UNCHANGED wirePbProfile fills + wires them.
+  if (typeof pbProfileHTML === 'function'){
+    window.pbProfileHTML = function(p){
+      var isMe=p.isMe, s=p.shelves||{}, st=p.stats||{};
+      var nights=st.gigs||(p.diary||[]).length||0, fol=p.followers||0;
+      var acts = isMe
+        ? '<button class="pf-btn" id="pb-share" type="button">Share card</button><button class="pf-btn" id="pb-edit" type="button">Settings</button>'
+        : '<button class="pf-btn primary follow'+(p.isFollowing?' following':'')+'" id="follow-btn" type="button" data-handle="'+E(p.handle)+'">'+(p.isFollowing?'Following':'Follow')+'</button><button class="pf-btn" id="pb-share" type="button">Share</button>';
+      var card = '<div class="fp-card">'
+        + '<div class="fp-card-av" style="background-image:'+((typeof avatarBg==='function')?avatarBg(p.handle,p.avatar):'')+'"></div>'
+        + '<div class="fp-card-id">'
+          + '<div class="fp-card-kick">Scene passport'+(st.homeCity?' · '+E(cityLabel(st.homeCity)):'')+'</div>'
+          + '<div class="fp-card-h">'+E(p.displayName||('u/'+p.handle))+'</div>'
+          + '<div class="fp-card-since">'+(st.homeCity?'Home city <b>'+E(cityLabel(st.homeCity))+'</b>':'Member on soundcheck')+'</div>'
+        + '</div>'
+        + '<div class="fp-card-r"><div class="fp-card-qr"><span>Scan to join ▒▒▒</span></div><div class="fp-card-btns">'+acts+'</div></div>'
+      + '</div>';
+      var stats = '<div class="fp-stats">'
+        + '<div class="fp-stat"><b>'+((s.seen||[]).length)+'</b><span>Seen live</span></div>'
+        + '<div class="fp-stat"><b>'+((s.wannaSee||[]).length)+'</b><span>Wanna see</span></div>'
+        + '<div class="fp-stat"><b>'+nights+'</b><span>Gigs logged</span></div>'
+        + '<div class="fp-stat"><b>'+fol+'</b><span>Followers</span></div>'
+      + '</div>';
+      return '<div class="pf">' + card + stats
+        + ((typeof pbRotationHTML==='function') ? pbRotationHTML(p) : '')
+        + '<div class="pf-cols">'
+          + '<div class="pf-box" id="pf-diary"></div>'
+          + ((typeof pfComingHTML==='function') ? pfComingHTML(p) : '')
+          + '<div class="pf-box" id="pf-seen"></div>'
+          + '<div class="pf-box" id="pf-wanna"></div>'
+          + '<div class="pf-box" id="pf-venues"></div>'
+          + '<div class="pf-box" id="pf-events"></div>'
+        + '</div>'
+      + '</div>';
+    };
+  }
+
+  // ── HOME CARD ───────────────────────────────────────────────────────────
+  // Poster card with a PLAY THE BILL / SAVE cell footer. Keeps the .evc-poster /
+  // .evc-play / .evc-chip / .heart[data-pick-evt] hooks so wireEvcCards + the
+  // delegated save handler wire it with no changes. (cardHTML is shared, so this
+  // footer also lands on artist-upcoming / venue / search grids — consistent.)
+  if (typeof cardHTML === 'function'){
+    window.cardHTML = function(ev){
+      var eid = ev.id!=null?String(ev.id):'';
+      var arts = ev.artists||[];
+      var isTon = (typeof currentDate!=='undefined') && currentDate===(typeof todayISO==='function'?todayISO():'');
+      var dayLab = ev._day || (isTon ? 'Tonight' : '');
+      var tRange = (typeof formatTimeRange==='function') ? formatTimeRange(ev.startTime, ev.endTime, ev._time) : '';
+      var mWhen = [dayLab, tRange].filter(Boolean).join(' · ');
+      var mWhere = [ev.venue||'TBA', ev._city||''].filter(Boolean).map(E).join(' · ');
+      var CAP=4, nShow=arts.length>CAP?CAP-1:arts.length, chips='';
+      arts.slice(0,nShow).forEach(function(a){
+        var slug = a.contentUrl?a.contentUrl.split('/').filter(Boolean).pop():'';
+        chips += '<button class="evc-chip" type="button"'+(slug?' data-slug="'+E(slug)+'"':'')+'><span class="evc-tri"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span><span class="evc-nm">'+E(a.name)+'</span></button>';
+      });
+      if (arts.length>nShow) chips += '<button class="evc-chip more" type="button" data-more><span class="evc-nm">+'+(arts.length-nShow)+' more</span></button>';
+      var picked = eid && (typeof isEventPicked==='function' && isEventPicked(eid)) ? ' on' : '';
+      var gtags = (ev.genres||[]).slice(0,2);
+      var genreOv = gtags.length ? '<div class="evc-genres">'+gtags.map(function(g){ return '<span class="evc-gtag">'+E(g)+'</span>'; }).join('')+'</div>' : '';
+      var canPlay = eid && arts.length;
+      var bmk = (typeof BOOKMARK_SVG!=='undefined')?BOOKMARK_SVG:'';
+      return '<article class="gcard evc fp-c"'+(eid?' data-evt="'+E(eid)+'"':'')+'>'
+        + '<div class="evc-hero">'
+          + '<button class="evc-poster" type="button" aria-label="View '+E(ev.title)+'">'+((typeof posterHTML==='function')?posterHTML(ev):'')+'</button>'
+          + genreOv
+          + '<div class="evc-title">'+E(ev.title)+'</div>'
+        + '</div>'
+        + '<div class="evc-body">'+(mWhen?'<div class="evc-meta"><span class="evc-mrow evc-mwhen">'+mWhen+'</span><span class="evc-mrow evc-mwhere">'+mWhere+'</span></div>':'')+'<div class="evc-chips">'+chips+'</div></div>'
+        + '<div class="fp-c-cta">'
+          + (canPlay?'<button class="evc-play fp-c-play" type="button" aria-label="Play the line-up">▶ Play the bill</button>':'')
+          + (eid?'<button class="heart'+picked+'" type="button" data-pick-evt="'+E(eid)+'" data-title="'+E(ev.title||'')+'" data-venue="'+E(ev.venue||'')+'" data-day="'+E(ev._day||'')+'" aria-label="Save this event">Save</button>':'')
+        + '</div>'
+      + '</article>';
+    };
+  }
 
 })();
 
