@@ -2848,7 +2848,7 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
 .pb-rot-title{ text-transform:uppercase; }
 
 </style>
-<meta name="sc-build" content="flyposter-1783168245785">
+<meta name="sc-build" content="flyposter-1783176816650">
 <meta name="robots" content="noindex">
 </head>
 <body>
@@ -4083,9 +4083,9 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
       var k=CSS.escape(slug), st=artStatus(slug);
       document.querySelectorAll('.heart[data-pick-art="'+k+'"]').forEach(function(b){ var on=st==='wanna_see'; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on?'true':'false'); });
       document.querySelectorAll('.seen-btn[data-seen-art="'+k+'"]').forEach(function(b){ b.classList.toggle('on', st==='seen'); });
-      // artist-page action buttons (immediate optimistic state, no re-render)
-      document.querySelectorAll('.act-btn[data-ap-wanna="'+k+'"]').forEach(function(b){ var on=st==='wanna_see'; b.classList.toggle('on',on); b.setAttribute('aria-pressed',on?'true':'false'); });
-      document.querySelectorAll('.act-btn[data-ap-seen="'+k+'"]').forEach(function(b){ var on=st==='seen'; b.classList.toggle('on',on); b.setAttribute('aria-pressed',on?'true':'false'); });
+      // artist-page action buttons (immediate optimistic state, no re-render) — class-agnostic so it matches both .act-btn and the bespoke .fp-ab buttons
+      document.querySelectorAll('[data-ap-wanna="'+k+'"]').forEach(function(b){ var on=st==='wanna_see'; b.classList.toggle('on',on); b.setAttribute('aria-pressed',on?'true':'false'); });
+      document.querySelectorAll('[data-ap-seen="'+k+'"]').forEach(function(b){ var on=st==='seen'; b.classList.toggle('on',on); b.setAttribute('aria-pressed',on?'true':'false'); });
     }
     function refreshEventButtons(id){
       var k=CSS.escape(id), on=isEventPicked(id);
