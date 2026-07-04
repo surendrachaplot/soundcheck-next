@@ -2848,7 +2848,7 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
 .pb-rot-title{ text-transform:uppercase; }
 
 </style>
-<meta name="sc-build" content="flyposter-1783166221022">
+<meta name="sc-build" content="flyposter-1783167973836">
 <meta name="robots" content="noindex">
 </head>
 <body>
@@ -6133,11 +6133,8 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
           h+='<div class="fp-sec"><div class="fp-sech">Past sets <span>logged by the scene</span></div>'+
             a.history.map(function(g){ var d=fmtDateLabel(String(g.event_date).slice(0,10)); var sub=[(g.title&&g.venue)?g.venue:'', cityLabel(g.city)].filter(Boolean).join(' · '); return '<div class="fp-row" data-ev="'+esc(String(g.id))+'"><b>'+esc(g.title||g.venue||'Set')+'</b><span class="fp-y">'+esc(d)+(sub?' · '+esc(sub):'')+'</span></div>'; }).join('')+'</div>';
         }
-        if((a.alongside||[]).length){
-          h+='<div class="fp-sec"><div class="fp-sech">Plays alongside <span>shares bills with</span></div><div class="fp-more">'+
-            a.alongside.slice(0,6).map(function(x){ var bg=x.image_url?('url('+imgUrl(x.image_url,300)+')'):avatarBg(x.slug,null); return '<div class="fp-mk" data-artist="'+esc(x.slug)+'"><div class="fp-mph" style="background:'+bg+';background-size:cover;background-position:center"></div><i>'+esc(x.name)+'</i><s>shared bills</s></div>'; }).join('')+'</div></div>';
-        }
-        if((a.alongside||[]).length) h+='<div class="fp-sec"><div class="fp-sech">More like '+esc(a.name||slug)+' <span>same lane · next dates</span></div><div class="fp-more" id="fp-morelike"></div></div>';
+        // "More like X" = similar-sound artists + the ones who share bills, merged into one rail.
+        if((a.alongside||[]).length) h+='<div class="fp-sec"><div class="fp-sech">More like '+esc(a.name||slug)+' <span>similar sound · shares bills</span></div><div class="fp-more" id="fp-morelike"></div></div>';
         h+='</div>';
         openPanel(h);
         var _acanon=location.origin+SC_BASE+'dj/'+slug+'/';
@@ -6168,12 +6165,12 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
         document.querySelectorAll('#page-body .fp-pl[data-play]').forEach(function(pl){ var g=up.filter(function(x){ return String(x.id)===pl.dataset.play; })[0]; var q=(g&&g.lineup||[]).map(function(x){ return { slug:x.slug, name:x.name, poster:g.poster_url }; }).filter(function(x){ return x.slug; }); pl.addEventListener('click',function(e){ e.stopPropagation(); if(q.length) playYtList(q,0); else openEvent(pl.dataset.play); }); });
         document.querySelectorAll('#page-body .fp-row[data-ev]').forEach(function(row){ row.addEventListener('click',function(){ openEvent(row.dataset.ev); }); });
         document.querySelectorAll('#page-body .fp-row[data-artist]').forEach(function(row){ row.addEventListener('click',function(){ openArtist(row.dataset.artist); }); });
-        document.querySelectorAll('#page-body .fp-more .fp-mk[data-artist]').forEach(function(t){ t.addEventListener('click',function(){ openArtist(t.dataset.artist); }); });   // Plays-alongside rail (More-like wires itself async)
         (function(){
           var rail=document.getElementById('fp-morelike'); if(!rail) return;
-          var fallback=(a.alongside||[]).map(function(x){ return { slug:x.slug, name:x.name, image:x.image_url }; });
-          var render=function(list){ if(!list.length){ var s=rail.closest('.fp-sec'); if(s) s.style.display='none'; return; } rail.innerHTML=list.slice(0,6).map(function(x){ var nd=x.nextDate?fmtDateLabel(String(x.nextDate).slice(0,10)):''; var sub=[nd, x.nextCity?cityLabel(x.nextCity):''].filter(Boolean).join(' · ')||'archive sets'; var bg=x.image?('url('+imgUrl(x.image,300)+')'):avatarBg(x.slug,null); return '<div class="fp-mk" data-artist="'+esc(x.slug)+'"><div class="fp-mph" style="background:'+bg+';background-size:cover;background-position:center"></div><i>'+esc(x.name)+'</i><s>'+esc(sub)+'</s></div>'; }).join(''); rail.querySelectorAll('.fp-mk[data-artist]').forEach(function(t){ t.addEventListener('click',function(){ openArtist(t.dataset.artist); }); }); };
-          authedFetch('/api/artist/similar?slug='+encodeURIComponent(slug)).then(function(r){ return r.json(); }).then(function(j){ var sim=(j&&j.similar)||[]; render(sim.length?sim.map(function(s){ return { slug:s.slug, name:s.name, image:s.image, nextDate:(s.next&&s.next.event_date)||null, nextCity:(s.next&&s.next.city)||null }; }):fallback); }).catch(function(){ render(fallback); });
+          var alongsideList=(a.alongside||[]).map(function(x){ return { slug:x.slug, name:x.name, image:x.image_url, shares:true }; });
+          var merge=function(sim){ var out=[], seen={}; sim.concat(alongsideList).forEach(function(x){ if(!x||!x.slug||seen[x.slug]) return; seen[x.slug]=1; out.push(x); }); return out; };   // similar first (keeps their next-date), then shares-bills artists; dedup by slug
+          var render=function(list){ if(!list.length){ var s=rail.closest('.fp-sec'); if(s) s.style.display='none'; return; } rail.innerHTML=list.slice(0,12).map(function(x){ var nd=x.nextDate?fmtDateLabel(String(x.nextDate).slice(0,10)):''; var sub=[nd, x.nextCity?cityLabel(x.nextCity):''].filter(Boolean).join(' · ')||(x.shares?'shares bills':'archive sets'); var bg=x.image?('url('+imgUrl(x.image,300)+')'):avatarBg(x.slug,null); return '<div class="fp-mk" data-artist="'+esc(x.slug)+'"><div class="fp-mph" style="background:'+bg+';background-size:cover;background-position:center"></div><i>'+esc(x.name)+'</i><s>'+esc(sub)+'</s></div>'; }).join(''); rail.querySelectorAll('.fp-mk[data-artist]').forEach(function(t){ t.addEventListener('click',function(){ openArtist(t.dataset.artist); }); }); };
+          authedFetch('/api/artist/similar?slug='+encodeURIComponent(slug)).then(function(r){ return r.json(); }).then(function(j){ var sim=((j&&j.similar)||[]).map(function(s){ return { slug:s.slug, name:s.name, image:s.image, nextDate:(s.next&&s.next.event_date)||null, nextCity:(s.next&&s.next.city)||null }; }); render(merge(sim)); }).catch(function(){ render(merge([])); });
         })();
       }catch(_){ openPanel('<div class="empty">Couldn’t load that artist.</div>'); }
     }
