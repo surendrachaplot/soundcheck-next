@@ -2460,9 +2460,11 @@
     .fp-hx{ padding:22px 24px; min-width:0; }
     .fp-kick{ font:600 12px var(--font-mono); letter-spacing:.1em; text-transform:uppercase; color:var(--accent); }
     .fp-kick .fp-foll{ background:var(--accent-weak); color:var(--accent); padding:2px 8px; border-radius:var(--radius-pill); margin-left:8px; white-space:nowrap; display:inline-block; }
-    .fp-h1{ font:800 clamp(34px,6.5vw,72px)/0.98 var(--head); letter-spacing:-0.03em; margin:10px 0 10px; overflow-wrap:break-word; }
-    .fp-bio{ font:400 15px/1.55 var(--body); color:var(--muted); max-width:56ch; margin:0 0 16px; }
+    .fp-namerow{ display:flex; align-items:flex-end; gap:6px 16px; flex-wrap:wrap; margin:10px 0 10px; }
+    .fp-h1{ font:800 clamp(34px,6.5vw,72px)/0.98 var(--head); letter-spacing:-0.03em; margin:0; overflow-wrap:break-word; }
+    .fp-bio{ font:400 15px/1.55 var(--body); color:var(--muted); max-width:none; margin:0 0 16px; }
     .fp-socials{ display:flex; gap:12px; margin-bottom:16px; align-items:center; }
+    .fp-namerow .fp-socials{ margin:0 0 6px; }
     .fp-gemline{ margin:0 0 14px; }
     .fp-acts{ display:flex; flex-wrap:wrap; gap:9px; }
     .fp-ab{ flex:1; min-width:120px; border:1px solid var(--border); border-radius:var(--radius); background:var(--surface-2); color:var(--fg); font:700 11px var(--body); letter-spacing:.05em; text-transform:uppercase; padding:0 14px; height:42px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:7px; transition:border-color .12s,background .12s; }
@@ -2471,7 +2473,8 @@
     .fp-ab.on{ background:var(--surface-2); color:var(--accent); border-color:var(--accent); }
     .fp-ab:hover{ border-color:var(--accent); }
     /* tour-dates table */
-    .fp-tr{ display:grid; grid-template-columns:110px minmax(0,1fr) 220px 110px 52px; align-items:center; border-bottom:1px solid var(--line); cursor:pointer; transition:background .12s; }
+    .fp-tr{ display:grid; grid-template-columns:60px 96px minmax(0,1fr) 190px 96px 52px; align-items:center; border-bottom:1px solid var(--line); cursor:pointer; transition:background .12s; }
+    .fp-tp{ width:44px; height:44px; margin:0 auto; border-radius:var(--radius-sm); background-size:cover; background-position:center; background-color:var(--surface-3); }
     .fp-tr:last-child{ border-bottom:0; } .fp-tr:hover{ background:var(--surface-2); }
     .fp-td{ padding:13px 16px; min-width:0; overflow:hidden; text-overflow:ellipsis; }
     .fp-dt{ font:700 13px var(--font-mono); color:var(--accent); letter-spacing:.02em; }
@@ -2480,7 +2483,7 @@
     .fp-ct i{ font-style:normal; font:600 10px var(--font-mono); letter-spacing:.08em; text-transform:uppercase; background:var(--surface-2); border:1px solid var(--border); border-radius:var(--radius-pill); padding:3px 9px; color:var(--fg); }
     .fp-pl{ width:36px; height:36px; margin:0 auto; border:1px solid var(--border); border-radius:var(--radius-pill); background:var(--surface-2); color:var(--fg); font-size:13px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
     .fp-pl:hover{ background:var(--accent); color:var(--accent-ink); border-color:var(--accent); }
-    @media(max-width:620px){ .fp-tr{ grid-template-columns:82px minmax(0,1fr) 40px; } .fp-tr .fp-wv,.fp-tr .fp-ct{ display:none; } .fp-td{ padding:12px 10px; } .fp-dt{ font-size:12px; } .fp-ev{ font-size:15px; } }
+    @media(max-width:620px){ .fp-tr{ grid-template-columns:52px 76px minmax(0,1fr) 40px; } .fp-tr .fp-wv,.fp-tr .fp-ct{ display:none; } .fp-td{ padding:12px 10px; } .fp-dt{ font-size:12px; } .fp-ev{ font-size:15px; } .fp-tp{ width:40px; height:40px; } }
     /* more-like rail */
     .fp-more{ display:grid; grid-template-columns:repeat(auto-fill,minmax(120px,1fr)); gap:14px; padding:16px 18px; }
     .fp-mk{ cursor:pointer; }
@@ -2537,12 +2540,14 @@
     .fp-ev-follow.on{ background:var(--surface-2); color:var(--accent); border-color:var(--accent); } .fp-ev-follow:hover{ border-color:var(--accent); }
     .fp-ev-addr{ font:600 12px var(--font-mono); letter-spacing:.04em; text-transform:uppercase; color:var(--muted); margin-bottom:10px; }
     .fp-ev-dir{ font:700 12px var(--body); letter-spacing:.05em; text-transform:uppercase; color:var(--accent); cursor:pointer; text-decoration:none; }
-    .fp-ev-map{ min-height:200px; background:var(--surface-2); }
+    /* isolation:isolate traps Leaflet's high internal z-indexes so the player dock (z 60) sits on top — same fix as .venue-map */
+    .fp-ev-map{ min-height:200px; background:var(--surface-2); position:relative; z-index:0; isolation:isolate; }
     .fp-ev-map .leaflet-container{ height:100%; min-height:200px; }
     /* also-on */
     .fp-ao{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); }
     @media(max-width:620px){ .fp-ao{ grid-template-columns:minmax(0,1fr); } }
     .fp-ao-cell{ border-right:1px solid var(--border); padding:15px 18px; cursor:pointer; transition:background .12s; }
+    .fp-ao-poster{ aspect-ratio:16/10; border-radius:var(--radius-sm); background-size:cover; background-position:center; background-color:var(--surface-3); margin-bottom:11px; }
     .fp-ao-cell:last-child{ border-right:0; } .fp-ao-cell:hover{ background:var(--surface-2); }
     .fp-ao-when{ font:700 11px var(--font-mono); letter-spacing:.08em; text-transform:uppercase; color:var(--accent); }
     .fp-ao-t{ font:700 16px var(--head); letter-spacing:-0.01em; margin:6px 0 3px; }
@@ -2564,8 +2569,8 @@
     .fp-card-since b{ color:var(--accent); }
     .fp-card-r{ border-left:1px solid var(--border); display:flex; flex-direction:column; }
     @media(max-width:760px){ .fp-card-r{ border-left:0; border-top:1px solid var(--border); } }
-    .fp-card-qr{ flex:1; display:flex; align-items:center; justify-content:center; border-bottom:1px solid var(--border); min-height:120px; background:repeating-linear-gradient(90deg,var(--surface),var(--surface) 3px,var(--surface-3) 3px,var(--surface-3) 5px); }
-    .fp-card-qr span{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); font:600 10px var(--font-mono); letter-spacing:.12em; text-transform:uppercase; padding:7px 11px; color:var(--fg); }
+    .fp-card-qr{ flex:1; display:flex; align-items:center; justify-content:center; border-bottom:1px solid var(--border); min-height:120px; padding:18px; background:var(--surface-2); }
+    .fp-card-qr-img{ width:120px; max-width:100%; aspect-ratio:1; background:#fff; padding:8px; border-radius:var(--radius-sm); box-sizing:border-box; }
     .fp-card-btns{ display:flex; }
     .fp-card-btns .pf-btn{ flex:1; border:0!important; border-right:1px solid var(--border)!important; background:var(--surface-2)!important; color:var(--fg)!important; border-radius:0; height:auto; padding:14px 0; margin:0; }
     .fp-card-btns .pf-btn:last-child{ border-right:0!important; }
@@ -2843,7 +2848,7 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
 .pb-rot-title{ text-transform:uppercase; }
 
 </style>
-<meta name="sc-build" content="flyposter-1783165239920">
+<meta name="sc-build" content="flyposter-1783166221022">
 <meta name="robots" content="noindex">
 </head>
 <body>
@@ -5358,7 +5363,7 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
           '<div class="fp-card-h">'+esc(p.displayName||('u/'+p.handle))+'</div>'+
           '<div class="fp-card-since">'+(st.homeCity?'Home city <b>'+esc(cityLabel(st.homeCity))+'</b>':'Member on soundcheck')+'</div>'+
         '</div>'+
-        '<div class="fp-card-r"><div class="fp-card-qr"><span>Scan to join ▒▒▒</span></div><div class="fp-card-btns">'+acts+'</div></div>'+
+        '<div class="fp-card-r"><div class="fp-card-qr"><img class="fp-card-qr-img" src="'+API_BASE+'/api/qr?u='+encodeURIComponent(p.handle)+'" alt="Scan to follow @'+esc(p.handle)+'" loading="lazy"></div><div class="fp-card-btns">'+acts+'</div></div>'+
       '</div>';
       var stats = '<div class="fp-stats">'+
         '<div class="fp-stat"><b>'+((s.seen||[]).length)+'</b><span>Seen live</span></div>'+
@@ -6103,10 +6108,9 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
             '<div class="fp-photo">'+(a.image?img:'<span class="fp-press-gen" style="background:'+avatarBg(slug,null)+'"></span>')+(a.country?'<div class="fp-origin">'+esc(a.country)+'</div>':'')+'</div>'+
             '<div class="fp-hx">'+
               '<div class="fp-kick">'+kick+'</div>'+
-              '<h1 class="fp-h1">'+esc(a.name||slug)+'</h1>'+
+              '<div class="fp-namerow"><h1 class="fp-h1">'+esc(a.name||slug)+'</h1>'+(socials?'<div class="fp-socials">'+socials+'</div>':'')+'</div>'+
               (a.bio?'<p class="fp-bio">'+esc(a.bio)+'</p>':(a.description?'<p class="fp-bio">'+esc(a.description)+'</p>':''))+
               festLine+gemLine+
-              (socials?'<div class="fp-socials">'+socials+'</div>':'')+
               '<div class="fp-acts">'+
                 '<button class="fp-ab go" id="ap-radio" data-slug="'+esc(slug)+'" data-name="'+esc(a.name||slug)+'"'+(a.image?' data-poster="'+esc(a.image)+'"':'')+nextVenueAttr+' type="button">'+YT_SVG+'<span>Tune in</span></button>'+
                 '<button class="fp-ab" id="ap-sets" data-slug="'+esc(slug)+'" data-name="'+esc(a.name||slug)+'" type="button">'+setsSvg+'<span>Sets</span></button>'+
@@ -6118,22 +6122,21 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
           '<div id="ap-seen-panel"></div>';
         var up=a.upcoming||[];
         if(up.length){
-          h+='<div class="fp-sec"><div class="fp-sech">Tour dates <span>'+up.length+' upcoming · ▶ previews the sound</span></div>'+
+          h+='<div class="fp-sec"><div class="fp-sech">Upcoming events <span>'+up.length+' upcoming · ▶ previews the sound</span></div>'+
             up.map(function(g){ var d=fmtDateLabel(String(g.event_date).slice(0,10));
-              return '<div class="fp-tr" data-ev="'+esc(String(g.id))+'"><div class="fp-td fp-dt">'+esc(d)+'</div><div class="fp-td fp-ev">'+esc(g.title||g.venue||'Show')+'</div><div class="fp-td fp-wv">'+esc(g.venue||'')+'</div><div class="fp-td fp-ct">'+(g.city?'<i>'+esc(cityLabel(g.city))+'</i>':'')+'</div><button class="fp-pl" type="button" data-play="'+esc(String(g.id))+'" aria-label="Play the line-up">▶</button></div>';
+              var pbg=g.poster_url?('background-image:url('+imgUrl(g.poster_url,160)+')'):('background:'+avatarBg(String(g.id),null));
+              return '<div class="fp-tr" data-ev="'+esc(String(g.id))+'"><div class="fp-tp" style="'+pbg+'"></div><div class="fp-td fp-dt">'+esc(d)+'</div><div class="fp-td fp-ev">'+esc(g.title||g.venue||'Show')+'</div><div class="fp-td fp-wv">'+esc(g.venue||'')+'</div><div class="fp-td fp-ct">'+(g.city?'<i>'+esc(cityLabel(g.city))+'</i>':'')+'</div><button class="fp-pl" type="button" data-play="'+esc(String(g.id))+'" aria-label="Play the lineup">▶</button></div>';
             }).join('')+'</div>';
         }
-        var col1='';
+        // Past sets — full width; Plays alongside — a photo rail like "More like".
         if((a.history||[]).length){
-          col1='<div class="fp-sec"><div class="fp-sech">Past sets <span>logged by the scene</span></div>'+
+          h+='<div class="fp-sec"><div class="fp-sech">Past sets <span>logged by the scene</span></div>'+
             a.history.map(function(g){ var d=fmtDateLabel(String(g.event_date).slice(0,10)); var sub=[(g.title&&g.venue)?g.venue:'', cityLabel(g.city)].filter(Boolean).join(' · '); return '<div class="fp-row" data-ev="'+esc(String(g.id))+'"><b>'+esc(g.title||g.venue||'Set')+'</b><span class="fp-y">'+esc(d)+(sub?' · '+esc(sub):'')+'</span></div>'; }).join('')+'</div>';
         }
-        var col2='';
         if((a.alongside||[]).length){
-          col2='<div class="fp-sec"><div class="fp-sech">Plays alongside <span>from real bills</span></div>'+
-            a.alongside.slice(0,6).map(function(x){ return '<div class="fp-row" data-artist="'+esc(x.slug)+'"><b>'+esc(x.name)+'</b><span class="fp-y">shared bills</span></div>'; }).join('')+'</div>';
+          h+='<div class="fp-sec"><div class="fp-sech">Plays alongside <span>shares bills with</span></div><div class="fp-more">'+
+            a.alongside.slice(0,6).map(function(x){ var bg=x.image_url?('url('+imgUrl(x.image_url,300)+')'):avatarBg(x.slug,null); return '<div class="fp-mk" data-artist="'+esc(x.slug)+'"><div class="fp-mph" style="background:'+bg+';background-size:cover;background-position:center"></div><i>'+esc(x.name)+'</i><s>shared bills</s></div>'; }).join('')+'</div></div>';
         }
-        if(col1||col2) h+='<div class="fp-cols">'+col1+col2+'</div>';
         if((a.alongside||[]).length) h+='<div class="fp-sec"><div class="fp-sech">More like '+esc(a.name||slug)+' <span>same lane · next dates</span></div><div class="fp-more" id="fp-morelike"></div></div>';
         h+='</div>';
         openPanel(h);
@@ -6165,6 +6168,7 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
         document.querySelectorAll('#page-body .fp-pl[data-play]').forEach(function(pl){ var g=up.filter(function(x){ return String(x.id)===pl.dataset.play; })[0]; var q=(g&&g.lineup||[]).map(function(x){ return { slug:x.slug, name:x.name, poster:g.poster_url }; }).filter(function(x){ return x.slug; }); pl.addEventListener('click',function(e){ e.stopPropagation(); if(q.length) playYtList(q,0); else openEvent(pl.dataset.play); }); });
         document.querySelectorAll('#page-body .fp-row[data-ev]').forEach(function(row){ row.addEventListener('click',function(){ openEvent(row.dataset.ev); }); });
         document.querySelectorAll('#page-body .fp-row[data-artist]').forEach(function(row){ row.addEventListener('click',function(){ openArtist(row.dataset.artist); }); });
+        document.querySelectorAll('#page-body .fp-more .fp-mk[data-artist]').forEach(function(t){ t.addEventListener('click',function(){ openArtist(t.dataset.artist); }); });   // Plays-alongside rail (More-like wires itself async)
         (function(){
           var rail=document.getElementById('fp-morelike'); if(!rail) return;
           var fallback=(a.alongside||[]).map(function(x){ return { slug:x.slug, name:x.name, image:x.image_url }; });
@@ -6500,7 +6504,7 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
             '</div>'+
             /* Sticky play bar: big play (the line-up YouTube queue) + Save/Share. A direct
                child of ev-col-main so position:sticky travels the full column (incl. the bill). */
-            (eid ? '<div class="ev-playbar">'+((ev.artists||[]).length?'<button class="ev-bigplay" id="ev-playbill" type="button" aria-label="Play the line-up"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></button>':'')+'<div class="ev-pb-acts">'+(isPast?evLog:(evHeart+evTickets))+evShare+'</div></div>' : '')+
+            (eid ? '<div class="ev-playbar">'+((ev.artists||[]).length?'<button class="ev-bigplay" id="ev-playbill" type="button" aria-label="Play the lineup"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></button>':'')+'<div class="ev-pb-acts">'+(isPast?evLog:(evHeart+evTickets))+evShare+'</div></div>' : '')+
             '<div id="ev-meta-rich"><div class="sk" style="height:18px;width:55%;border-radius:var(--radius-xs);margin-top:16px"></div><div class="sk" style="height:13px;width:92%;border-radius:var(--radius-xs);margin-top:11px"></div><div class="sk" style="height:13px;width:78%;border-radius:var(--radius-xs);margin-top:7px"></div></div>'+   /* genre chips + blurb — skeleton reserves space; renderEventRich swaps in place */
             '<div id="ev-review"></div>'+    /* D5: opt-in structured review (attendance-gated) */
             '<div id="ev-bill"></div>'+      /* the bill — who-not-to-miss ranked in, names once (mountBill) */
@@ -6653,7 +6657,7 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
               '<div class="fp-ev-venue">at <button class="venue-link" type="button" data-venue="'+esc(ev.venue||'')+'">'+esc(ev.venue||'TBA')+'</button></div>'+
               '<div class="fp-ev-meta">'+[ev.city?cityLabel(ev.city):'', (ev.genres||[]).slice(0,3).join(' / ')].filter(Boolean).map(esc).join(' · ')+'</div>'+
               '<div class="fp-ev-playbar">'+
-                ((ev.artists||[]).length?'<button class="fp-pb go" id="fp-ev-play" type="button">▶ Play the bill</button>':'')+
+                ((ev.artists||[]).length?'<button class="fp-pb go" id="fp-ev-play" type="button">▶ Play the lineup</button>':'')+
                 (isPast?'':'<button class="fp-pb'+(evPicked?' on':'')+'" id="fp-ev-save" type="button">'+(evPicked?'Saved':'Save')+'</button>')+
                 (isPast?'':'<a class="fp-pb" href="https://www.google.com/search?q='+encodeURIComponent((ev.title||'')+' tickets')+'" target="_blank" rel="noopener">Tickets ↗</a>')+
                 '<button class="fp-pb" id="fp-ev-share" type="button">Share</button>'+
@@ -6662,19 +6666,19 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
               (blurb?'<p class="fp-ev-blurb">'+esc(blurb)+'</p>':'')+
             '</div>'+
           '</div>'+
-          '<div class="fp-sec"><div class="fp-sech">Lineup <span>'+(ev.artists||[]).length+' acts · plays as one queue</span></div><div id="fp-lineup"></div></div>'+
+          '<div class="fp-sec"><div class="fp-sech">Lineup <span>'+(ev.artists||[]).length+' artists</span></div><div id="fp-lineup"></div></div>'+
           '<div id="ev-review" style="margin-top:22px"></div>';
         if(ev.venueLat!=null && ev.venueLng!=null){
           h+='<div class="fp-sec"><div class="fp-sech">Location <span>'+esc((ev.venueAddress||'').split(',').pop().trim())+'</span></div>'+
             '<div class="fp-ev-loc"><div class="fp-ev-loc-l">'+
-              '<div class="fp-ev-loc-v"><b>'+esc(ev.venue||'Venue')+'</b>'+(ev.venue_slug?'<button class="fp-ev-follow'+(ev.venueFollowing?' on':'')+'" id="fp-ev-follow" type="button">'+(ev.venueFollowing?'Following':'+ Follow venue')+'</button>':'')+'</div>'+
+              '<div class="fp-ev-loc-v"><b>'+esc(ev.venue||'Venue')+'</b>'+(ev.venue_slug?'<button class="fp-ev-follow'+(ev.venueFollowing?' on':'')+'" id="fp-ev-follow" type="button" aria-pressed="'+(ev.venueFollowing?'true':'false')+'"><span>'+(ev.venueFollowing?'Following':'Follow')+'</span></button>':'')+'</div>'+
               (ev.venueAddress?'<div class="fp-ev-addr">'+esc(ev.venueAddress)+'</div>':'')+
               '<a class="fp-ev-dir" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query='+ev.venueLat+','+ev.venueLng+'">Directions →</a>'+
               '</div><div class="fp-ev-map" id="fp-ev-map"></div></div></div>';
         }
         if((ev.alsoOn||[]).length){
           h+='<div class="fp-sec"><div class="fp-sech">Also on that night <span>same city · same date</span></div><div class="fp-ao">'+
-            ev.alsoOn.slice(0,3).map(function(g){ var t=formatTimeRange(g.start_time,g.end_time,''); return '<div class="fp-ao-cell" data-ev="'+esc(String(g.id))+'"><div class="fp-ao-when">'+esc(t||fmtDateLabel(String(g.event_date).slice(0,10)))+'</div><div class="fp-ao-t">'+esc(g.title||'Event')+'</div><div class="fp-ao-w">'+esc(g.venue||'')+'</div></div>'; }).join('')+
+            ev.alsoOn.slice(0,3).map(function(g){ var t=formatTimeRange(g.start_time,g.end_time,''); var pbg=g.poster_url?('background-image:url('+imgUrl(g.poster_url,240)+')'):('background:'+avatarBg(String(g.id),null)); return '<div class="fp-ao-cell" data-ev="'+esc(String(g.id))+'"><div class="fp-ao-poster" style="'+pbg+'"></div><div class="fp-ao-when">'+esc(t||fmtDateLabel(String(g.event_date).slice(0,10)))+'</div><div class="fp-ao-t">'+esc(g.title||'Event')+'</div><div class="fp-ao-w">'+esc(g.venue||'')+'</div></div>'; }).join('')+
             '</div></div>';
         }
         if(ev.venue) h+='<button class="fp-morev venue-link" type="button" data-venue="'+esc(ev.venue)+'">More nights at '+esc(ev.venue)+' →</button>';
@@ -7287,7 +7291,7 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
           genreOv+
           (eid?'<button class="heart evc-heart'+picked+'" type="button" data-pick-evt="'+esc(eid)+'" data-title="'+esc(ev.title||'')+'" data-venue="'+esc(ev.venue||'')+'" data-day="'+esc(ev._day||'')+'" aria-pressed="'+(picked?'true':'false')+'" aria-label="Save this event">'+BOOKMARK_SVG+'</button>':'')+
           '<div class="evc-title">'+esc(ev.title)+'</div>'+
-          (canPlay?'<button class="evc-play" type="button" aria-label="Play the line-up"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>':'')+
+          (canPlay?'<button class="evc-play" type="button" aria-label="Play the lineup"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>':'')+
         '</div>'+
         '<div class="evc-body">'+(meta?'<div class="evc-meta">'+meta+'</div>':'')+'<div class="evc-chips">'+chips+'</div></div>'+
       '</article>';
@@ -7979,7 +7983,7 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
     if(_qfrom && _qto) loadRange(_qfrom,_qto);
     else if(_qd) load(_qd);
     else if(_shareDate) load(_shareDate);
-    else load(nextFridayISO(), 'fri'); // default landing: the next Friday
+    else load(todayISO(), 'tonight'); // default landing: tonight (today)
 
     // Deep link to a page (dj/slug, u/handle, club/name, e/id, n/id, legacy a//v/,
     // or a #hash overlay)? The default landing above set up the home grid underneath;
@@ -8049,7 +8053,7 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
         + '</div>'
         + '<div class="evc-body">'+(mWhen?'<div class="evc-meta"><span class="evc-mrow evc-mwhen">'+mWhen+'</span><span class="evc-mrow evc-mwhere">'+mWhere+'</span></div>':'')+'<div class="evc-chips">'+chips+'</div></div>'
         + '<div class="fp-c-cta">'
-          + (canPlay?'<button class="evc-play fp-c-play" type="button" aria-label="Play the line-up">▶ Play the bill</button>':'')
+          + (canPlay?'<button class="evc-play fp-c-play" type="button" aria-label="Play the lineup">▶ Play the lineup</button>':'')
           + (eid?'<button class="heart'+picked+'" type="button" data-pick-evt="'+E(eid)+'" data-title="'+E(ev.title||'')+'" data-venue="'+E(ev.venue||'')+'" data-day="'+E(ev._day||'')+'" aria-label="Save this event">Save</button>':'')
         + '</div>'
       + '</article>';
