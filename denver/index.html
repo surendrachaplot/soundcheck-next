@@ -2848,7 +2848,7 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
 .pb-rot-title{ text-transform:uppercase; }
 
 </style>
-<meta name="sc-build" content="flyposter-1783177437782">
+<meta name="sc-build" content="flyposter-1783181630020">
 <meta name="robots" content="noindex">
 </head>
 <body>
@@ -5251,22 +5251,22 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
       if(!isMe && !rot.length) return '';   // visitors see nothing when it's empty
       var who=isMe?'you’re':(esc(p.displayName||('u/'+p.handle))+'’s ears are');
       var head='<div class="pb-rot-head"><div class="pb-rot-tt"><h3 class="pb-rot-title">Now Playing</h3><p class="pb-rot-sub">Who '+who+' listening to right now</p></div><div class="pb-rot-acts">'+
-        (rot.length?'<button class="pb-rot-btn pb-rot-acc" id="pb-rot-playall" type="button"><i class="ti ti-player-play" aria-hidden="true"></i> Play all</button>':'')+
-        (isMe?'<button class="pb-rot-btn gh" id="pb-rot-add" type="button"><i class="ti ti-plus" aria-hidden="true"></i> Add DJ</button>':'')+
-        '<button class="pb-rot-btn gh" id="pb-rot-share" type="button"><i class="ti ti-share-2" aria-hidden="true"></i> Share</button>'+
+        (rot.length?'<button class="pb-rot-btn pb-rot-acc" id="pb-rot-playall" type="button">▶ Play all</button>':'')+
+        (isMe?'<button class="pb-rot-btn gh" id="pb-rot-add" type="button">+ Add DJ</button>':'')+
+        '<button class="pb-rot-btn gh" id="pb-rot-share" type="button">Share</button>'+
       '</div></div>';
       return '<div class="pb-rot" id="pb-rot"><div class="pb-rot-inner">'+head+'<div class="pb-rot-rail" id="pb-rot-rail"></div></div></div>';
     }
     function rotDiscHTML(v,i){
       var img=v.image?('background-image:url('+imgUrl(v.image,160)+')'):('background:'+sceneTone(v.slug));
       // Owner gets a small ✕ to remove; everyone gets the play affordance on hover.
-      var rm = pbRotMe ? '<button class="pb-rot-x" type="button" data-rmi="'+i+'" aria-label="Remove '+esc(v.name||v.slug)+'"><i class="ti ti-x"></i></button>' : '';
-      return '<div class="pb-rot-disc" data-slug="'+esc(v.slug)+'" data-name="'+esc(v.name||v.slug)+'"><span class="pb-rot-av" style="'+img+'"><span class="pb-rot-play" aria-hidden="true"><i class="ti ti-player-play"></i></span>'+rm+'</span><span class="pb-rot-nm">'+esc(v.name||v.slug)+'</span></div>';
+      var rm = pbRotMe ? '<button class="pb-rot-x" type="button" data-rmi="'+i+'" aria-label="Remove '+esc(v.name||v.slug)+'">×</button>' : '';
+      return '<div class="pb-rot-disc" data-slug="'+esc(v.slug)+'" data-name="'+esc(v.name||v.slug)+'"><span class="pb-rot-av" style="'+img+'"><span class="pb-rot-play" aria-hidden="true">▶</span>'+rm+'</span><span class="pb-rot-nm">'+esc(v.name||v.slug)+'</span></div>';
     }
     function renderRotRail(){
       var rail=document.getElementById('pb-rot-rail'); if(!rail) return;
       if(!pbRot.length){
-        rail.innerHTML = pbRotMe ? '<div class="pb-rot-empty"><i class="ti ti-disc" style="font-size:24px" aria-hidden="true"></i><div><b>Start your Now Playing list</b><span>Add the DJs you’re into &mdash; friends can play their sets from your profile.</span></div><button class="pb-rot-btn pb-rot-acc" id="pb-rot-add2" type="button"><i class="ti ti-plus"></i> Add a DJ</button></div>' : '';
+        rail.innerHTML = pbRotMe ? '<div class="pb-rot-empty"><div><b>Start your Now Playing list</b><span>Add the DJs you’re into &mdash; friends can play their sets from your profile.</span></div><button class="pb-rot-btn pb-rot-acc" id="pb-rot-add2" type="button">+ Add a DJ</button></div>' : '';
         var a2=document.getElementById('pb-rot-add2'); if(a2) a2.addEventListener('click',function(){ openRotationAdd(); });
         return;
       }
