@@ -2905,7 +2905,7 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
 .pb-rot-title{ text-transform:uppercase; }
 
 </style>
-<meta name="sc-build" content="flyposter-1783274869943">
+<meta name="sc-build" content="flyposter-1783275394839">
 <meta name="robots" content="noindex">
 </head>
 <body>
@@ -6510,8 +6510,16 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
           var vBeen='<button class="act-btn act-2nd'+(v.myReview?' on':'')+'" id="vp-been" type="button">'+CHECK_SVG+'<span>'+(v.myReview?'You&rsquo;ve been':'I&rsquo;ve been')+'</span></button>';
           h+='<div class="artist-actions">'+(vNext?('<button class="act-btn radio" id="vp-radio" type="button">'+RADIO_SVG+'<span>Play next night</span></button>'+vFollow+vBeen):(vFollow+vBeen))+'</div>';
         }
-        h+='<div id="vp-dna">'+dnaBoxHTML(v.dna)+'</div><div id="vp-upcoming"></div><div id="vp-past"></div>';
-        if(v.lat!=null && v.lng!=null) h+='<div class="pf-box" style="margin-top:16px"><div class="sec-h">Location</div>'+(v.address?'<div class="venue-addr">'+esc(v.address)+'</div>':'')+'<div id="venue-loc" class="venue-map" style="height:300px"></div></div>';
+        h+='<div id="vp-dna">'+dnaBoxHTML(v.dna)+'</div>';
+        // Content sections as in-page tabs (Upcoming / Past / Location) — same pattern as the artist page.
+        var vUp=(v.upcoming||[]), vPast=(v.past||[]), vTabs=[];
+        if(vUp.length) vTabs.push({ key:'upcoming', label:'Upcoming', count:vUp.length, html:'<div id="vp-upcoming"></div>' });
+        if(vPast.length) vTabs.push({ key:'past', label:'Past', count:vPast.length, html:'<div id="vp-past"></div>' });
+        if(v.lat!=null && v.lng!=null) vTabs.push({ key:'location', label:'Location', count:null, html:'<div class="pf-box" style="margin-top:14px">'+(v.address?'<div class="venue-addr">'+esc(v.address)+'</div>':'')+'<div id="venue-loc" class="venue-map" style="height:320px"></div></div>' });
+        if(vTabs.length>=2){
+          h+='<div class="fp-tabs" role="tablist">'+vTabs.map(function(t,i){ return '<button class="fp-tab'+(i===0?' on':'')+'" type="button" role="tab" aria-selected="'+(i===0)+'" data-tab="'+t.key+'">'+esc(t.label)+(t.count!=null?'<span class="c">'+t.count+'</span>':'')+'</button>'; }).join('')+'</div>'+
+            vTabs.map(function(t,i){ return '<div class="fp-tabpanel'+(i===0?'':' hide')+'" data-panel="'+t.key+'">'+t.html+'</div>'; }).join('');
+        } else if(vTabs.length===1){ h+=vTabs[0].html; }
         h+='<div class="claim-banner"><div class="cb-tx"><div class="cb-h">Do you run '+esc(dispName)+'?</div><div class="cb-s">Claim your page to keep your line-ups current and reach the people who follow you on soundcheck.</div></div><button class="cb-btn" id="vp-claim" type="button">Claim this venue</button></div>';
         openPanel(h);
         var _vcanon=location.origin+SC_BASE+(v.city||currentCity||'london')+'/club/'+venueSlug(dispName)+'/';
@@ -6528,15 +6536,21 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
         // F7: venue DNA — rendered in place from v.dna (folded into /api/venue), so
         // it paints with the page instead of popping in late. Just wire its links.
         document.querySelectorAll('#vp-dna .vd-vlink[data-venue]').forEach(function(b){ b.addEventListener('click',function(){ openVenue(b.dataset.venue, v.city||currentCity); }); });
+        var _venueMap=null;
+        document.querySelectorAll('#page-body .fp-tab[data-tab]').forEach(function(b){ b.addEventListener('click',function(){ var k=b.dataset.tab;
+          document.querySelectorAll('#page-body .fp-tab').forEach(function(x){ var on=x===b; x.classList.toggle('on',on); x.setAttribute('aria-selected',on?'true':'false'); });
+          document.querySelectorAll('#page-body .fp-tabpanel').forEach(function(p){ p.classList.toggle('hide', p.dataset.panel!==k); });
+          if(k==='location' && _venueMap) setTimeout(function(){ try{ _venueMap.invalidateSize(); }catch(_){} }, 60);   // map was hidden → resize on show
+        }); });
         var up=(v.upcoming||[]), vu=document.getElementById('vp-upcoming');
         if(vu && up.length){
-          vu.innerHTML='<div class="sec-h" style="margin-top:26px">Upcoming at '+esc(dispName)+'<span class="ct">'+up.length+'</span></div><div id="vp-cards"></div>';
+          vu.innerHTML='<div id="vp-cards" style="margin-top:16px"></div>';
           mountEventCards(document.getElementById('vp-cards'), up);
         }
         // Past events — same gig-history list pattern as "Past sets" on the artist page.
         var pst=(v.past||[]), vpst=document.getElementById('vp-past');
         if(vpst && pst.length){
-          vpst.innerHTML='<div class="pf-box" style="margin-top:16px"><div class="sec-h">Past events</div><ul class="gig-history">'+pst.map(function(g){
+          vpst.innerHTML='<div class="pf-box" style="margin-top:16px"><ul class="gig-history">'+pst.map(function(g){
             var d=fmtDateLabel(String(g.event_date).slice(0,10));
             var line=(g.lineup||[]).map(function(a){ return a.name; }).filter(Boolean).slice(0,3).join(', ');
             var label=g.title||line||'Event';
@@ -6552,7 +6566,7 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
           var locEl=document.getElementById('venue-loc');
           loadLeaflet(function(){
             var _rt=currentRoute(); if((_rt.indexOf('club/')!==0 && _rt.indexOf('v/')!==0) || !document.getElementById('venue-loc')) return;   // path-routed, not hash
-            var map=L.map(locEl,{ scrollWheelZoom:false }).setView([v.lat,v.lng], 15);
+            var map=L.map(locEl,{ scrollWheelZoom:false }).setView([v.lat,v.lng], 15); _venueMap=map;
             L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{ attribution:'&copy; OpenStreetMap, &copy; CARTO', subdomains:'abcd', maxZoom:19 }).addTo(map);
             L.circleMarker([v.lat,v.lng],{ radius:9, color:'#1a0f0e', weight:2, fillColor:'#ff7a6b', fillOpacity:1 }).addTo(map).bindPopup('<b>'+esc(dispName)+'</b>'+(v.address?'<br><span style="color:var(--muted)">'+esc(v.address)+'</span>':''));
             setTimeout(function(){ map.invalidateSize(); },120);
