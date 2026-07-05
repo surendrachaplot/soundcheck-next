@@ -2865,7 +2865,7 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
 .pb-rot-title{ text-transform:uppercase; }
 
 </style>
-<meta name="sc-build" content="flyposter-1783262376099">
+<meta name="sc-build" content="flyposter-1783262847538">
 <meta name="robots" content="noindex">
 </head>
 <body>
@@ -6505,50 +6505,6 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
       box.querySelectorAll('.bill-tile[data-bill-go]').forEach(function(el){ el.addEventListener('click',function(){ openArtist(el.dataset.billGo); }); });
       var pb=document.getElementById('ev-playbill'); if(pb){ pb.onclick=function(){ playYtList(q,0); }; }
     }
-    function eventPageHTML(ev){
-      var time=formatTimeRange(ev.startTime, ev.endTime, ev._time);
-      var dlabel=ev._day||(ev.event_date?fmtEventDay(ev.event_date):'');   // always show a date
-      var whenStr=(dlabel?' &middot; '+esc(dlabel):'')+(time?' &middot; '+esc(time):'');
-      var priceStr=formatPrice(ev.minPrice, ev.maxPrice, ev.currency);   // scraped ticket price (label only — no ticketing link)
-      var priceTag=priceStr?'<span class="price-tag'+(priceStr==='Free'?' free':'')+'">'+esc(priceStr)+'</span>':'';
-      var eid=ev.id!=null?String(ev.id):'';
-      var evPicked = eid && isEventPicked(eid) ? ' on' : '';
-      var evHeart = eid ? '<button class="act-btn act-2nd heart'+evPicked+'" type="button" data-pick-evt="'+esc(eid)+'" data-title="'+esc(ev.title||'')+'" data-venue="'+esc(ev.venue||'')+'" data-day="'+esc(ev._day||'')+'" aria-pressed="'+(evPicked?'true':'false')+'" aria-label="Save this event">'+BOOKMARK_SVG+'<span>Save</span></button>' : '';
-      var evShare = eid ? '<button class="act-btn act-2nd act-icon share-btn" type="button" data-share-evt="'+esc(eid)+'" data-title="'+esc(ev.title||'')+'" data-venue="'+esc(ev.venue||'')+'" aria-label="Share this event">'+SHARE_SVG+'</button>' : '';
-      // Past event → "Add to log" / "Logged" (you can't "save/go" to a night that's
-      // already happened); future event keeps the save heart.
-      var isPast = eid && ev.event_date && String(ev.event_date).slice(0,10) < todayISO();
-      var evLog = isPast ? '<button class="act-btn act-2nd act-log'+(ev.logged?' on':'')+'" type="button" data-log-evt="'+esc(eid)+'">'+CHECK_SVG+'<span>'+(ev.logged?'Logged':'Log it')+'</span></button>' : '';
-      // Tickets: a Google search for the event (upcoming only) — opens in a new tab. No
-      // third-party ticketing partner; just a quick "find tickets" jump-off.
-      var evTickets = (eid && !isPast) ? '<a class="act-btn act-2nd act-tickets" href="https://www.google.com/search?q='+encodeURIComponent((ev.title||'')+' tickets')+'" target="_blank" rel="noopener noreferrer" aria-label="Find tickets for this event"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2"/><path d="M13 11v2"/><path d="M13 17v2"/></svg><span>Tickets</span></a>' : '';
-      var n=(ev.artists||[]).length;
-      // Big, uncropped, full-res poster on top (flyers carry the line-up/times);
-      // gradient fallback only when there's no real poster.
-      var posterBig = ev.poster
-        ? '<div class="ev-poster-big"><img loading="lazy" decoding="async" src="'+imgUrl(ev.poster,1000)+'" alt="" onerror="var p=this.closest(\'.ev-poster-big\'); if(p) p.style.display=\'none\'"></div>'
-        : '<div class="poster ev-poster-gen">'+genPoster(ev.title||'Event')+'</div>';
-      return '<div class="ev-layout">'+
-          '<div class="ev-col-poster">'+posterBig+'</div>'+
-          '<div class="ev-col-main">'+
-            '<div class="event-head-tx">'+
-              (isPickVenue(ev.venue)?'<span class="pick">Pick</span>':'')+
-              '<h3>'+esc(ev.title||'Event')+'</h3>'+
-              '<div class="sheet-meta"><b class="venue-link ev-venue-name" data-venue="'+esc(ev.venue||'')+'">'+esc(ev.venue||'TBA')+'</b><span class="ev-meta-line"><span id="ev-when">'+whenStr+'</span>'+priceTag+'</span></div>'+
-            '</div>'+
-            /* Sticky play bar: big play (the line-up YouTube queue) + Save/Share. A direct
-               child of ev-col-main so position:sticky travels the full column (incl. the bill). */
-            (eid ? '<div class="ev-playbar">'+((ev.artists||[]).length?'<button class="ev-bigplay" id="ev-playbill" type="button" aria-label="Play the lineup"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></button>':'')+'<div class="ev-pb-acts">'+(isPast?evLog:(evHeart+evTickets))+evShare+'</div></div>' : '')+
-            '<div id="ev-meta-rich"><div class="sk" style="height:18px;width:55%;border-radius:var(--radius-xs);margin-top:16px"></div><div class="sk" style="height:13px;width:92%;border-radius:var(--radius-xs);margin-top:11px"></div><div class="sk" style="height:13px;width:78%;border-radius:var(--radius-xs);margin-top:7px"></div></div>'+   /* genre chips + blurb — skeleton reserves space; renderEventRich swaps in place */
-            '<div id="ev-review"></div>'+    /* D5: opt-in structured review (attendance-gated) */
-            '<div id="ev-bill"></div>'+      /* the bill — who-not-to-miss ranked in, names once (mountBill) */
-          '</div>'+
-        '</div>'+
-        '<div id="ev-rich"></div>'+        /* location map + recommendations (full-width, filled by renderEventRich) */
-        (ev.venue?'<button class="more-venue venue-link" type="button" data-venue="'+esc(ev.venue)+'">More nights at '+esc(ev.venue)+' &rsaquo;</button>':'');
-    }
-    function wireEventRadio(ev){ var rb=document.querySelector('#page-body .ev-radio'); if(rb) rb.addEventListener('click',function(){ startEventRadio(ev); }); }
-    // ── event page enrichment (genres, blurb, map, recommendations) ──
     function musicEventLD(ev){
       var o={ "@context":"https://schema.org","@type":"MusicEvent", name:ev.title||'Event', url:location.origin+SC_BASE+eventPath(ev.id, ev.title||((ev.artists||[])[0]||{}).name, ev.venue)+'/', eventAttendanceMode:"https://schema.org/OfflineEventAttendanceMode" };
       if(ev.startTime||ev.event_date) o.startDate=ev.startTime||ev.event_date;
@@ -6558,98 +6514,6 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
       if(perf.length) o.performer=perf;
       if(ev.poster) o.image=imgUrl(ev.poster,640);
       return o;
-    }
-    // Fill the two placeholders eventPageHTML left, using the enriched event.
-    function renderEventRich(ev){
-      // Always show the date: the fetched detail is authoritative (has event_date),
-      // so fill the header's #ev-when even if the cached open had no/partial date.
-      var when=document.getElementById('ev-when');
-      if(when){ var d=ev.event_date?fmtEventDay(ev.event_date):(ev._day||''); var t=formatTimeRange(ev.startTime, ev.endTime, ev._time); when.innerHTML=(d?' &middot; '+esc(d):'')+(t?' &middot; '+esc(t):''); }
-      // The bill — fold who-not-to-miss into the line-up: rank it (highlights get a badge +
-      // one-line why, the rest list plainly), every DJ shown ONCE. Re-render #ev-bill in the
-      // ranked order, merging artist photos from the event. Falls back to the instant bill.
-      // "Who not to miss" tips (Do-not-miss badges + reasons) only make sense for a
-      // night you can still catch — skip the ranked re-mount on past events, keep the
-      // plain line-up.
-      var evPast = ev.event_date && String(ev.event_date).slice(0,10) < todayISO();
-      if(!evPast && (ev.artists||[]).length>=2){
-        var imgBy={}; (ev.artists||[]).forEach(function(a){ var s=(a.contentUrl||'').split('/').filter(Boolean).pop(); if(s) imgBy[s]=a.image; });
-        authedFetch('/api/event/lineup?id='+encodeURIComponent(ev.id)).then(function(r){ return r.json(); }).then(function(j){
-          if(!j) return;
-          var ranked=(j.highlights||[]).concat(j.more||[]);
-          if(!ranked.length) return; // keep the instant (unranked) bill
-          mountBill(ranked.map(function(t){ return { slug:t.slug, name:t.name, image:imgBy[t.slug], tier:t.tier||null, reason:t.reason||null }; }));
-        }).catch(function(){});
-      }
-      // D5: structured review — aggregate for everyone, the slider form only if you logged
-      // this night (attendance-gated server-side).
-      var rvEl=document.getElementById('ev-review');
-      if(rvEl){
-        authedFetch('/api/review?eventId='+encodeURIComponent(ev.id)).then(function(r){ return r.json(); }).then(function(j){
-          if(!j) return;
-          var agg=j.agg, can=j.canReview, mine=j.mine||{};
-          if(!agg && !can) return;
-          var html='<div class="rv-box"><div class="nm-k">Reviews <small>from people who were there</small></div>';
-          if(agg) html+='<div class="rv-agg">'+rvStat('Sound',agg.sound)+rvStat('Crowd',agg.crowd)+rvStat('Find',agg.discovery)+'<div class="rv-n">'+agg.n+' review'+(agg.n==1?'':'s')+'</div></div>';
-          if(can) html+='<div class="rv-form">'+rvSlider('sound','Sound',mine.sound)+rvSlider('crowd','Crowd',mine.crowd)+rvSlider('discovery','Discovery',mine.discovery)+'<button class="rv-submit" id="rv-submit" type="button">'+(j.mine?'Update review':'Post review')+'</button><div class="rv-msg" id="rv-msg"></div></div>';
-          html+='</div>';
-          rvEl.innerHTML=html;
-          var sb=document.getElementById('rv-submit');
-          if(sb) sb.addEventListener('click',function(){
-            var body={ eventId:ev.id };
-            ['sound','crowd','discovery'].forEach(function(k){ var el=rvEl.querySelector('input[name="rv-'+k+'"]:checked'); if(el) body[k]=parseInt(el.value,10); });
-            if(body.sound==null&&body.crowd==null&&body.discovery==null){ document.getElementById('rv-msg').textContent='Pick at least one rating.'; return; }
-            sb.disabled=true;
-            authedFetch('/api/review',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(function(r){ return r.json(); }).then(function(o){
-              document.getElementById('rv-msg').textContent=(o&&o.ok)?'Thanks — your review is in.':((o&&o.error)?o.error:'Could not save.'); sb.disabled=false;
-            }).catch(function(){ document.getElementById('rv-msg').textContent='Could not save.'; sb.disabled=false; });
-          });
-        }).catch(function(){});
-      }
-      // The cached first-paint doesn't know if you've logged this night (only the
-      // fresh /api/event does) — refresh the Add-to-log / Logged button now.
-      var lb=document.querySelector('#page-body .act-log');
-      if(lb){ lb.classList.toggle('on', !!ev.logged); lb.innerHTML = ev.logged ? '&#10003; Logged' : '+ Add to log'; }
-      var top=document.getElementById('ev-meta-rich');
-      if(top){
-        var th='';
-        if((ev.genres||[]).length) th+='<div class="ev-genres">'+ev.genres.slice(0,6).map(function(g){ return '<span class="gchip">'+esc(g)+'</span>'; }).join('')+'</div>';
-        if((ev.promoters||[]).length) th+='<div class="ev-promoters">Presented by '+ev.promoters.map(function(p){ return '<a class="pr-link" data-promoter="'+esc(p.slug)+'">'+esc(p.name)+'</a>'; }).join(', ')+'</div>';
-        var blurb = ev.content || ev.description; if(blurb) th+='<p class="seo-desc">'+esc(blurb)+'</p>';
-        top.innerHTML=th;
-        top.querySelectorAll('.pr-link[data-promoter]').forEach(function(b){ b.addEventListener('click',function(){ openPromoter(b.dataset.promoter); }); });
-      }
-      var rich=document.getElementById('ev-rich');
-      if(rich){
-        var rh='';
-        if(ev.venueLat!=null && ev.venueLng!=null){
-          rh+='<div class="pf-box" style="margin-top:16px"><div class="sec-h">Location</div>'+
-            '<div class="ev-loc-head"><button class="venue-link ev-loc-venue" type="button" data-venue="'+esc(ev.venue||'')+'">'+esc(ev.venue||'Venue')+'</button>'+
-              (ev.venue_slug?'<button class="act-btn act-2nd ev-loc-follow'+(ev.venueFollowing?' on':'')+'" id="ev-vfollow" type="button" aria-pressed="'+(ev.venueFollowing?'true':'false')+'" aria-label="Follow '+esc(ev.venue||'')+'">'+HEART_SVG+'<span>'+(ev.venueFollowing?'Following':'Follow')+'</span></button>':'')+'</div>'+
-            (ev.venueAddress?'<div class="venue-addr">'+esc(ev.venueAddress)+'</div>':'')+
-            '<a class="ev-directions" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query='+ev.venueLat+','+ev.venueLng+'">Directions &rsaquo;</a>'+
-            '<div id="ev-loc" class="venue-map" style="height:240px"></div></div>';
-        }
-        if((ev.alsoOn||[]).length) rh+='<div class="sec-h" style="margin-top:26px">Also on that night</div><div id="ev-alsoon"></div>';
-        rich.innerHTML=rh;
-        var evf=document.getElementById('ev-vfollow');
-        if(evf) evf.addEventListener('click',function(){ toggleVenueFollow({ slug:ev.venue_slug, name:ev.venue, following:ev.venueFollowing }, evf); });
-        if((ev.alsoOn||[]).length) mountEventCards(document.getElementById('ev-alsoon'), ev.alsoOn);
-        if(ev.venueLat!=null && ev.venueLng!=null){
-          var locEl=document.getElementById('ev-loc');
-          loadLeaflet(function(){
-            if(currentRoute().indexOf('e/')!==0 || !document.getElementById('ev-loc')) return;
-            var map=L.map(locEl,{ scrollWheelZoom:false }).setView([ev.venueLat,ev.venueLng], 15);
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{ attribution:'&copy; OpenStreetMap, &copy; CARTO', subdomains:'abcd', maxZoom:19 }).addTo(map);
-            L.circleMarker([ev.venueLat,ev.venueLng],{ radius:9, color:'#1a0f0e', weight:2, fillColor:'#ff7a6b', fillOpacity:1 }).addTo(map).bindPopup('<b>'+esc(ev.venue||'')+'</b>'+(ev.venueAddress?'<br><span style="color:var(--muted)">'+esc(ev.venueAddress)+'</span>':''));
-            setTimeout(function(){ map.invalidateSize(); },120);
-          });
-        }
-      }
-      // lineup avatars + section tiles open via existing wireCard/venue-link delegation
-      document.querySelectorAll('#page-body .sheet-line .ln-av[data-artist]').forEach(function(el){ el.style.cursor='pointer'; el.addEventListener('click',function(){ openArtist(el.dataset.artist); }); });
-      var _evld=musicEventLD(ev);
-      setSeo((ev.title||'Event')+' · '+(ev.venue||'')+' | soundcheck', ev.description||'', _evld, _evld.url);
     }
     function mapEventDetail(d){
       return { id:String(d.id), title:d.title, venue:d.venue, venue_slug:d.venue_slug, venueFollowing:!!d.venue_following, poster:d.poster_url,
@@ -6718,7 +6582,7 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
         h+='</div>';
         openPanel(h);
         var _canon=location.origin+SC_BASE+eventPath(id,_who,ev.venue)+'/';
-        setSeo((ev.title||'Event')+' · '+(ev.venue||'')+' | soundcheck', ev.description||'', null, _canon);
+        setSeo((ev.title||'Event')+' · '+(ev.venue||'')+' | soundcheck', ev.description||'', musicEventLD(ev), _canon);   // MusicEvent JSON-LD (restored after the bespoke port dropped it)
         armEventSticky(ev.title||'');
         var save=document.getElementById('fp-ev-save'); if(save) save.addEventListener('click',function(){ toggleEvent(id,{title:ev.title,venue:ev.venue,day:ev._day}); save.classList.toggle('on'); save.innerHTML=(save.classList.contains('on')?'Saved':'Save'); });
         var shr=document.getElementById('fp-ev-share'); if(shr) shr.addEventListener('click',function(){ shareEvent(id, ev.title, ev.venue); });
