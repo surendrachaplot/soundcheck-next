@@ -2862,7 +2862,7 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
 .pb-rot-title{ text-transform:uppercase; }
 
 </style>
-<meta name="sc-build" content="flyposter-1783260379658">
+<meta name="sc-build" content="flyposter-1783261323867">
 <meta name="robots" content="noindex">
 </head>
 <body>
@@ -6165,7 +6165,7 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
         // Past sets — full width; Plays alongside — a photo rail like "More like".
         if((a.history||[]).length){
           h+='<div class="fp-sec"><div class="fp-sech">Past sets <span>logged by the scene</span></div>'+
-            a.history.map(function(g){ var d=fmtDateLabel(String(g.event_date).slice(0,10)); var sub=[(g.title&&g.venue)?g.venue:'', cityLabel(g.city)].filter(Boolean).join(' · '); return '<div class="fp-row" data-ev="'+esc(String(g.id))+'"><b>'+esc(g.title||g.venue||'Set')+'</b><span class="fp-y">'+esc(d)+(sub?' · '+esc(sub):'')+'</span></div>'; }).join('')+'</div>';
+            a.history.map(function(g){ return fpEventRowHTML(g, false); }).join('')+'</div>';
         }
         // "More like X" = similar-sound artists + the ones who share bills, merged into one rail.
         if((a.alongside||[]).length) h+='<div class="fp-sec"><div class="fp-sech">More like '+esc(a.name||slug)+' <span>similar sound · shares bills</span></div><div class="fp-more" id="fp-morelike"></div></div>';
