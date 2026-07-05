@@ -2908,7 +2908,7 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
 .pb-rot-title{ text-transform:uppercase; }
 
 </style>
-<meta name="sc-build" content="flyposter-1783280806660">
+<meta name="sc-build" content="flyposter-1783281109979">
 <meta name="robots" content="noindex">
 </head>
 <body>
@@ -6215,7 +6215,7 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
         var festLine=(a.festivals&&a.festivals.length)?'<p class="ah-fests" style="margin:0 0 14px"><b>Festivals</b> '+a.festivals.map(function(f){ return esc(f.name); }).join(' · ')+'</p>':'';
         var gemLine=(a.hiddenGem&&a.hiddenGem.level)?'<div class="fp-gemline"><span class="gem-pill"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 2h12l3.6 6L12 22 2.4 8z"/></svg><span>'+esc(a.hiddenGem.level)+'</span>'+(a.hiddenGem.reason?'<small>'+esc(a.hiddenGem.reason)+'</small>':'')+'</span></div>':'';
         var nextVenueAttr=(nextGig&&nextGig.venue)?' data-venue="'+esc(nextGig.venue)+'" data-city="'+esc(nextGig.city||'')+'"':'';
-        var setsSvg='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h11M3 12h11M3 18h7"/><path d="M16 13v8l6-4z" fill="currentColor" stroke="none"/></svg>';
+        var logSvg='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
         var h='<div class="fp-artist">'+
           '<div class="fp-hero">'+
             '<div class="fp-photo">'+(a.image?img:'<span class="fp-press-gen" style="background:'+avatarBg(slug,null)+'"></span>')+(a.country?'<div class="fp-origin">'+esc(a.country)+'</div>':'')+'</div>'+
@@ -6226,9 +6226,8 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
               festLine+gemLine+
               '<div class="fp-acts">'+
                 '<button class="fp-ab go" id="ap-radio" data-slug="'+esc(slug)+'" data-name="'+esc(a.name||slug)+'"'+(a.image?' data-poster="'+esc(a.image)+'"':'')+nextVenueAttr+' type="button">'+YT_SVG+'<span>Tune in</span></button>'+
-                '<button class="fp-ab" id="ap-sets" data-slug="'+esc(slug)+'" data-name="'+esc(a.name||slug)+'" type="button">'+setsSvg+'<span>Sets</span></button>'+
                 '<button class="fp-ab'+(mine==='wanna_see'?' on':'')+'" id="ap-wanna" data-ap-wanna="'+esc(slug)+'" type="button" aria-pressed="'+(mine==='wanna_see')+'">'+HEART_SVG+'<span>Wanna see</span></button>'+
-                '<button class="fp-ab'+(mine==='seen'?' on':'')+'" id="ap-seen" data-ap-seen="'+esc(slug)+'" type="button" aria-pressed="'+(mine==='seen')+'">'+CHECK_SVG+'<span>Seen live</span></button>'+
+                '<button class="fp-ab" id="ap-log" type="button">'+logSvg+'<span>Log a gig</span></button>'+
               '</div>'+
             '</div>'+
           '</div>'+
@@ -6245,9 +6244,12 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
           html:'<div class="fp-sec"><div class="fp-sech">Sets <span>full sets · pick one to play</span></div><div class="fp-sets" id="fp-sets"><div class="fp-sets-load">Loading sets…</div></div></div>' });
         if((a.alongside||[]).length) secTabs.push({ key:'similar', label:'Similar', count:null,
           html:'<div class="fp-sec"><div class="fp-sech">More like '+esc(a.name||slug)+' <span>similar sound · shares bills</span></div><div class="fp-more" id="fp-morelike"></div></div>' });
+        // Deep-link support: /dj/<slug>/#sets opens (and is shareable to) that tab.
+        var _wantTab=(location.hash||'').replace(/^#/,'');
+        var _activeTab=secTabs.some(function(t){ return t.key===_wantTab; })?_wantTab:(secTabs[0]&&secTabs[0].key);
         if(secTabs.length>=2){
-          h+='<div class="fp-tabs" role="tablist">'+secTabs.map(function(t,i){ return '<button class="fp-tab'+(i===0?' on':'')+'" type="button" role="tab" aria-selected="'+(i===0)+'" data-tab="'+t.key+'">'+esc(t.label)+(t.count!=null?'<span class="c">'+t.count+'</span>':'')+'</button>'; }).join('')+'</div>'+
-            secTabs.map(function(t,i){ return '<div class="fp-tabpanel'+(i===0?'':' hide')+'" data-panel="'+t.key+'">'+t.html+'</div>'; }).join('');
+          h+='<div class="fp-tabs" role="tablist">'+secTabs.map(function(t){ var on=t.key===_activeTab; return '<button class="fp-tab'+(on?' on':'')+'" type="button" role="tab" aria-selected="'+on+'" data-tab="'+t.key+'">'+esc(t.label)+(t.count!=null?'<span class="c">'+t.count+'</span>':'')+'</button>'; }).join('')+'</div>'+
+            secTabs.map(function(t){ return '<div class="fp-tabpanel'+(t.key===_activeTab?'':' hide')+'" data-panel="'+t.key+'">'+t.html+'</div>'; }).join('');
         } else if(secTabs.length===1){ h+=secTabs[0].html; }
         h+='</div>';
         openPanel(h);
@@ -6256,10 +6258,9 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
         var apRadio=document.getElementById('ap-radio');
         apRadio.addEventListener('pointerdown',function(){ prefetchYt(apRadio); },{passive:true});
         apRadio.addEventListener('click',function(){ handleYtClick(apRadio); });
-        var apSets=document.getElementById('ap-sets'); if(apSets) apSets.addEventListener('click',function(){ playArtistSets(slug, a.name||slug); });
         armSticky(a.name||slug, function(){ apRadio.click(); }, apRadio);
         document.getElementById('ap-wanna').addEventListener('click',function(){ toggleArtist(slug,{name:a.name}); });
-        document.getElementById('ap-seen').addEventListener('click',function(){ toggleSeen(slug,{name:a.name}); });
+        document.getElementById('ap-log').addEventListener('click',function(){ openLog({ artist:{ slug:slug, name:a.name||slug } }); });
         if(currentUser){
           var _anm=a.name||slug;
           authedFetch('/api/artist/seen?slug='+encodeURIComponent(slug)).then(function(r){ return r.json(); }).then(function(sd){
@@ -6296,6 +6297,7 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
         document.querySelectorAll('#page-body .fp-tab[data-tab]').forEach(function(b){ b.addEventListener('click',function(){ var k=b.dataset.tab;
           document.querySelectorAll('#page-body .fp-tab').forEach(function(x){ var on=x===b; x.classList.toggle('on',on); x.setAttribute('aria-selected',on?'true':'false'); });
           document.querySelectorAll('#page-body .fp-tabpanel').forEach(function(p){ p.classList.toggle('hide', p.dataset.panel!==k); });
+          try{ history.replaceState(history.state,'','#'+k); }catch(_){}   // keep /dj/<slug>/ path, tag the tab so the URL is shareable
           if(k==='sets') loadSetsTab();
         }); });
         // If Sets is the initially-visible panel (e.g. it's the only section), load it now.
