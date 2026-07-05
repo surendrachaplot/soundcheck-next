@@ -2862,7 +2862,7 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
 .pb-rot-title{ text-transform:uppercase; }
 
 </style>
-<meta name="sc-build" content="flyposter-1783261323867">
+<meta name="sc-build" content="flyposter-1783261650797">
 <meta name="robots" content="noindex">
 </head>
 <body>
@@ -6722,7 +6722,7 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
         var fol=document.getElementById('fp-ev-follow'); if(fol) fol.addEventListener('click',function(){ toggleVenueFollow({slug:ev.venue_slug,name:ev.venue,following:ev.venueFollowing}, fol); });
         // Entity pages don't go through wireCard, so wire the venue links directly ("at <venue>" + "More nights at").
         document.querySelectorAll('#page-body .venue-link[data-venue]').forEach(function(b){ b.addEventListener('click',function(){ if(b.dataset.venue) openVenue(b.dataset.venue, ev.city); }); });
-        document.querySelectorAll('#page-body .fp-ao-cell[data-ev]').forEach(function(c){ c.addEventListener('click',function(){ openEvent(c.dataset.ev); }); });
+        document.querySelectorAll('#page-body .fp-erow[data-ev]').forEach(function(c){ c.addEventListener('click',function(){ openEvent(c.dataset.ev); }); });
         if(ev.venueLat!=null && ev.venueLng!=null){
           loadLeaflet(function(){
             var el=document.getElementById('fp-ev-map'); if(!el||currentRoute().indexOf('e/')!==0) return;
