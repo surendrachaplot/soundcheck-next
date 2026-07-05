@@ -2908,7 +2908,7 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
 .pb-rot-title{ text-transform:uppercase; }
 
 </style>
-<meta name="sc-build" content="flyposter-1783281109979">
+<meta name="sc-build" content="flyposter-1783281282679">
 <meta name="robots" content="noindex">
 </head>
 <body>
@@ -6256,9 +6256,13 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
         var _acanon=location.origin+SC_BASE+'dj/'+slug+'/';
         setSeo((a.name||slug)+' — gigs & upcoming shows | soundcheck', a.description||'', { "@context":"https://schema.org","@type":"MusicGroup", name:(a.name||slug), url:_acanon, description:a.description||'' }, _acanon);
         var apRadio=document.getElementById('ap-radio');
-        apRadio.addEventListener('pointerdown',function(){ prefetchYt(apRadio); },{passive:true});
-        apRadio.addEventListener('click',function(){ handleYtClick(apRadio); });
-        armSticky(a.name||slug, function(){ apRadio.click(); }, apRadio);
+        // Tune in = play the artist's full sets back-to-back. Warm the sets list on
+        // press so the queue is ready by click-time (keeps mobile autoplay inside the gesture).
+        function prefetchSets(){ try{ loadYtApi(); }catch(_){} if(!apRadio._setsP) apRadio._setsP=fetch(API_BASE+'/api/youtube/sets?slug='+encodeURIComponent(slug)+'&name='+encodeURIComponent(a.name||slug)).then(function(r){ return r.json(); }).catch(function(){ return {}; }); return apRadio._setsP; }
+        function tuneInSets(){ prefetchSets().then(function(j){ var sets=(j&&j.sets)||[]; if(!sets.length){ showToast('No sets found for '+(a.name||slug)+' yet.'); return; } playYtList(sets.map(function(s){ return { slug:slug, name:a.name||slug, videoId:s.videoId }; }), 0); }); }
+        apRadio.addEventListener('pointerdown',prefetchSets,{passive:true});
+        apRadio.addEventListener('click',tuneInSets);
+        armSticky(a.name||slug, tuneInSets, apRadio);
         document.getElementById('ap-wanna').addEventListener('click',function(){ toggleArtist(slug,{name:a.name}); });
         document.getElementById('ap-log').addEventListener('click',function(){ openLog({ artist:{ slug:slug, name:a.name||slug } }); });
         if(currentUser){
