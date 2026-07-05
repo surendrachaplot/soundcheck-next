@@ -2468,6 +2468,20 @@
     .fp-tab.on .c{ color:var(--accent); }
     .fp-tabpanel .fp-sec{ margin-top:16px; }
     .fp-tabpanel.hide{ display:none; }
+    /* Sets tab — grid of the artist's full YouTube sets; tap one to play (queues the rest) */
+    .fp-sets{ padding:14px 16px 18px; }
+    .fp-sets-load,.fp-sets-empty{ padding:8px 2px; color:var(--muted); font:600 13px var(--body); }
+    .fp-sets-all{ display:flex; align-items:center; gap:9px; width:100%; border:1px solid var(--accent); background:var(--accent-weak); color:var(--accent); border-radius:var(--radius); padding:11px 14px; font:700 13px var(--body); cursor:pointer; margin-bottom:14px; }
+    .fp-sets-all span{ margin-left:auto; font:600 11px var(--font-mono); letter-spacing:.04em; text-transform:uppercase; opacity:.85; }
+    .fp-sets-all:hover{ background:var(--accent); color:var(--accent-ink); }
+    .fp-sets-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:16px 14px; }
+    @media(max-width:560px){ .fp-sets-grid{ grid-template-columns:1fr 1fr; gap:14px 10px; } }
+    .fp-sk{ display:flex; flex-direction:column; text-align:left; background:none; border:0; padding:0; cursor:pointer; color:var(--fg); min-width:0; }
+    .fp-sk-th{ position:relative; aspect-ratio:16/9; border-radius:var(--radius-md); background-size:cover; background-position:center; background-color:var(--surface-3); overflow:hidden; }
+    .fp-sk-dur{ position:absolute; left:6px; bottom:6px; font:700 10px var(--font-mono); background:rgba(8,7,11,.82); color:#f4efe9; border-radius:4px; padding:2px 6px; }
+    .fp-sk-pl{ position:absolute; right:6px; bottom:6px; width:34px; height:34px; border-radius:50%; background:var(--accent); color:var(--accent-ink); display:flex; align-items:center; justify-content:center; font-size:13px; border:1px solid var(--accent); }
+    .fp-sk-ti{ font:700 14px var(--head); letter-spacing:-0.01em; line-height:1.2; margin-top:9px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+    .fp-sk-ch{ font:600 11px var(--font-mono); color:var(--muted); margin-top:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     .fp-cols{ display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:16px; margin-top:16px; }
     @media(max-width:720px){ .fp-cols{ grid-template-columns:minmax(0,1fr); } }
     .fp-row{ display:flex; align-items:center; gap:14px; padding:12px 18px; border-bottom:1px solid var(--line); font:600 13px var(--body); cursor:pointer; transition:background .12s; }
@@ -2891,7 +2905,7 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
 .pb-rot-title{ text-transform:uppercase; }
 
 </style>
-<meta name="sc-build" content="flyposter-1783274028925">
+<meta name="sc-build" content="flyposter-1783274869943">
 <meta name="robots" content="noindex">
 </head>
 <body>
@@ -6223,6 +6237,9 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
           html:'<div class="fp-sec"><div class="fp-sech">Upcoming events <span>'+up.length+' upcoming · ▶ previews the sound</span></div>'+up.map(function(g){ return fpEventRowHTML(g, true); }).join('')+'</div>' });
         if((a.history||[]).length) secTabs.push({ key:'past', label:'Past sets', count:a.history.length,
           html:'<div class="fp-sec"><div class="fp-sech">Past sets <span>logged by the scene</span></div>'+a.history.map(function(g){ return fpEventRowHTML(g, false); }).join('')+'</div>' });
+        // "Sets" — the artist's full YouTube sets; lazy-loaded on first tab open (one YT search per artist, cached).
+        secTabs.push({ key:'sets', label:'Sets', count:null,
+          html:'<div class="fp-sec"><div class="fp-sech">Sets <span>full sets · pick one to play</span></div><div class="fp-sets" id="fp-sets"><div class="fp-sets-load">Loading sets…</div></div></div>' });
         if((a.alongside||[]).length) secTabs.push({ key:'similar', label:'Similar', count:null,
           html:'<div class="fp-sec"><div class="fp-sech">More like '+esc(a.name||slug)+' <span>similar sound · shares bills</span></div><div class="fp-more" id="fp-morelike"></div></div>' });
         if(secTabs.length>=2){
@@ -6255,10 +6272,31 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
             box.querySelectorAll('.ap-seen-v[data-venue]').forEach(function(b){ b.addEventListener('click',function(){ if(b.dataset.venue) openVenue(b.dataset.venue); }); });
           }).catch(function(){});
         }
+        // The "Sets" panel is filled lazily — one /api/youtube/sets call the first time it's shown.
+        var _setsLoaded=false;
+        function loadSetsTab(){
+          if(_setsLoaded) return; _setsLoaded=true;
+          var box=document.getElementById('fp-sets'); if(!box) return;
+          function fmtDur(s){ s=Math.round(s||0); var h=Math.floor(s/3600), m=Math.floor((s%3600)/60), ss=s%60, p=function(n){ return String(n).padStart(2,'0'); }; return h? h+':'+p(m)+':'+p(ss) : m+':'+p(ss); }
+          fetch(API_BASE+'/api/youtube/sets?slug='+encodeURIComponent(slug)+'&name='+encodeURIComponent(a.name||slug)).then(function(r){ return r.ok?r.json():null; }).then(function(j){
+            var sets=(j&&j.sets)||[];
+            if(!sets.length){ box.innerHTML='<div class="fp-sets-empty">No full sets found for '+esc(a.name||slug)+' yet.</div>'; return; }
+            var items=sets.map(function(s){ return { slug:slug, name:a.name||slug, videoId:s.videoId, poster:(a.image||'') }; });
+            box.innerHTML='<button class="fp-sets-all" id="fp-sets-all" type="button">▶ Play all in order <span>'+sets.length+' sets</span></button>'+
+              '<div class="fp-sets-grid">'+sets.map(function(s,i){ var th='https://i.ytimg.com/vi/'+encodeURIComponent(s.videoId)+'/mqdefault.jpg'; var d=s.duration?fmtDur(s.duration):'';
+                return '<button class="fp-sk" type="button" data-i="'+i+'"><span class="fp-sk-th" style="background-image:url(\''+th+'\')">'+(d?'<span class="fp-sk-dur">'+esc(d)+'</span>':'')+'<span class="fp-sk-pl">▶</span></span><span class="fp-sk-ti">'+esc(s.title||'Set')+'</span>'+(s.channel?'<span class="fp-sk-ch">'+esc(s.channel)+'</span>':'')+'</button>';
+              }).join('')+'</div>';
+            var pa=document.getElementById('fp-sets-all'); if(pa) pa.addEventListener('click',function(){ playYtList(items,0); });
+            box.querySelectorAll('.fp-sk[data-i]').forEach(function(b){ b.addEventListener('click',function(){ playYtList(items, +b.dataset.i); }); });
+          }).catch(function(){ if(box) box.innerHTML='<div class="fp-sets-empty">Couldn’t load sets.</div>'; });
+        }
         document.querySelectorAll('#page-body .fp-tab[data-tab]').forEach(function(b){ b.addEventListener('click',function(){ var k=b.dataset.tab;
           document.querySelectorAll('#page-body .fp-tab').forEach(function(x){ var on=x===b; x.classList.toggle('on',on); x.setAttribute('aria-selected',on?'true':'false'); });
           document.querySelectorAll('#page-body .fp-tabpanel').forEach(function(p){ p.classList.toggle('hide', p.dataset.panel!==k); });
+          if(k==='sets') loadSetsTab();
         }); });
+        // If Sets is the initially-visible panel (e.g. it's the only section), load it now.
+        if(document.getElementById('fp-sets') && !document.querySelector('#page-body .fp-tabpanel[data-panel="sets"].hide')) loadSetsTab();
         document.querySelectorAll('#page-body .fp-erow[data-ev]').forEach(function(tr){ tr.addEventListener('click',function(){ openEvent(tr.dataset.ev); }); });
         document.querySelectorAll('#page-body .fp-erow-play[data-play]').forEach(function(pl){ var g=up.filter(function(x){ return String(x.id)===pl.dataset.play; })[0]; var q=(g&&g.lineup||[]).map(function(x){ return { slug:x.slug, name:x.name, poster:g.poster_url }; }).filter(function(x){ return x.slug; }); pl.addEventListener('click',function(e){ e.stopPropagation(); if(q.length) playYtList(q,0); else openEvent(pl.dataset.play); }); });
         document.querySelectorAll('#page-body .fp-row[data-ev]').forEach(function(row){ row.addEventListener('click',function(){ openEvent(row.dataset.ev); }); });
