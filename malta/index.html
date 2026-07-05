@@ -423,6 +423,21 @@
     .dock.expanded .bar { height:8px; }
     .dock.expanded .bar-knob { width:46px; height:46px; box-shadow:0 6px 18px rgba(0,0,0,0.45); }
     .dock.expanded .bar-knob .ic { display:block; width:22px; height:22px; }
+    /* Tracklist button (expanded dock, only when the playing video has a parsed tracklist) + sheet */
+    .dock-tl { display:none; align-items:center; gap:8px; order:3; margin:2px auto 0; border:1px solid var(--border); background:var(--surface-2); color:var(--fg); border-radius:var(--radius-pill); font:600 var(--fs-sm) var(--body); padding:8px 16px; cursor:pointer; -webkit-tap-highlight-color:transparent; }
+    .dock-tl svg { width:16px; height:16px; flex:none; }
+    .dock-tl:hover { border-color:var(--accent); color:var(--accent); }
+    .dock.expanded.has-tl .dock-tl { display:inline-flex; }
+    .tl-sheet .auth-box { max-width:520px; }
+    .tl-list { max-height:min(58vh,520px); overflow-y:auto; margin-top:10px; -webkit-overflow-scrolling:touch; }
+    .tl-row { display:flex; align-items:center; gap:13px; width:100%; text-align:left; background:none; border:0; border-top:1px solid var(--line); padding:12px 2px; color:var(--fg); font:inherit; }
+    .tl-row:first-child { border-top:0; }
+    .tl-row.seekable { cursor:pointer; }
+    .tl-row.seekable:hover .tl-s { color:var(--accent); }
+    .tl-t { font:700 12px var(--font-mono); color:var(--accent); flex:none; width:56px; }
+    .tl-n { font:600 12px var(--font-mono); color:var(--faint); flex:none; width:56px; }
+    .tl-s { flex:1; min-width:0; font-size:var(--fs-sm); line-height:1.35; }
+    .tl-row.seekable .tl-t::after { content:' \25B6'; font-size:9px; color:var(--faint); }
 
     /* collapsed: slim bar; video kept alive offscreen (audio only) */
     .dock:not(.expanded) .panel { display:flex; align-items:center; gap:16px; padding:11px 22px calc(11px + env(safe-area-inset-bottom)); }
@@ -2865,7 +2880,7 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
 .pb-rot-title{ text-transform:uppercase; }
 
 </style>
-<meta name="sc-build" content="flyposter-1783262847538">
+<meta name="sc-build" content="flyposter-1783265518364">
 <meta name="robots" content="noindex">
 </head>
 <body>
@@ -2965,6 +2980,7 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
           <div class="bar" id="bar"><div class="bar-fill" id="bar-fill"></div><button class="bar-knob" id="bar-knob" type="button" aria-label="Pause"><svg class="ic" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg></button></div>
           <span class="t" id="t-dur">0:00</span>
         </div>
+        <button class="dock-tl" id="dock-tl-btn" type="button" aria-label="Show tracklist"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg><span id="dock-tl-lbl">Tracklist</span></button>
       </div>
     </div>
   </div>
@@ -3410,9 +3426,36 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
       bumpPlayCount();
       updateNavButtons();
     }
+    // ── Tracklist: parsed from the playing YouTube video's description (if it lists one) ──
+    var curTracklist=[], curVideoId=null;
+    function loadTracklist(videoId){
+      curTracklist=[]; dock.classList.remove('has-tl'); curVideoId=videoId||null;
+      if(!videoId) return;
+      fetch(API_BASE+'/api/youtube/tracklist?v='+encodeURIComponent(videoId)).then(function(r){ return r.ok?r.json():null; }).then(function(j){
+        if(videoId!==curVideoId) return;   // the user moved to another set while this was in flight
+        if(!j || !j.tracklist || !j.tracklist.length) return;
+        curTracklist=j.tracklist;
+        var lbl=document.getElementById('dock-tl-lbl'); if(lbl) lbl.textContent='Tracklist ('+curTracklist.length+')';
+        dock.classList.add('has-tl');
+      }).catch(function(){});
+    }
+    function openTracklistSheet(){
+      if(!curTracklist.length) return;
+      var ov=document.createElement('div'); ov.className='auth-overlay show tl-sheet';
+      ov.innerHTML='<div class="auth-box"><button class="auth-close" type="button" aria-label="Close">&times;</button>'+
+        '<div class="eyebrow">Tracklist · tap a time to jump</div><h3>'+esc(dockName.textContent||'Now playing')+'</h3>'+
+        '<div class="tl-list">'+curTracklist.map(function(t,i){ var seek=(t.sec!=null); var tag=seek?'button':'div'; return '<'+tag+' class="tl-row'+(seek?' seekable':'')+'"'+(seek?' type="button" data-sec="'+t.sec+'"':'')+'>'+(t.t?'<span class="tl-t">'+esc(t.t)+'</span>':'<span class="tl-n">'+(i+1)+'</span>')+'<span class="tl-s">'+esc(t.s)+'</span></'+tag+'>'; }).join('')+'</div></div>';
+      document.body.appendChild(ov);
+      function close(){ ov.remove(); }
+      ov.querySelector('.auth-close').addEventListener('click',close);
+      ov.addEventListener('click',function(e){ if(e.target===ov) close(); });
+      ov.querySelectorAll('.tl-row[data-sec]').forEach(function(b){ b.addEventListener('click',function(){ seekTo(+b.dataset.sec); if(currentType==='yt'&&ytPlayer&&ytPlayer.playVideo){ try{ ytPlayer.playVideo(); }catch(_){} } close(); }); });
+    }
+    (function(){ var b=document.getElementById('dock-tl-btn'); if(b) b.addEventListener('click',openTracklistSheet); })();
     function stopActive(){
       if(typeof radio!=='undefined' && radio.on) radioStop();
       scQ=null;
+      curTracklist=[]; curVideoId=null; dock.classList.remove('has-tl');
       if(!active) return;
       active.button.classList.remove('playing'); setState(active.button,'▶');
       clearPlayers();
@@ -3431,6 +3474,7 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
       dockMedia.appendChild(art);
       dockMedia.appendChild(f);
       openDockUI(btn,btn.dataset.name||'Now playing',btn.dataset.venue||'SoundCloud', true); // open expanded (web + mobile); chevron collapses
+      curTracklist=[]; curVideoId=null; dock.classList.remove('has-tl');   // SoundCloud has no YT tracklist
       // The iframe already autoplays (auto_play=true); the Widget API just adds
       // the scrubber + play/pause sync, so we bind it lazily once api.js loads.
       loadScApi(function(){
@@ -3454,6 +3498,7 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
       var reuse = ytPlayer && ytReadyFlag && currentType==='yt' && f && f.isConnected;
       currentType='yt';
       openDockUI(btn,btn.dataset.name||'Now playing',btn.dataset.venue||'', true); // open expanded (web + mobile); chevron collapses
+      loadTracklist(videoId);   // parse the video's description tracklist (if any) → dock "Tracklist" button
       if(reuse){
         try{ ytPlayer.loadVideoById({ videoId:videoId, startSeconds:start }); }catch(_){}
         pos=0; paintScrub(); startPoll();
