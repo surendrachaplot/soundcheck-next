@@ -434,10 +434,10 @@
     .tl-row:first-child { border-top:0; }
     .tl-row.seekable { cursor:pointer; }
     .tl-row.seekable:hover .tl-s { color:var(--accent); }
-    .tl-t { font:700 12px var(--font-mono); color:var(--accent); flex:none; width:56px; }
-    .tl-n { font:600 12px var(--font-mono); color:var(--faint); flex:none; width:56px; }
+    .tl-t { font:700 12px var(--font-mono); color:var(--accent); flex:none; width:74px; white-space:nowrap; }
+    .tl-n { font:600 12px var(--font-mono); color:var(--faint); flex:none; width:74px; white-space:nowrap; }
     .tl-s { flex:1; min-width:0; font-size:var(--fs-sm); line-height:1.35; }
-    .tl-row.seekable .tl-t::after { content:' \25B6'; font-size:9px; color:var(--faint); }
+    .tl-row.seekable .tl-t::after { content:'\25B6'; font-size:8px; color:var(--faint); margin-left:5px; vertical-align:1px; }
 
     /* collapsed: slim bar; video kept alive offscreen (audio only) */
     .dock:not(.expanded) .panel { display:flex; align-items:center; gap:16px; padding:11px 22px calc(11px + env(safe-area-inset-bottom)); }
@@ -2880,7 +2880,7 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
 .pb-rot-title{ text-transform:uppercase; }
 
 </style>
-<meta name="sc-build" content="flyposter-1783265518364">
+<meta name="sc-build" content="flyposter-1783266708493">
 <meta name="robots" content="noindex">
 </head>
 <body>
