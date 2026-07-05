@@ -496,7 +496,7 @@
 
     @media (max-width:920px)  { .wrap{ padding:0 28px; } }
     @media (max-width:620px)  { .grid { grid-template-columns:repeat(2,1fr); } .wrap{ padding:0 18px; } .evc-body { padding:28px 9px 12px; } .evc-chips { gap:6px; } .evc-chip { padding:0 8px; gap:4px; } .evc-tri svg { width:8px; height:8px; } .evc-title { font-size:0.97rem; left:11px; right:52px; } }
-    @media (max-width:380px)  { .grid { grid-template-columns:1fr; } }
+    @media (max-width:380px)  { .grid { grid-template-columns:repeat(2,1fr); gap:14px 10px; } }
 
     /* ── Picks (Phase 1: heart + shortlist + share) ── */
     /* Heart / share / seen are BARE icons (no circle border) so they match the thin
@@ -2484,6 +2484,20 @@
     .fp-pl{ width:36px; height:36px; margin:0 auto; border:1px solid var(--border); border-radius:var(--radius-pill); background:var(--surface-2); color:var(--fg); font-size:13px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
     .fp-pl:hover{ background:var(--accent); color:var(--accent-ink); border-color:var(--accent); }
     @media(max-width:620px){ .fp-tr{ grid-template-columns:52px 76px minmax(0,1fr) 40px; } .fp-tr .fp-wv,.fp-tr .fp-ct{ display:none; } .fp-td{ padding:12px 10px; } .fp-dt{ font-size:12px; } .fp-ev{ font-size:15px; } .fp-tp{ width:40px; height:40px; } }
+    /* RA-style event row — poster snippet + name + line-up + venue·city·flag + date; all info visible at any width */
+    .fp-erow{ display:grid; grid-template-columns:76px minmax(0,1fr) auto; gap:14px; align-items:center; padding:12px 16px; border-bottom:1px solid var(--line); cursor:pointer; transition:background .12s; }
+    .fp-erow:last-child{ border-bottom:0; }
+    .fp-erow:hover{ background:var(--surface-2); }
+    .fp-erow-poster{ width:76px; height:76px; border-radius:var(--radius-sm); background-size:cover; background-position:center; background-color:var(--surface-3); }
+    .fp-erow-body{ min-width:0; }
+    .fp-erow-date{ font:700 11px var(--font-mono); letter-spacing:.05em; text-transform:uppercase; color:var(--accent); margin-bottom:3px; }
+    .fp-erow-title{ font:800 17px/1.12 var(--head); letter-spacing:-0.01em; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+    .fp-erow-arts{ font:500 12.5px var(--body); color:var(--muted); margin-top:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .fp-erow-where{ font:600 12px var(--body); color:var(--muted); margin-top:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .fp-erow-flag{ font-family:initial; margin-left:2px; }
+    .fp-erow-play{ width:40px; height:40px; border-radius:50%; border:1px solid var(--border); background:var(--surface-2); color:var(--fg); font-size:14px; cursor:pointer; }
+    .fp-erow-play:hover{ background:var(--accent); color:var(--accent-ink); border-color:var(--accent); }
+    @media(max-width:560px){ .fp-erow{ grid-template-columns:64px minmax(0,1fr) auto; gap:12px; padding:12px 14px; } .fp-erow-poster{ width:64px; height:64px; } .fp-erow-title{ font-size:16px; } }
     /* more-like rail */
     .fp-more{ display:grid; grid-template-columns:repeat(auto-fill,minmax(120px,1fr)); gap:14px; padding:16px 18px; }
     .fp-mk{ cursor:pointer; }
@@ -2848,7 +2862,7 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
 .pb-rot-title{ text-transform:uppercase; }
 
 </style>
-<meta name="sc-build" content="flyposter-1783181630020">
+<meta name="sc-build" content="flyposter-1783260379658">
 <meta name="robots" content="noindex">
 </head>
 <body>
@@ -6086,6 +6100,29 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
     // D5 review helpers — one aggregate stat + one 1–5 picker row.
     function rvStat(label,val){ return '<div class="rv-stat"><span class="rv-v">'+(val!=null?val:'–')+'</span><span class="rv-l">'+label+'</span></div>'; }
     function rvSlider(key,label,cur){ var d=''; for(var i=1;i<=5;i++){ d+='<label class="rv-dot"><input type="radio" name="rv-'+key+'" value="'+i+'"'+(cur==i?' checked':'')+'><span>'+i+'</span></label>'; } return '<div class="rv-srow"><span class="rv-sk">'+label+'</span><span class="rv-dots">'+d+'</span></div>'; }
+    // country code for a city slug (→ flag), via the baked CITY_LIST
+    function cityCC(slug){ if(!slug || typeof CITY_LIST==='undefined') return ''; for(var i=0;i<CITY_LIST.length;i++){ if(CITY_LIST[i].slug===slug) return CITY_LIST[i].country||''; } return ''; }
+    // RA-style event row — poster snippet + name + line-up + venue · city + flag + date, all visible on any width (never a cramped single line). Shared by artist "Upcoming events" + event "Also on". showPlay adds a ▶ that plays the line-up.
+    function fpEventRowHTML(g, showPlay){
+      var id=String(g.id);
+      var d=g.event_date?fmtDateLabel(String(g.event_date).slice(0,10)):'';
+      var pbg=g.poster_url?('background-image:url('+imgUrl(g.poster_url,220)+')'):('background:'+avatarBg(id,null));
+      var arts=(g.lineup||[]).map(function(a){ return a.name; }).filter(Boolean);
+      var artsLine=arts.slice(0,4).join(', ')+(arts.length>4?' +'+(arts.length-4):'');
+      var flag=flagEmoji(cityCC(g.city));
+      var whereTxt=[g.venue||'', g.city?cityLabel(g.city):''].filter(Boolean).join(' · ');
+      var canPlay=showPlay && arts.length;
+      return '<div class="fp-erow" data-ev="'+esc(id)+'">'+
+        '<div class="fp-erow-poster" style="'+pbg+'"></div>'+
+        '<div class="fp-erow-body">'+
+          (d?'<div class="fp-erow-date">'+esc(d)+'</div>':'')+
+          '<div class="fp-erow-title">'+esc(g.title||g.venue||'Event')+'</div>'+
+          (artsLine?'<div class="fp-erow-arts">'+esc(artsLine)+'</div>':'')+
+          (whereTxt?'<div class="fp-erow-where">'+esc(whereTxt)+(flag?' <span class="fp-erow-flag">'+flag+'</span>':'')+'</div>':'')+
+        '</div>'+
+        (canPlay?'<button class="fp-erow-play" type="button" data-play="'+esc(id)+'" aria-label="Play the lineup">▶</button>':'')+
+      '</div>';
+    }
     async function openArtist(slug){
       setRoute('dj/'+slug);
       trackView('artist', slug);
@@ -6123,10 +6160,7 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
         var up=a.upcoming||[];
         if(up.length){
           h+='<div class="fp-sec"><div class="fp-sech">Upcoming events <span>'+up.length+' upcoming · ▶ previews the sound</span></div>'+
-            up.map(function(g){ var d=fmtDateLabel(String(g.event_date).slice(0,10));
-              var pbg=g.poster_url?('background-image:url('+imgUrl(g.poster_url,160)+')'):('background:'+avatarBg(String(g.id),null));
-              return '<div class="fp-tr" data-ev="'+esc(String(g.id))+'"><div class="fp-tp" style="'+pbg+'"></div><div class="fp-td fp-dt">'+esc(d)+'</div><div class="fp-td fp-ev">'+esc(g.title||g.venue||'Show')+'</div><div class="fp-td fp-wv">'+esc(g.venue||'')+'</div><div class="fp-td fp-ct">'+(g.city?'<i>'+esc(cityLabel(g.city))+'</i>':'')+'</div><button class="fp-pl" type="button" data-play="'+esc(String(g.id))+'" aria-label="Play the lineup">▶</button></div>';
-            }).join('')+'</div>';
+            up.map(function(g){ return fpEventRowHTML(g, true); }).join('')+'</div>';
         }
         // Past sets — full width; Plays alongside — a photo rail like "More like".
         if((a.history||[]).length){
@@ -6161,8 +6195,8 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
             box.querySelectorAll('.ap-seen-v[data-venue]').forEach(function(b){ b.addEventListener('click',function(){ if(b.dataset.venue) openVenue(b.dataset.venue); }); });
           }).catch(function(){});
         }
-        document.querySelectorAll('#page-body .fp-tr[data-ev]').forEach(function(tr){ tr.addEventListener('click',function(){ openEvent(tr.dataset.ev); }); });
-        document.querySelectorAll('#page-body .fp-pl[data-play]').forEach(function(pl){ var g=up.filter(function(x){ return String(x.id)===pl.dataset.play; })[0]; var q=(g&&g.lineup||[]).map(function(x){ return { slug:x.slug, name:x.name, poster:g.poster_url }; }).filter(function(x){ return x.slug; }); pl.addEventListener('click',function(e){ e.stopPropagation(); if(q.length) playYtList(q,0); else openEvent(pl.dataset.play); }); });
+        document.querySelectorAll('#page-body .fp-erow[data-ev]').forEach(function(tr){ tr.addEventListener('click',function(){ openEvent(tr.dataset.ev); }); });
+        document.querySelectorAll('#page-body .fp-erow-play[data-play]').forEach(function(pl){ var g=up.filter(function(x){ return String(x.id)===pl.dataset.play; })[0]; var q=(g&&g.lineup||[]).map(function(x){ return { slug:x.slug, name:x.name, poster:g.poster_url }; }).filter(function(x){ return x.slug; }); pl.addEventListener('click',function(e){ e.stopPropagation(); if(q.length) playYtList(q,0); else openEvent(pl.dataset.play); }); });
         document.querySelectorAll('#page-body .fp-row[data-ev]').forEach(function(row){ row.addEventListener('click',function(){ openEvent(row.dataset.ev); }); });
         document.querySelectorAll('#page-body .fp-row[data-artist]').forEach(function(row){ row.addEventListener('click',function(){ openArtist(row.dataset.artist); }); });
         (function(){
@@ -6674,9 +6708,8 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
               '</div><div class="fp-ev-map" id="fp-ev-map"></div></div></div>';
         }
         if((ev.alsoOn||[]).length){
-          h+='<div class="fp-sec"><div class="fp-sech">Also on that night <span>same city · same date</span></div><div class="fp-ao">'+
-            ev.alsoOn.slice(0,3).map(function(g){ var t=formatTimeRange(g.start_time,g.end_time,''); var pbg=g.poster_url?('background-image:url('+imgUrl(g.poster_url,240)+')'):('background:'+avatarBg(String(g.id),null)); return '<div class="fp-ao-cell" data-ev="'+esc(String(g.id))+'"><div class="fp-ao-poster" style="'+pbg+'"></div><div class="fp-ao-when">'+esc(t||fmtDateLabel(String(g.event_date).slice(0,10)))+'</div><div class="fp-ao-t">'+esc(g.title||'Event')+'</div><div class="fp-ao-w">'+esc(g.venue||'')+'</div></div>'; }).join('')+
-            '</div></div>';
+          h+='<div class="fp-sec"><div class="fp-sech">Also on that night <span>same city · same date</span></div>'+
+            ev.alsoOn.slice(0,4).map(function(g){ return fpEventRowHTML(g, false); }).join('')+'</div>';
         }
         if(ev.venue) h+='<button class="fp-morev venue-link" type="button" data-venue="'+esc(ev.venue)+'">More nights at '+esc(ev.venue)+' →</button>';
         h+='</div>';
