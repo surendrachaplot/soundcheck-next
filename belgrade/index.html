@@ -2471,9 +2471,12 @@
     /* Sets tab — grid of the artist's full YouTube sets; tap one to play (queues the rest) */
     .fp-sets{ padding:14px 16px 18px; }
     .fp-sets-load,.fp-sets-empty{ padding:8px 2px; color:var(--muted); font:600 13px var(--body); }
-    .fp-sets-all{ display:flex; align-items:center; gap:9px; width:100%; border:1px solid var(--accent); background:var(--accent-weak); color:var(--accent); border-radius:var(--radius); padding:11px 14px; font:700 13px var(--body); cursor:pointer; margin-bottom:14px; }
-    .fp-sets-all span{ margin-left:auto; font:600 11px var(--font-mono); letter-spacing:.04em; text-transform:uppercase; opacity:.85; }
-    .fp-sets-all:hover{ background:var(--accent); color:var(--accent-ink); }
+    .fp-sets-all{ display:flex; align-items:center; gap:12px; width:100%; border:0; background:var(--accent); color:var(--accent-ink); border-radius:var(--radius); padding:12px 14px; cursor:pointer; margin-bottom:14px; text-align:left; }
+    .fp-sets-all .fp-sets-all-ic{ flex:0 0 auto; width:34px; height:34px; border-radius:50%; display:grid; place-items:center; background:rgba(0,0,0,.16); font-size:12px; padding-left:2px; }
+    .fp-sets-all .fp-sets-all-tx{ display:flex; flex-direction:column; gap:2px; line-height:1.15; font:800 14px var(--body); }
+    .fp-sets-all .fp-sets-all-tx b{ font:600 11px var(--font-mono); letter-spacing:.05em; text-transform:uppercase; opacity:.82; }
+    .fp-sets-all:hover{ filter:brightness(1.07); }
+    .fp-sets-all:active{ transform:translateY(1px); }
     .fp-sets-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:16px 14px; }
     @media(max-width:560px){ .fp-sets-grid{ grid-template-columns:1fr 1fr; gap:14px 10px; } }
     .fp-sk{ display:flex; flex-direction:column; text-align:left; background:none; border:0; padding:0; cursor:pointer; color:var(--fg); min-width:0; }
@@ -2905,7 +2908,7 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
 .pb-rot-title{ text-transform:uppercase; }
 
 </style>
-<meta name="sc-build" content="flyposter-1783275394839">
+<meta name="sc-build" content="flyposter-1783280806660">
 <meta name="robots" content="noindex">
 </head>
 <body>
@@ -6282,7 +6285,7 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
             var sets=(j&&j.sets)||[];
             if(!sets.length){ box.innerHTML='<div class="fp-sets-empty">No full sets found for '+esc(a.name||slug)+' yet.</div>'; return; }
             var items=sets.map(function(s){ return { slug:slug, name:a.name||slug, videoId:s.videoId, poster:(a.image||'') }; });
-            box.innerHTML='<button class="fp-sets-all" id="fp-sets-all" type="button">▶ Play all in order <span>'+sets.length+' sets</span></button>'+
+            box.innerHTML='<button class="fp-sets-all" id="fp-sets-all" type="button"><span class="fp-sets-all-ic">▶</span><span class="fp-sets-all-tx">Play all in order<b>'+sets.length+' sets · continuous</b></span></button>'+
               '<div class="fp-sets-grid">'+sets.map(function(s,i){ var th='https://i.ytimg.com/vi/'+encodeURIComponent(s.videoId)+'/mqdefault.jpg'; var d=s.duration?fmtDur(s.duration):'';
                 return '<button class="fp-sk" type="button" data-i="'+i+'"><span class="fp-sk-th" style="background-image:url(\''+th+'\')">'+(d?'<span class="fp-sk-dur">'+esc(d)+'</span>':'')+'<span class="fp-sk-pl">▶</span></span><span class="fp-sk-ti">'+esc(s.title||'Set')+'</span>'+(s.channel?'<span class="fp-sk-ch">'+esc(s.channel)+'</span>':'')+'</button>';
               }).join('')+'</div>';
