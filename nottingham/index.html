@@ -2457,6 +2457,17 @@
     .fp-sech{ display:flex; justify-content:space-between; align-items:center; gap:12px; padding:13px 18px; border-bottom:1px solid var(--border); background:var(--surface-2); color:var(--fg); font:800 18px var(--head); letter-spacing:-0.01em; }
     .fp-sech span{ color:var(--accent); font:600 11px var(--font-mono); letter-spacing:.12em; text-transform:uppercase; }
     @media(max-width:560px){ .fp-sech{ flex-direction:column; align-items:flex-start; gap:3px; font-size:16px; padding:12px 15px; } .fp-sech span{ font-size:10px; } }
+    /* artist-page section tabs (Upcoming / Past sets / Similar) — swap the panel below in place */
+    .fp-tabs{ display:flex; gap:0; border-bottom:1px solid var(--border); margin-top:22px; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
+    .fp-tabs::-webkit-scrollbar{ display:none; }
+    .fp-tab{ padding:14px 2px; margin-right:26px; font:700 14px var(--body); color:var(--muted); background:none; border:0; border-bottom:2px solid transparent; margin-bottom:-1px; cursor:pointer; white-space:nowrap; transition:color .12s; }
+    .fp-tab:last-child{ margin-right:0; }
+    .fp-tab.on{ color:var(--fg); border-bottom-color:var(--accent); }
+    .fp-tab:hover{ color:var(--fg); }
+    .fp-tab .c{ font:700 11px var(--font-mono); color:var(--faint); margin-left:6px; }
+    .fp-tab.on .c{ color:var(--accent); }
+    .fp-tabpanel .fp-sec{ margin-top:16px; }
+    .fp-tabpanel.hide{ display:none; }
     .fp-cols{ display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:16px; margin-top:16px; }
     @media(max-width:720px){ .fp-cols{ grid-template-columns:minmax(0,1fr); } }
     .fp-row{ display:flex; align-items:center; gap:14px; padding:12px 18px; border-bottom:1px solid var(--line); font:600 13px var(--body); cursor:pointer; transition:background .12s; }
@@ -2880,7 +2891,7 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
 .pb-rot-title{ text-transform:uppercase; }
 
 </style>
-<meta name="sc-build" content="flyposter-1783266708493">
+<meta name="sc-build" content="flyposter-1783274028925">
 <meta name="robots" content="noindex">
 </head>
 <body>
@@ -6205,18 +6216,19 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
             '</div>'+
           '</div>'+
           '<div id="ap-seen-panel"></div>';
-        var up=a.upcoming||[];
-        if(up.length){
-          h+='<div class="fp-sec"><div class="fp-sech">Upcoming events <span>'+up.length+' upcoming · ▶ previews the sound</span></div>'+
-            up.map(function(g){ return fpEventRowHTML(g, true); }).join('')+'</div>';
-        }
-        // Past sets — full width; Plays alongside — a photo rail like "More like".
-        if((a.history||[]).length){
-          h+='<div class="fp-sec"><div class="fp-sech">Past sets <span>logged by the scene</span></div>'+
-            a.history.map(function(g){ return fpEventRowHTML(g, false); }).join('')+'</div>';
-        }
-        // "More like X" = similar-sound artists + the ones who share bills, merged into one rail.
-        if((a.alongside||[]).length) h+='<div class="fp-sec"><div class="fp-sech">More like '+esc(a.name||slug)+' <span>similar sound · shares bills</span></div><div class="fp-more" id="fp-morelike"></div></div>';
+        // Sections as in-page tabs — one URL, tap swaps the panel below (no reload). Only
+        // tabs with content; "More like X" merges similar-sound + shares-bills artists.
+        var up=a.upcoming||[], secTabs=[];
+        if(up.length) secTabs.push({ key:'upcoming', label:'Upcoming', count:up.length,
+          html:'<div class="fp-sec"><div class="fp-sech">Upcoming events <span>'+up.length+' upcoming · ▶ previews the sound</span></div>'+up.map(function(g){ return fpEventRowHTML(g, true); }).join('')+'</div>' });
+        if((a.history||[]).length) secTabs.push({ key:'past', label:'Past sets', count:a.history.length,
+          html:'<div class="fp-sec"><div class="fp-sech">Past sets <span>logged by the scene</span></div>'+a.history.map(function(g){ return fpEventRowHTML(g, false); }).join('')+'</div>' });
+        if((a.alongside||[]).length) secTabs.push({ key:'similar', label:'Similar', count:null,
+          html:'<div class="fp-sec"><div class="fp-sech">More like '+esc(a.name||slug)+' <span>similar sound · shares bills</span></div><div class="fp-more" id="fp-morelike"></div></div>' });
+        if(secTabs.length>=2){
+          h+='<div class="fp-tabs" role="tablist">'+secTabs.map(function(t,i){ return '<button class="fp-tab'+(i===0?' on':'')+'" type="button" role="tab" aria-selected="'+(i===0)+'" data-tab="'+t.key+'">'+esc(t.label)+(t.count!=null?'<span class="c">'+t.count+'</span>':'')+'</button>'; }).join('')+'</div>'+
+            secTabs.map(function(t,i){ return '<div class="fp-tabpanel'+(i===0?'':' hide')+'" data-panel="'+t.key+'">'+t.html+'</div>'; }).join('');
+        } else if(secTabs.length===1){ h+=secTabs[0].html; }
         h+='</div>';
         openPanel(h);
         var _acanon=location.origin+SC_BASE+'dj/'+slug+'/';
@@ -6243,6 +6255,10 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
             box.querySelectorAll('.ap-seen-v[data-venue]').forEach(function(b){ b.addEventListener('click',function(){ if(b.dataset.venue) openVenue(b.dataset.venue); }); });
           }).catch(function(){});
         }
+        document.querySelectorAll('#page-body .fp-tab[data-tab]').forEach(function(b){ b.addEventListener('click',function(){ var k=b.dataset.tab;
+          document.querySelectorAll('#page-body .fp-tab').forEach(function(x){ var on=x===b; x.classList.toggle('on',on); x.setAttribute('aria-selected',on?'true':'false'); });
+          document.querySelectorAll('#page-body .fp-tabpanel').forEach(function(p){ p.classList.toggle('hide', p.dataset.panel!==k); });
+        }); });
         document.querySelectorAll('#page-body .fp-erow[data-ev]').forEach(function(tr){ tr.addEventListener('click',function(){ openEvent(tr.dataset.ev); }); });
         document.querySelectorAll('#page-body .fp-erow-play[data-play]').forEach(function(pl){ var g=up.filter(function(x){ return String(x.id)===pl.dataset.play; })[0]; var q=(g&&g.lineup||[]).map(function(x){ return { slug:x.slug, name:x.name, poster:g.poster_url }; }).filter(function(x){ return x.slug; }); pl.addEventListener('click',function(e){ e.stopPropagation(); if(q.length) playYtList(q,0); else openEvent(pl.dataset.play); }); });
         document.querySelectorAll('#page-body .fp-row[data-ev]').forEach(function(row){ row.addEventListener('click',function(){ openEvent(row.dataset.ev); }); });
