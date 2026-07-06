@@ -2498,6 +2498,24 @@
     .fp-tab.on .c{ color:var(--accent); }
     .fp-tabpanel .fp-sec{ margin-top:16px; }
     .fp-tabpanel.hide{ display:none; }
+    /* P1 profile hero */
+    .pfh-top{ display:flex; align-items:center; gap:16px; }
+    .pfh-av{ width:72px; height:72px; border-radius:50%; background-size:cover; background-position:center; flex:0 0 auto; }
+    .pfh-id{ flex:1; min-width:0; }
+    .pfh-name{ font-family:var(--head); font-weight:800; font-size:1.7rem; letter-spacing:-.02em; margin:0 0 3px; }
+    .pfh-sub{ color:var(--muted); font-size:.85rem; }
+    .pfh-acts{ display:flex; gap:9px; flex:0 0 auto; }
+    .pfh-ribbon{ display:grid; grid-template-columns:repeat(4,1fr); margin-top:18px; border:1px solid var(--border); border-radius:var(--radius-md); overflow:hidden; background:var(--surface); }
+    .pfh-ribbon .c{ padding:14px 15px; border-right:1px solid var(--border); }
+    .pfh-ribbon .c:last-child{ border-right:0; }
+    .pfh-ribbon b{ font-family:var(--head); font-weight:800; font-size:1.5rem; display:block; line-height:1; }
+    .pfh-ribbon span{ font:700 .6rem var(--font-mono); letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin-top:6px; display:block; }
+    .pfh-tags{ display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; align-items:center; }
+    .pfh-tl{ font:700 .6rem var(--font-mono); letter-spacing:.12em; text-transform:uppercase; color:var(--faint); margin-right:2px; }
+    .pfh-tag{ display:inline-flex; padding:6px 13px; border-radius:var(--radius-pill); border:1px solid var(--border); background:var(--surface-2); color:var(--fg); font:700 .78rem var(--body); }
+    .pfh-tag.hot{ background:var(--accent-weak); border-color:rgba(255,122,107,.28); color:var(--accent); }
+    .pfh-tag.pfh-home{ color:var(--muted); }
+    @media(max-width:560px){ .pfh-top{ flex-wrap:wrap; } .pfh-acts{ width:100%; } .pfh-acts .pf-btn{ flex:1; } }
     /* Sets tab — grid of the artist's full YouTube sets; tap one to play (queues the rest) */
     .fp-sets{ padding:14px 16px 18px; }
     .fp-sets-load,.fp-sets-empty{ padding:8px 2px; color:var(--muted); font:600 13px var(--body); }
@@ -2938,7 +2956,7 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
 .pb-rot-title{ text-transform:uppercase; }
 
 </style>
-<meta name="sc-build" content="flyposter-1783367695997">
+<meta name="sc-build" content="flyposter-1783369993441">
 <meta name="robots" content="noindex">
 </head>
 <body>
@@ -5489,36 +5507,39 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
     // + home-city line + barcode + Share/Settings-or-Follow cells) + 4-cell stat strip.
     // The section boxes below keep their original ids so the unchanged wirePbProfile fills them.
     function pbProfileHTML(p){
-      var isMe=p.isMe, s=p.shelves||{}, st=p.stats||{};
-      var nights=st.gigs||(p.diary||[]).length||0, fol=p.followers||0;
+      var isMe=p.isMe, s=p.shelves||{}, st=p.stats||{}, diary=p.diary||[];
+      var nights=st.gigs||diary.length||0;
+      var seenN=(s.seen||[]).length, wannaN=(s.wannaSee||[]).length, venN=(s.venues||[]).length, savedN=(s.events||[]).length;
+      var genres=st.topGenres||[], hv=(st.topVenues||[])[0];
       var acts = isMe
-        ? '<button class="pf-btn" id="pb-share" type="button">Share card</button><button class="pf-btn" id="pb-edit" type="button">Settings</button>'
+        ? '<button class="pf-btn" id="pb-share" type="button">Share</button><button class="pf-btn" id="pb-edit" type="button">Settings</button>'
         : '<button class="pf-btn primary follow'+(p.isFollowing?' following':'')+'" id="follow-btn" type="button" data-handle="'+esc(p.handle)+'">'+(p.isFollowing?'Following':'Follow')+'</button><button class="pf-btn" id="pb-share" type="button">Share</button>';
-      var card = '<div class="fp-card">'+
-        '<div class="fp-card-av" style="background-image:'+avatarBg(p.handle,p.avatar)+'"></div>'+
-        '<div class="fp-card-id">'+
-          '<div class="fp-card-h">'+esc(p.displayName||('u/'+p.handle))+'</div>'+
-          '<div class="fp-card-since">'+(st.homeCity?'Home city <b>'+esc(cityLabel(st.homeCity))+'</b>':'Member on soundcheck')+'</div>'+
+      // P1 hero — identity + stat ribbon + genre tags (no QR; sharing lives behind the Share button).
+      var sub=['@'+esc(p.handle), st.homeCity?esc(cityLabel(st.homeCity)):''].filter(Boolean).join(' &middot; ');
+      var hero='<div class="pfh">'+
+        '<div class="pfh-top"><span class="pfh-av" style="background-image:'+avatarBg(p.handle,p.avatar)+'"></span>'+
+          '<div class="pfh-id"><h1 class="pfh-name">'+esc(p.displayName||('u/'+p.handle))+'</h1><div class="pfh-sub">'+sub+'</div></div>'+
+          '<div class="pfh-acts">'+acts+'</div></div>'+
+        '<div class="pfh-ribbon">'+
+          '<div class="c"><b>'+nights+'</b><span>Nights</span></div>'+
+          '<div class="c"><b>'+venN+'</b><span>Venues</span></div>'+
+          '<div class="c"><b>'+seenN+'</b><span>Seen live</span></div>'+
+          '<div class="c"><b>'+wannaN+'</b><span>Wanna see</span></div>'+
         '</div>'+
-        '<div class="fp-card-r"><div class="fp-card-qr"><img class="fp-card-qr-img" src="'+API_BASE+'/api/qr?u='+encodeURIComponent(p.handle)+'" alt="Scan to follow @'+esc(p.handle)+'" loading="lazy"></div><div class="fp-card-btns">'+acts+'</div></div>'+
+        ((genres.length||hv)?'<div class="pfh-tags"><span class="pfh-tl">Sound</span>'+genres.slice(0,4).map(function(g,i){ return '<span class="pfh-tag'+(i===0?' hot':'')+'">'+esc(g)+'</span>'; }).join('')+(hv?'<span class="pfh-tag pfh-home">'+esc(hv.venue||hv)+(hv.n?' &times;'+hv.n:'')+'</span>':'')+'</div>':'')+
       '</div>';
-      var stats = '<div class="fp-stats">'+
-        '<div class="fp-stat"><b>'+((s.seen||[]).length)+'</b><span>Seen live</span></div>'+
-        '<div class="fp-stat"><b>'+((s.wannaSee||[]).length)+'</b><span>Wanna see</span></div>'+
-        '<div class="fp-stat"><b>'+nights+'</b><span>Gigs logged</span></div>'+
-        '<div class="fp-stat"><b>'+fol+'</b><span>Followers</span></div>'+
-      '</div>';
-      return '<div class="pf">'+ card + stats +
-        pbRotationHTML(p)+
-        '<div class="pf-cols">'+
-          '<div class="pf-box" id="pf-diary"></div>'+
-          pfComingHTML(p)+
-          '<div class="pf-box" id="pf-seen"></div>'+
-          '<div class="pf-box" id="pf-wanna"></div>'+
-          '<div class="pf-box" id="pf-venues"></div>'+
-          '<div class="pf-box" id="pf-events"></div>'+
-        '</div>'+
-      '</div>';
+      // Sections as in-page tabs (only render a tab when it has content, matching the
+      // per-box empty rules the wiring uses). Boxes keep their ids so wirePbProfile fills them.
+      var T=[];
+      if(isMe||diary.length) T.push({k:'diary',l:'Diary',c:nights,html:'<div class="pf-box" id="pf-diary"></div>'});
+      if(isMe) T.push({k:'coming',l:'Coming soon',html:pfComingHTML(p)});
+      if(isMe||seenN) T.push({k:'seen',l:'Seen live',c:seenN,html:'<div class="pf-box" id="pf-seen"></div>'});
+      if(isMe||wannaN) T.push({k:'wanna',l:'Wanna see',c:wannaN,html:'<div class="pf-box" id="pf-wanna"></div>'});
+      if(venN) T.push({k:'venues',l:'Venues',c:venN,html:'<div class="pf-box" id="pf-venues"></div>'});
+      if(savedN) T.push({k:'saved',l:'Saved',c:savedN,html:'<div class="pf-box" id="pf-events"></div>'});
+      var tabsBar='<div class="fp-tabs pf-tabs" role="tablist">'+T.map(function(t,i){ return '<button class="fp-tab'+(i===0?' on':'')+'" type="button" role="tab" aria-selected="'+(i===0)+'" data-tab="'+t.k+'">'+esc(t.l)+(t.c!=null?'<span class="c">'+t.c+'</span>':'')+'</button>'; }).join('')+'</div>';
+      var panels=T.map(function(t,i){ return '<div class="fp-tabpanel'+(i===0?'':' hide')+'" data-panel="'+t.k+'">'+t.html+'</div>'; }).join('');
+      return '<div class="pf">'+hero+pbRotationHTML(p)+tabsBar+panels+'</div>';
     }
     function pfHead(title, count, actHtml){ return '<div class="pf-h"><span class="pf-h-t">'+esc(title)+'</span>'+(count!=null?'<span class="pf-h-ct">'+count+'</span>':'')+(actHtml||'')+'</div>'; }
     // "Coming up" — the owner's followed artists' next gigs, flattened + sorted by date.
@@ -5568,6 +5589,11 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
       var s=p.shelves||{}, isMe=p.isMe, diary=p.diary||[];
       wireProfile();
       wireRotation(p);
+      // In-page tabs (Diary / Coming soon / Seen / Wanna / Venues / Saved).
+      document.querySelectorAll('.pf-tabs .fp-tab[data-tab]').forEach(function(b){ b.addEventListener('click',function(){ var k=b.dataset.tab;
+        document.querySelectorAll('.pf-tabs .fp-tab').forEach(function(x){ var on=x===b; x.classList.toggle('on',on); x.setAttribute('aria-selected',on?'true':'false'); });
+        document.querySelectorAll('.pf .fp-tabpanel').forEach(function(pn){ pn.classList.toggle('hide', pn.dataset.panel!==k); });
+      }); });
       var sh=document.getElementById('pb-share'); if(sh) sh.addEventListener('click',function(){ pbShareCard(p); });
       // Coming up: wire rows + See-all. openAccount prefetches /api/upcoming, but openProfile
       // (/u/<me>) does NOT — so when it's missing (own profile via that path, or a failed
