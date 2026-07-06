@@ -1564,6 +1564,22 @@
     .lg-ev .le-d { grid-column:1; grid-row:1 / span 2; align-self:center; font:700 var(--fs-sm) var(--head); color:var(--accent); white-space:nowrap; }
     .lg-ev .le-t { grid-column:2; font-size:var(--fs-base); color:var(--fg); }
     .lg-ev .le-l { grid-column:2; font-size:var(--fs-sm); color:var(--muted); }
+    /* search-first log flow */
+    .lg-search { display:flex; align-items:center; gap:11px; background:var(--surface-2); border:1px solid rgba(255,122,107,0.28); border-radius:var(--radius); padding:12px 14px; }
+    .lg-search:focus-within { border-color:var(--accent); }
+    .lg-search svg { width:19px; height:19px; color:var(--accent); flex:0 0 auto; }
+    .lg-search input { flex:1; border:0; background:transparent; color:var(--fg); font:600 var(--fs-md) var(--body); outline:none; padding:0; }
+    .lg-shint { font-size:var(--fs-sm); color:var(--faint); margin:9px 2px 14px; } .lg-shint b { color:var(--muted); font-weight:700; }
+    .lg-erow { display:flex; align-items:center; gap:13px; text-align:left; width:100%; background:var(--surface-2); border:1px solid var(--border); border-radius:var(--radius); padding:10px; cursor:pointer; -webkit-tap-highlight-color:transparent; transition:border-color .12s, background .12s; }
+    .lg-erow:hover { border-color:var(--accent); }
+    .lg-erow.on { border-color:var(--accent); background:var(--accent-weak); }
+    .lg-erow .le-po { width:52px; height:52px; border-radius:9px; flex:0 0 auto; background:var(--surface-3) center/cover no-repeat; }
+    .lg-erow .le-m { flex:1; min-width:0; display:flex; flex-direction:column; gap:1px; }
+    .lg-erow .le-d { font:700 var(--fs-xs) var(--font-mono); letter-spacing:.06em; text-transform:uppercase; color:var(--accent); }
+    .lg-erow .le-t { font:700 var(--fs-base) var(--head); margin:1px 0 2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .lg-erow .le-s { font-size:var(--fs-sm); color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .lg-erow .le-go { margin-left:auto; color:var(--faint); font-size:18px; flex:0 0 auto; }
+    .lg-erow.on .le-go { color:var(--accent); }
     /* autosuggest dropdown */
     .sg-wrap { position:relative; }
     .sg-wrap input { scroll-margin-top:76px; }   /* stop below the sticky bar when scrolled into view for the keyboard */
@@ -2908,7 +2924,7 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
 .pb-rot-title{ text-transform:uppercase; }
 
 </style>
-<meta name="sc-build" content="flyposter-1783352631685">
+<meta name="sc-build" content="flyposter-1783355195896">
 <meta name="robots" content="noindex">
 </head>
 <body>
@@ -6826,27 +6842,23 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
     }
     function logFormHTML(){
       return '<h2 class="page-title">Log a gig</h2>'+
-        (_logHint?'<div class="lg-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Add the night you caught <b>'+esc(_logHint)+'</b></div>':'')+
-        '<div class="sub" style="margin-bottom:16px">Fill in what you remember &mdash; the DJ, the venue, or roughly when. Any one is enough; add more to narrow it down.</div>'+
-        '<div style="max-width:540px">'+
-          '<div id="lg-preselect" style="display:none"></div>'+
+        (_logHint?'<div class="lg-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Find the night you caught <b>'+esc(_logHint)+'</b></div>':'')+
+        '<div class="sub" style="margin-bottom:16px">Find the night you went to &mdash; pick it and the venue &amp; lineup fill themselves in.</div>'+
+        '<div style="max-width:600px">'+
           '<div class="pf-box">'+
-          '<div id="lg-pickers">'+
-            '<div class="lg-field"><label>City</label>'+cityPickerHTML('lg-city', currentCity)+'</div>'+
-            '<div class="lg-field"><label>Artist <small class="lg-opt">optional</small></label><div class="sg-wrap"><input type="text" id="lg-artist-in" placeholder="Search the DJ you saw…" autocomplete="off" autocapitalize="off"><div class="sg-drop" id="lg-artist-drop"></div></div></div>'+
-            '<div class="lg-field"><label>Venue <small class="lg-opt">optional</small></label><div class="sg-wrap"><input type="text" id="lg-venue-in" placeholder="Search any venue…" autocomplete="off" autocapitalize="off"><div class="sg-drop" id="lg-venue-drop"></div></div></div>'+
-            '<div class="lg-field"><label>Date <small class="lg-opt">optional</small></label><button type="button" id="lg-range" class="lg-rangebtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><span id="lg-range-lbl">Add a date range</span></button></div>'+
-            '<button type="button" id="lg-find" class="pf-btn primary block" style="margin-top:4px">Find nights</button>'+
-            '<div class="err" id="lg-find-err" style="color:var(--accent);font-size:var(--fs-sm);min-height:1em;margin-top:8px"></div>'+
-            '<div class="lg-field" id="lg-events-field" style="display:none;margin-top:16px"><label>Which night?</label><div class="lg-events" id="lg-events"></div></div>'+
+            '<div class="lg-field" style="margin-bottom:12px"><label>City</label>'+cityPickerHTML('lg-city', currentCity)+'</div>'+
+            '<div class="lg-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg><input type="text" id="lg-q" placeholder="Search by club, artist, or date…" autocomplete="off" autocapitalize="off"></div>'+
+            '<div class="lg-shint" id="lg-shint">Searches nights we&rsquo;ve indexed in <b id="lg-shint-city">'+esc(cityLabel(currentCity))+'</b> &middot; pick one to log it.</div>'+
+            '<div class="lg-events" id="lg-events"></div>'+
           '</div>'+
           '<div id="lg-extra" style="display:none">'+
+            '<div class="pf-box" style="margin-top:16px">'+
             '<div class="lg-field" id="lg-lineup-field"><label>Who did you see?</label><div class="lg-chips" id="lg-lineup"></div></div>'+
             '<div class="lg-field"><label>Note (optional)</label><textarea id="lg-note" placeholder="How was it?"></textarea></div>'+
             '<button id="lg-save" type="button" class="pf-btn primary block">Save to diary</button>'+
             '<div class="err" id="lg-err" style="color:var(--accent);font-size:var(--fs-sm);min-height:1em;margin-top:8px"></div>'+
+            '</div>'+
           '</div>'+
-        '</div>'+
         '</div>';
     }
     // A "not here? add it" escape hatch shown under the nights list — for when the
@@ -6855,12 +6867,14 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
     // Render the artist's indexed nights as a selectable list.
     function renderLgEvents(){
       var el=document.getElementById('lg-events'); if(!el) return;
-      if(!lgEventList.length){ el.innerHTML='<div class="empty" style="padding:6px 0">No nights matched those filters — try fewer, a wider date range, or add the event below.</div>'+lgAddEvHTML(); return; }
+      if(!lgEventList.length){ el.innerHTML='<div class="empty" style="padding:6px 0">No indexed nights matched — try the club or a headliner, or add the night below.</div>'+lgAddEvHTML(); return; }
       el.innerHTML=lgEventList.map(function(e,i){
         var d=e.event_date?fmtDateLabel(String(e.event_date).slice(0,10)):'';
-        var ln=(e.lineup||[]).map(function(a){ return a.name; }).filter(Boolean).slice(0,3).join(', ');
+        var ln=(e.lineup||[]).map(function(a){ return a.name; }).filter(Boolean).slice(0,2).join(', ');
+        var sub=[esc(e.venue||''), e.city?esc(cityLabel(e.city)):'', ln?esc(ln):''].filter(Boolean).join(' &middot; ');
+        var po=e.poster_url?' style="background-image:url(\''+imgUrl(e.poster_url,120)+'\')"':'';
         var on=lgSel&&lgSel.id===e.id;
-        return '<button type="button" class="lg-ev'+(on?' on':'')+'" data-evi="'+i+'"><span class="le-d">'+esc(d)+'</span><span class="le-t">'+esc(e.title||'Club night')+'</span>'+(ln?'<span class="le-l">'+esc(ln)+'</span>':'')+'</button>';
+        return '<button type="button" class="lg-erow'+(on?' on':'')+'" data-evi="'+i+'"><span class="le-po"'+po+'></span><span class="le-m"><span class="le-d">'+esc(d)+'</span><span class="le-t">'+esc(e.title||e.venue||'Club night')+'</span>'+(sub?'<span class="le-s">'+sub+'</span>':'')+'</span><span class="le-go">'+(on?'&check;':'&rsaquo;')+'</span></button>';
       }).join('')+lgAddEvHTML();
     }
     // Real, named acts only — drops empty / "-" placeholder entries from the bill.
@@ -6881,39 +6895,37 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
       document.getElementById('lg-extra').style.display='';
       renderLgLineup(); renderLgEvents();
     }
-    // Unified search: whatever of {artist, venue, date range} is filled → matching
-    // past nights (all optional, ≥1 required). Venue pins the city; else scoped to
-    // the selected city (server-side).
-    function lgFind(){
-      var err=document.getElementById('lg-find-err'); if(err) err.textContent='';
-      var hasDate = lgRange && lgRange[0] && lgRange[1];
-      if(!lgPickedArtist && !lgVenue && !hasDate){ if(err) err.textContent='Add an artist, venue, or date to search.'; return; }
-      var qs='city='+encodeURIComponent(document.getElementById('lg-city').value);
-      if(lgPickedArtist) qs+='&artist='+encodeURIComponent(lgPickedArtist.slug);
-      if(lgVenue) qs+='&venue='+encodeURIComponent(lgVenue.slug||lgVenue.name);
-      if(hasDate) qs+='&from='+lgRange[0]+'&to='+lgRange[1];
-      lgSel=null; lgEventList=[];
-      var field=document.getElementById('lg-events-field'); field.style.display='';
-      document.getElementById('lg-events').innerHTML='<div class="empty" style="padding:6px 0">Finding nights…</div>';
-      document.getElementById('lg-extra').style.display='none';
-      pubGet('/api/log/search?'+qs).then(function(j){ lgEventList=(j&&j.gigs)||[]; renderLgEvents(); }).catch(function(){ lgEventList=[]; renderLgEvents(); });
+    // Search-first: one box, free-text across venue + lineup (server ranks the
+    // best match to the top), scoped to the chosen city. Debounced; the newest
+    // query wins so a slow response can't overwrite a fresher one.
+    var _lgQSeq=0;
+    function lgSearchNow(){
+      var box=document.getElementById('lg-q'); if(!box) return;
+      var q=box.value.trim();
+      var ev=document.getElementById('lg-events');
+      lgSel=null; document.getElementById('lg-extra').style.display='none';
+      if(q.length<2){ lgEventList=[]; if(ev) ev.innerHTML=''; return; }
+      if(ev) ev.innerHTML='<div class="empty" style="padding:6px 0">Searching…</div>';
+      var seq=++_lgQSeq;
+      var qs='city='+encodeURIComponent(document.getElementById('lg-city').value)+'&q='+encodeURIComponent(q);
+      pubGet('/api/log/search?'+qs).then(function(j){ if(seq!==_lgQSeq) return; lgEventList=(j&&j.gigs)||[]; renderLgEvents(); })
+        .catch(function(){ if(seq!==_lgQSeq) return; lgEventList=[]; renderLgEvents(); });
     }
+    var _lgQTimer=null;
+    function lgSearchDebounced(){ if(_lgQTimer) clearTimeout(_lgQTimer); _lgQTimer=setTimeout(lgSearchNow, 240); }
     // Coming from a "+ Log" button on a past event: skip the pickers, pull the
     // event's lineup and pre-select it so it's a note-and-save away. Marks the
     // line-up seen on save like any other log.
     async function preselectLogEvent(id){
-      var pk=document.getElementById('lg-pickers'); if(pk) pk.style.display='none';
-      var pre=document.getElementById('lg-preselect');
-      if(pre){ pre.style.display=''; pre.innerHTML='<div class="empty" style="padding:6px 0">Loading…</div>'; }
+      // Hide the search — the night is already known; just show it + lineup chips.
+      ['lg-q','lg-shint'].forEach(function(i){ var el=document.getElementById(i); if(el){ (i==='lg-q'?el.closest('.lg-search'):el).style.display='none'; } });
+      var cf=document.getElementById('lg-city'); if(cf){ var ff=cf.closest('.lg-field'); if(ff) ff.style.display='none'; }
+      var ev0=document.getElementById('lg-events'); if(ev0) ev0.innerHTML='<div class="empty" style="padding:6px 0">Loading…</div>';
       try{
         var r=await authedFetch('/api/event?id='+encodeURIComponent(id)); var ev=await r.json();
-        selectLgEvent({ id:ev.id, title:ev.title, venue:ev.venue, event_date:ev.event_date, lineup:ev.lineup||[] });
-        if(pre){
-          var d=ev.event_date?fmtDateLabel(String(ev.event_date).slice(0,10)):'';
-          var ln=(ev.lineup||[]).map(function(a){ return a.name; }).filter(Boolean).slice(0,4).join(', ');
-          pre.innerHTML='<div class="lg-pre"><div class="lg-pre-t">'+esc(ev.title||ev.venue||'This night')+'</div><div class="lg-pre-s">'+esc(ev.venue||'')+(d?(' &middot; '+esc(d)):'')+'</div>'+(ln?'<div class="lg-pre-l">'+esc(ln)+'</div>':'')+'</div>';
-        }
-      }catch(_){ if(pre) pre.innerHTML='<div class="empty">Couldn&rsquo;t load that night.</div>'; }
+        lgEventList=[{ id:ev.id, title:ev.title, venue:ev.venue, city:ev.city, event_date:ev.event_date, poster_url:ev.poster_url, lineup:ev.lineup||[] }];
+        selectLgEvent(lgEventList[0]);
+      }catch(_){ if(ev0) ev0.innerHTML='<div class="empty">Couldn&rsquo;t load that night.</div>'; }
     }
     // ── P1: taste onboarding (the <3-min flow → living taste profile) ──
     var TASTE_VIBES=['intimate','warehouse','queer','audiophile','afterhours','high energy','deep/listening','experimental'];
@@ -6985,18 +6997,20 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
     }
     function openLog(prefill){
       setRoute('log');
-      lgArtists=(prefill&&prefill.artist&&prefill.artist.slug)?[prefill.artist]:[]; lgSel=null; lgEventList=[];
-      lgPickedArtist=(prefill&&prefill.artist&&prefill.artist.slug)?prefill.artist:null; lgVenue=null; lgRange=null;
+      lgArtists=[]; lgSel=null; lgEventList=[];
+      lgPickedArtist=null; lgVenue=null; lgRange=null;
       _logHint = (prefill&&prefill.seenName) ? prefill.seenName : (prefill&&prefill.artist?prefill.artist.name:null);
       showPage(logFormHTML());
       wireLog();
       if(prefill&&prefill.eventId){ preselectLogEvent(prefill.eventId); return; }
-      // Coming from an artist (e.g. their seen panel) — seed the artist filter + search now.
-      if(lgPickedArtist){ var ai=document.getElementById('lg-artist-in'); if(ai) ai.value=lgPickedArtist.name; lgFind(); }
+      // Coming from an artist (seen panel etc.) — seed the search with their name and run it.
+      if(prefill&&prefill.artist&&prefill.artist.name){ var q=document.getElementById('lg-q'); if(q){ q.value=prefill.artist.name; lgSearchNow(); q.focus(); } }
     }
     function wireLog(){
       document.getElementById('lg-save').addEventListener('click',saveLog);
-      document.getElementById('lg-find').addEventListener('click',lgFind);
+      // Free-text search box → debounced find as you type.
+      var qBox=document.getElementById('lg-q');
+      qBox.addEventListener('input',lgSearchDebounced);
       // Toggle which acts you actually saw (chips); only the lit ones get logged + marked seen.
       document.getElementById('lg-lineup').addEventListener('click',function(e){
         var b=e.target.closest('[data-aslug]'); if(!b) return;
@@ -7004,32 +7018,15 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
         if(lgArtistOn(slug)){ lgArtists=lgArtists.filter(function(a){ return a.slug!==slug; }); b.classList.remove('on'); }
         else { lgArtists.push({ slug:slug, name:b.dataset.aname }); b.classList.add('on'); }
       });
-      // City change — re-run the search if any filter is set + results are showing.
-      wireCityPicker('lg-city', function(){ if((lgPickedArtist||lgVenue||lgRange) && document.getElementById('lg-events-field').style.display!=='none') lgFind(); });
+      // City change — re-run the search in the new city if there's a query.
+      wireCityPicker('lg-city', function(){
+        var sc=document.getElementById('lg-shint-city'); if(sc) sc.textContent=cityLabel(document.getElementById('lg-city').value);
+        if(qBox.value.trim().length>=2) lgSearchNow();
+      });
       // Pick one of the matched nights — or add the event if it's missing.
       document.getElementById('lg-events').addEventListener('click',function(e){
-        if(e.target.closest('#lg-addev')){ openImport({ city:document.getElementById('lg-city').value, artist:(lgPickedArtist&&lgPickedArtist.name)||null, venue:(lgVenue&&lgVenue.name)||null }); return; }
-        var b=e.target.closest('[data-evi]'); if(b) selectLgEvent(lgEventList[+b.dataset.evi]);
-      });
-      // Artist filter (optional) — type-ahead; pick stores it. Clearing the box drops the filter.
-      var artIn=document.getElementById('lg-artist-in');
-      attachSuggest(artIn, document.getElementById('lg-artist-drop'),
-        function(q){ return pubGet('/api/artists?q='+encodeURIComponent(q)).then(function(j){ return (j.artists||[]).map(function(a){ return { slug:a.slug, name:a.name, label:esc(a.name) }; }); }); },
-        function(pick){ if(pick&&pick.slug){ lgPickedArtist={ slug:pick.slug, name:pick.name }; artIn.value=pick.name; } });
-      artIn.addEventListener('input',function(){ if(lgPickedArtist && artIn.value.trim()!==lgPickedArtist.name) lgPickedArtist=null; });
-      // Venue filter (optional) — search EVERY venue worldwide; the suggestion shows its city.
-      var venIn=document.getElementById('lg-venue-in');
-      attachSuggest(venIn, document.getElementById('lg-venue-drop'),
-        function(q){ return pubGet('/api/venues?q='+encodeURIComponent(q)).then(function(j){ return (j.venues||[]).map(function(v){ var loc=[v.area, cityLabel(v.city)].filter(Boolean).join(', '); return { name:v.name, slug:v.slug||v.name, city:v.city||'', label:esc(v.name)+(loc?(' <small>'+esc(loc)+'</small>'):'') }; }); }); },
-        function(pick){ if(!pick) return; lgVenue={ name:pick.name, slug:pick.slug, city:pick.city }; venIn.value=pick.name; });
-      venIn.addEventListener('input',function(){ if(lgVenue && venIn.value.trim()!==lgVenue.name) lgVenue=null; });
-      // Date filter (optional) → the same home-page calendar, range mode, past dates allowed.
-      var rangeBtn=document.getElementById('lg-range');
-      if(rangeBtn) rangeBtn.addEventListener('click',function(){
-        openCal({ allowPast:true, rangeStart:lgRange&&lgRange[0], rangeEnd:lgRange&&lgRange[1], onRange:function(from,to){
-          lgRange=[from,to];
-          var lbl=document.getElementById('lg-range-lbl'); if(lbl) lbl.textContent=fmtRange(from,to);
-        } });
+        if(e.target.closest('#lg-addev')){ openImport({ city:document.getElementById('lg-city').value, artist:qBox.value.trim()||null }); return; }
+        var b=e.target.closest('[data-evi]'); if(b){ selectLgEvent(lgEventList[+b.dataset.evi]); document.getElementById('lg-extra').scrollIntoView({behavior:'smooth',block:'nearest'}); }
       });
     }
     function lgResetEvents(){ lgSel=null; lgEventList=[]; var f=document.getElementById('lg-events-field'); if(f) f.style.display='none'; var x=document.getElementById('lg-extra'); if(x) x.style.display='none'; }
