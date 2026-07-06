@@ -2505,6 +2505,13 @@
     .fp-tab.on .c{ color:var(--accent); }
     .fp-tabpanel .fp-sec{ margin-top:16px; }
     .fp-tabpanel.hide{ display:none; }
+    /* venue owner updates ("From the venue") */
+    .vp-compose textarea{ width:100%; min-height:64px; background:var(--surface-2); border:1px solid var(--border); border-radius:var(--radius); color:var(--fg); padding:10px 12px; font:500 var(--fs-base) var(--body); resize:vertical; outline:none; margin-bottom:9px; }
+    .vp-compose textarea:focus{ border-color:var(--accent); }
+    .vp-update{ padding:11px 0; border-top:1px dashed var(--border); }
+    .vp-compose + #vp-updates-list .vp-update:first-child, .pf-h + #vp-updates-list .vp-update:first-child{ border-top:0; }
+    .vp-update p{ margin:0 0 5px; font-size:var(--fs-base); line-height:1.5; }
+    .vp-update-d{ font:600 10px var(--font-mono); letter-spacing:.08em; text-transform:uppercase; color:var(--faint); }
     /* P1 profile hero */
     .pfh-top{ display:flex; align-items:center; gap:16px; }
     .pfh-av{ width:72px; height:72px; border-radius:50%; background-size:cover; background-position:center; flex:0 0 auto; }
@@ -2963,7 +2970,7 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
 .pb-rot-title{ text-transform:uppercase; }
 
 </style>
-<meta name="sc-build" content="flyposter-1783376448876">
+<meta name="sc-build" content="flyposter-1783378933507">
 <meta name="robots" content="noindex">
 </head>
 <body>
@@ -5480,6 +5487,27 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
       var more=list.length>CAP?'<button class="pf-more" type="button" data-pfmore="'+id+'">See '+(list.length-CAP)+' more</button>':'';
       return head+'<div class="pf-grid" id="pf-grid-'+id+'">'+tiles+'</div>'+more;
     }
+    // Web Push opt-in: "an artist you follow announced a night in your city".
+    // Requires the PWA service worker + VAPID key from the API; alerts are sent
+    // by the daily push cron. Safe to call repeatedly (resubscribes idempotently).
+    async function enablePush(){
+      if(!currentUser){ openAuth(); return; }
+      if(!('serviceWorker' in navigator) || !('PushManager' in window)){ showToast('This browser doesn’t support notifications.'); return; }
+      try{
+        var perm=await Notification.requestPermission();
+        if(perm!=='granted'){ showToast('Notifications blocked — enable them in browser settings.'); return; }
+        var reg=await navigator.serviceWorker.ready;
+        var kr=await fetch(API_BASE+'/api/push/vapid'); var kj=await kr.json();
+        if(!kr.ok||!kj.key){ showToast('Alerts aren’t configured yet.'); return; }
+        // base64url → Uint8Array (applicationServerKey wants raw bytes)
+        var pad='='.repeat((4 - kj.key.length % 4) % 4);
+        var raw=atob((kj.key+pad).replace(/-/g,'+').replace(/_/g,'/'));
+        var key=new Uint8Array(raw.length); for(var i=0;i<raw.length;i++) key[i]=raw.charCodeAt(i);
+        var sub=await reg.pushManager.subscribe({ userVisibleOnly:true, applicationServerKey:key });
+        var r=await authedFetch('/api/push/subscribe',{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(sub.toJSON()) });
+        showToast(r.ok?'Night alerts on — we’ll ping you when artists you follow announce shows.':'Couldn’t save the subscription.');
+      }catch(e){ showToast('Couldn’t enable alerts.'); }
+    }
     function wirePbProfile(p){
       var s=p.shelves||{}, isMe=p.isMe, diary=p.diary||[];
       wireProfile();
@@ -5496,6 +5524,7 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
       }); });
       var sh=document.getElementById('pb-share'); if(sh) sh.addEventListener('click',function(){ pbShareCard(p); });
       var ed=document.getElementById('pb-edit'); if(ed) ed.addEventListener('click',function(){ openActionSheet({ title:'Settings', items:[
+        { label:'Turn on night alerts', run:function(){ enablePush(); } },
         { label:'Change handle', run:function(){ openHandleModal(true); } },
         { label:'Change home city', run:function(){ openCityModal(true); } },
         { label:(currentUser&&currentUser.avatar)?'Change photo':'Add a photo', run:function(){ pickAvatar(); } },
@@ -5906,7 +5935,7 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
         var r=await authedFetch('/api/discover'); var j=await r.json();
         var arts=j.artists||[];
         var h='<h2 class="page-title">Discover</h2><div class="sub" style="margin-bottom:16px">Tonight, tuned to you.</div>';
-        h+='<div id="dc-taste"></div><div id="dc-feed"></div><div id="dc-artists"></div><div id="dc-venues"></div><div id="dc-scenes"></div>';
+        h+='<div id="dc-taste"></div><div id="dc-feed"></div><div id="dc-artists"></div><div id="dc-recs"></div><div id="dc-venues"></div><div id="dc-scenes"></div>';
         openPanel(h);
         // Reserve each async rail's space with a shimmer skeleton so nothing jumps; the real
         // content eases in (.srail-anim) as each fetch resolves.
@@ -5919,6 +5948,15 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
         loadDcVenues();          // venues in the current city
         loadDcScenes();          // scene-guides entry rail
         loadForYou();            // for-you posters (toggles the taste prompt; city fallback otherwise)
+        // Taste-graph rail: artists that people with overlapping diaries/shelves
+        // rate — collaborative, not content-based. Hidden entirely until the
+        // graph has enough density to return anything (honest by design).
+        if(currentUser){
+          authedFetch('/api/recs').then(function(r){ return r.ok?r.json():null; }).then(function(j){
+            var list=(j&&j.artists)||[]; if(!list.length) return;
+            mountArtistRail(document.getElementById('dc-recs'), list.map(function(x){ return { slug:x.slug, name:x.name, image:x.image, nextDate:(x.next&&x.next.event_date)||null, nextVenue:(x.next&&x.next.venue)||null, nextCity:(x.next&&x.next.city)||null }; }), {title:'Rated by people with your taste', wrap:true, wide:true, mt:'24px', emptyLabel:'No upcoming dates'});
+          }).catch(function(){});
+        }
       }catch(_){ openPanel('<h2 class="page-title">Discover</h2><div class="empty">Couldn&rsquo;t load Discover.</div>'); }
     }
     // Recent searches — device-local, ephemeral UI history (not synced / not picks data).
@@ -6462,24 +6500,37 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
         var r=await authedFetch('/api/venue?slug='+encodeURIComponent(slug)+'&city='+encodeURIComponent(city)); var v=await r.json();
         if(v && v.city && v.city!==city){ history.replaceState({sc:1},'', SC_BASE+v.city+'/club/'+slug+'/'); }
         var dispName=v.name||input;
-        var sub=v.address?esc(v.address):(v.area?esc(v.area):'on soundcheck');
-        var av='<span class="artist-av" style="background-image:'+avatarBg(v.slug||dispName,null)+'">'+(v.image?'<img src="'+imgUrl(v.image,200)+'" alt="" loading="lazy" decoding="async" onerror="this.remove()">':'')+'</span>';
-        // Venue header mirrors the artist-page hero: logo + name/socials + description.
-        var h='<div class="artist-head artist-hero">'+(v.image?'<div class="hero-tint" style="background-image:url('+imgUrl(v.image,480)+')"></div>':'')+av+'<div class="artist-head-tx"><div class="ah-namerow"><h3>'+esc(dispName)+'</h3>'+socialLinksHTML({ website:v.website })+'</div>'+(sub?'<div class="sub">'+sub+'</div>':'')+'</div>'+(v.description?'<p class="seo-desc">'+esc(v.description)+'</p>':'')+'</div>';
-        var stats=[];
-        if(v.followers>1) stats.push('<span><b>'+v.followers+'</b> followers</span>');
-        // "logged" + "saved upcoming" counts hidden — no social proof surfaced yet.
-        if(stats.length) h+='<div class="panel-stat" style="margin-top:12px">'+stats.join('')+'</div>';
+        // Venue hero — the SAME bespoke fp-hero structure as the artist page:
+        // photo block (image or generative) + kick line + big name w/ website + acts row.
         var vNext=nextPlayableEvent(v.upcoming);
+        var vImg=v.image?'<img loading="lazy" decoding="async" src="'+imgUrl(v.image,600)+'" alt="" onerror="this.remove()">':'<span class="fp-press-gen" style="background:'+avatarBg(v.slug||dispName,null)+'"></span>';
+        var vKick=[v.area?esc(v.area):'', v.city?esc(cityLabel(v.city)):''].filter(Boolean).join(' · ');
+        if(v.followers>1) vKick+=(vKick?' ':'')+'<b class="fp-foll">'+v.followers+' followers</b>';
+        var vActs='';
         if(v.slug){
-          // Locked action-row pattern: 1 primary (full-width) + 2 secondary (50/50).
-          // Primary = the play/preview action when there's a playable night, matching
-          // the artist "Tune in"; otherwise Follow takes the primary slot.
-          var vFollow='<button class="act-btn '+(vNext?'act-2nd':'radio')+(v.following?' on':'')+'" id="vf-btn" type="button" aria-pressed="'+(v.following?'true':'false')+'">'+HEART_SVG+'<span>'+(v.following?'Following':'Follow')+'</span></button>';
-          var vBeen='<button class="act-btn act-2nd'+(v.myReview?' on':'')+'" id="vp-been" type="button">'+CHECK_SVG+'<span>'+(v.myReview?'You&rsquo;ve been':'I&rsquo;ve been')+'</span></button>';
-          h+='<div class="artist-actions">'+(vNext?('<button class="act-btn radio" id="vp-radio" type="button">'+RADIO_SVG+'<span>Play next night</span></button>'+vFollow+vBeen):(vFollow+vBeen))+'</div>';
+          var vFollow='<button class="fp-ab'+(v.following?' on':'')+'" id="vf-btn" type="button" aria-pressed="'+(v.following?'true':'false')+'">'+HEART_SVG+'<span>'+(v.following?'Following':'Follow')+'</span></button>';
+          var vBeen='<button class="fp-ab'+(v.myReview?' on':'')+'" id="vp-been" type="button">'+CHECK_SVG+'<span>'+(v.myReview?'You&rsquo;ve been':'I&rsquo;ve been')+'</span></button>';
+          vActs='<div class="fp-acts">'+(vNext?('<button class="fp-ab go" id="vp-radio" type="button">'+RADIO_SVG+'<span>Play next night</span></button>'):'')+vFollow+vBeen+'</div>';
         }
+        var h='<div class="fp-artist">'+
+          '<div class="fp-hero">'+
+            '<div class="fp-photo">'+vImg+(v.area?'<div class="fp-origin">'+esc(v.area)+'</div>':'')+'</div>'+
+            '<div class="fp-hx">'+
+              '<div class="fp-kick">'+vKick+'</div>'+
+              '<div class="fp-namerow"><h1 class="fp-h1">'+esc(dispName)+'</h1>'+(socialLinksHTML({ website:v.website })?'<div class="fp-socials">'+socialLinksHTML({ website:v.website })+'</div>':'')+'</div>'+
+              (v.address?'<p class="fp-bio">'+esc(v.address)+'</p>':'')+
+              vActs+
+            '</div>'+
+          '</div>';
         h+='<div id="vp-dna">'+dnaBoxHTML(v.dna)+'</div>';
+        // "From the venue" — owner updates (claim → broadcast; reach is free).
+        if((v.updates||[]).length || v.isOwner){
+          h+='<div class="pf-box vp-updates" id="vp-updates" style="margin-top:14px">'+
+            '<div class="pf-h"><span class="pf-h-t">From the venue</span></div>'+
+            (v.isOwner?'<div class="vp-compose"><textarea id="vp-bc-text" maxlength="500" placeholder="Post an update to your '+(v.followers||0)+' followers…"></textarea><button class="pf-btn primary" id="vp-bc-send" type="button">Post update</button><div class="err" id="vp-bc-err" style="color:var(--accent);font-size:var(--fs-sm);min-height:1em;margin-top:6px"></div></div>':'')+
+            '<div id="vp-updates-list">'+(v.updates||[]).map(function(u){ return '<div class="vp-update"><p>'+esc(u.body)+'</p><span class="vp-update-d">'+esc(fmtDateLabel(String(u.created_at).slice(0,10)))+'</span></div>'; }).join('')+'</div>'+
+          '</div>';
+        }
         // Content sections as in-page tabs (Upcoming / Past / Location) — same pattern as the artist page.
         var vUp=(v.upcoming||[]), vPast=(v.past||[]), vTabs=[];
         if(vUp.length) vTabs.push({ key:'upcoming', label:'Upcoming', count:vUp.length, html:'<div id="vp-upcoming"></div>' });
@@ -6490,6 +6541,7 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
             vTabs.map(function(t,i){ return '<div class="fp-tabpanel'+(i===0?'':' hide')+'" data-panel="'+t.key+'">'+t.html+'</div>'; }).join('');
         } else if(vTabs.length===1){ h+=vTabs[0].html; }
         h+='<div class="claim-banner"><div class="cb-tx"><div class="cb-h">Do you run '+esc(dispName)+'?</div><div class="cb-s">Claim your page to keep your line-ups current and reach the people who follow you on soundcheck.</div></div><button class="cb-btn" id="vp-claim" type="button">Claim this venue</button></div>';
+        h+='</div>';   // close .fp-artist
         openPanel(h);
         var _vcanon=location.origin+SC_BASE+(v.city||currentCity||'london')+'/club/'+venueSlug(dispName)+'/';
         setSeo(dispName+" — what's on & tickets | soundcheck", v.description||'', { "@context":"https://schema.org","@type":["MusicVenue","LocalBusiness"], name:dispName, url:_vcanon, description:v.description||'', address:v.address||undefined }, _vcanon);
@@ -6499,7 +6551,23 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
         if(beenBtn) beenBtn.addEventListener('click',function(){ openVenueReview(v); });
         var vrb=document.getElementById('vp-radio');
         if(vrb && vNext) vrb.addEventListener('click',function(){ playEventLineupRadio({ id:vNext.id, venue:dispName, event_date:vNext.event_date, poster_url:vNext.poster_url, lineup:vNext.lineup }); });
-        armSticky(dispName, (vrb&&vNext)?function(){ vrb.click(); }:null, vrb || document.querySelector('#page-body .artist-hero'));   // sticky title bar: venue name + Play next night (name-only if nothing upcoming)
+        armSticky(dispName, (vrb&&vNext)?function(){ vrb.click(); }:null, vrb || document.querySelector('#page-body .fp-hero'));   // sticky title bar: venue name + Play next night (name-only if nothing upcoming)
+        // Owner broadcast: post an update to followers (free reach — the anti-RA wedge).
+        var bcSend=document.getElementById('vp-bc-send');
+        if(bcSend) bcSend.addEventListener('click',async function(){
+          var ta=document.getElementById('vp-bc-text'), err=document.getElementById('vp-bc-err');
+          var text=(ta.value||'').trim(); err.textContent='';
+          if(text.length<3){ err.textContent='Write a little more.'; return; }
+          bcSend.disabled=true;
+          try{
+            var r=await authedFetch('/api/venue/broadcast',{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ slug:v.slug, body:text }) });
+            var j=await r.json().catch(function(){return{};});
+            if(!r.ok){ err.textContent=(j.error||'Could not post')+'.'; bcSend.disabled=false; return; }
+            var list=document.getElementById('vp-updates-list');
+            list.insertAdjacentHTML('afterbegin','<div class="vp-update"><p>'+esc(text)+'</p><span class="vp-update-d">just now</span></div>');
+            ta.value=''; bcSend.disabled=false; showToast('Posted to your followers');
+          }catch(_){ err.textContent='Network error.'; bcSend.disabled=false; }
+        });
         var cbBtn=document.getElementById('vp-claim');
         if(cbBtn) cbBtn.addEventListener('click',function(){ openClaimModal(dispName, v.slug); });
         // F7: venue DNA — rendered in place from v.dna (folded into /api/venue), so

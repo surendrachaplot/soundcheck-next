@@ -6,7 +6,7 @@
 //  - everything cross-origin (api.6minutes.club, the image proxy, CARTO tiles,
 //    YouTube/SoundCloud SDKs, unpkg) → passthrough; we never cache live data.
 // Bump VERSION to invalidate the shell cache on a meaningful release.
-const VERSION = "sc-1783376270448";
+const VERSION = "sc-1783378760132";
 const SHELL = [
   "./",
   "./index.html",
@@ -59,4 +59,25 @@ self.addEventListener("fetch", (e) => {
       }).catch(() => hit)
     )
   );
+});
+
+// ── Web Push: "an artist you follow announced a night in your city" ──
+self.addEventListener("push", (e) => {
+  let d = {};
+  try { d = e.data ? e.data.json() : {}; } catch (_) {}
+  e.waitUntil(self.registration.showNotification(d.title || "soundcheck", {
+    body: d.body || "",
+    icon: "./icons/icon-192.png",
+    badge: "./icons/icon-192.png",
+    data: { url: d.url || "./" },
+  }));
+});
+
+self.addEventListener("notificationclick", (e) => {
+  e.notification.close();
+  const url = (e.notification.data && e.notification.data.url) || "./";
+  e.waitUntil(clients.matchAll({ type: "window", includeUncontrolled: true }).then((list) => {
+    for (const c of list) { if ("focus" in c) { c.navigate(url); return c.focus(); } }
+    return clients.openWindow(url);
+  }));
 });
