@@ -2400,6 +2400,18 @@
 .diary-page .pb-ds-body .ptiles{margin-top:11px;grid-template-columns:repeat(auto-fill,minmax(62px,1fr));gap:11px 10px;max-width:none}
 .diary-page .pb-ds .dv-del{margin-left:auto;width:26px;height:26px;font-size:15px}
 .diary-page .pb-ds-note{font-size:13px;line-height:1.5;margin-top:10px;padding-top:9px;border-top:1px dashed var(--border);color:var(--fg)}
+/* passport stat band above the diary */
+.diary-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0 20px}
+.diary-stat{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-md);padding:13px 14px;min-width:0}
+.diary-stat b{font-family:var(--head);font-weight:800;font-size:26px;line-height:1;display:block;background:var(--accent-grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.diary-stat b.sm{font-size:19px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.diary-stat span{font:700 9.5px var(--font-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-top:7px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media(max-width:560px){.diary-stats{grid-template-columns:repeat(2,1fr)}}
+/* D1 ticket flourishes: perforation notches + barcode foot */
+.diary-page .pb-ds-date::before,.diary-page .pb-ds-date::after{content:"";position:absolute;right:-6px;width:12px;height:12px;border-radius:50%;background:var(--bg);border:1px solid var(--border);z-index:1}
+.diary-page .pb-ds-date::before{top:-6px}
+.diary-page .pb-ds-date::after{bottom:-6px}
+.diary-page .pb-ds-bc{margin-top:12px;height:15px;background-image:repeating-linear-gradient(90deg,var(--faint) 0 1px,transparent 1px 3px,var(--faint) 3px 5px,transparent 5px 8px);opacity:.26;border-radius:2px}
 /* Coming-up rows on the profile: the ticket-stub as a tappable button */
 .pf-cu-row{ width:100%; text-align:left; font:inherit; color:inherit; cursor:pointer; -webkit-tap-highlight-color:transparent; }
 .pf-cu-row:hover{ border-color:var(--accent); }
@@ -2924,7 +2936,7 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
 .pb-rot-title{ text-transform:uppercase; }
 
 </style>
-<meta name="sc-build" content="flyposter-1783355195896">
+<meta name="sc-build" content="flyposter-1783366565402">
 <meta name="robots" content="noindex">
 </head>
 <body>
@@ -5255,8 +5267,26 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
         var del = (isMe && d.id!=null) ? '<button class="dv-del" type="button" data-del="'+esc(String(d.id))+'" aria-label="Remove gig">&times;</button>' : '';
         var tiles = arts.length ? '<div class="ptiles ptiles-wide">'+arts.map(function(a){ return ptile(a.slug, a.name||a.slug, false, a.image); }).join('')+'</div>' : '';
         var note = d.note?'<div class="pb-ds-note">'+esc(d.note)+'</div>':'';
-        return '<div class="pb-ds"><div class="pb-ds-date"><div class="pb-ds-d">'+day+'</div><div class="pb-ds-m">'+esc(mon)+'</div>'+(yr?'<div class="pb-ds-y">'+yr+'</div>':'')+'</div><div class="pb-ds-body"><div class="pb-ds-venue">'+vn+city+ev+del+'</div>'+tiles+note+'</div></div>';
+        return '<div class="pb-ds"><div class="pb-ds-date"><div class="pb-ds-d">'+day+'</div><div class="pb-ds-m">'+esc(mon)+'</div>'+(yr?'<div class="pb-ds-y">'+yr+'</div>':'')+'</div><div class="pb-ds-body"><div class="pb-ds-venue">'+vn+city+ev+del+'</div>'+tiles+note+'<div class="pb-ds-bc"></div></div></div>';
       }).join('')+'</div>';
+    }
+    // Passport stat band above the diary: nights / venues / cities / most-seen act.
+    function diaryStatsHTML(diary){
+      if(!diary.length) return '';
+      var venues={}, cities={}, arts={};
+      diary.forEach(function(d){
+        if(d.venue) venues[d.venue]=1;
+        if(d.city) cities[d.city]=1;
+        diaryValid(d).forEach(function(a){ var k=a.name||a.slug; arts[k]=(arts[k]||0)+1; });
+      });
+      var topN='', topC=0; Object.keys(arts).forEach(function(k){ if(arts[k]>topC){ topC=arts[k]; topN=k; } });
+      function tile(v,l,sm){ return '<div class="diary-stat"><b'+(sm?' class="sm"':'')+'>'+esc(String(v))+'</b><span>'+esc(l)+'</span></div>'; }
+      return '<div class="diary-stats">'+
+        tile(diary.length,'Nights')+
+        tile(Object.keys(venues).length,'Venues')+
+        tile(Object.keys(cities).length,'Cities')+
+        tile(topN||'—','Most seen'+(topC>1?' · '+topC+'×':''),true)+
+      '</div>';
     }
     // Wire a rendered diary: artist tiles → artist page, venue → venue page, and
     // (own diary only) the × → delete, then re-render via onChange.
@@ -5622,6 +5652,7 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
         var bc='<button class="diary-bc" type="button" id="diary-bc">'+CHV+'<span>'+esc(mine?'Your profile':nm)+'</span></button>';
         var body='<div class="pd-page diary-page" style="max-width:760px">'+bc+
           '<div class="pb-p-head" style="margin-top:6px"><span class="pb-p-title">Gig diary</span><span class="pb-p-count">'+diary.length+' '+(diary.length===1?'STUB':'STUBS')+'</span>'+logBtn+'</div>'+
+          diaryStatsHTML(diary)+
           diaryTLHTML(diary, mine)+'</div>';
         openPanel(body);
         wireDiary(panelBody, mine, function(){ openDiaryPage(handle, mine); });
