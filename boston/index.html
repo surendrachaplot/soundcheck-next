@@ -11,6 +11,7 @@
   <link rel="preload" as="font" type="font/woff2" href="/fonts/inter.woff2" crossorigin />
   <!-- Warm the API connection (TLS) before the first /api/day fetch fires. -->
   <link rel="preconnect" href="https://api.soundcheck.club" crossorigin />
+  <link rel="preconnect" href="https://i.ytimg.com" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
   <link rel="apple-touch-icon" href="/icons/icon-192.png" />
@@ -49,6 +50,9 @@
     html { scroll-behavior:smooth; color-scheme:dark; }
     body { background:var(--bg); color:var(--fg); font-family:var(--body); font-size:var(--fs-base); line-height:1.55; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
     a { color:inherit; }
+    /* Keyboard focus is visible EVERYWHERE by default (the app is almost all
+       buttons). Mouse/touch stay clean — :focus-visible only fires on keyboard. */
+    :focus-visible { outline:2px solid var(--accent); outline-offset:2px; border-radius:2px; }
     .wrap { max-width:1180px; margin:0 auto; padding:0 40px; }
 
     /* nav */
@@ -456,7 +460,7 @@
     .dock:not(.expanded) .panel { cursor:pointer; }
     .dock-grab { display:none; }
     .dock.expanded .dock-grab { display:flex; position:absolute; top:9px; left:50%; transform:translateX(-50%); width:120px; height:26px; align-items:center; justify-content:center; cursor:pointer; z-index:4; -webkit-tap-highlight-color:transparent; }
-    .dock.expanded .dock-grab span { width:40px; height:4px; border-radius:99px; background:rgba(255,255,255,0.3); transition:background .15s; }
+    .dock.expanded .dock-grab span { width:40px; height:4px; border-radius:var(--radius-pill); background:rgba(255,255,255,0.3); transition:background .15s; }
     .dock.expanded .dock-grab:hover span, .dock.expanded .dock-grab:focus-visible span { background:var(--accent); }
     .dock.expanded .dock-grab:focus-visible { outline:none; }
 
@@ -1674,7 +1678,7 @@
     .bnav-tab.on { background:var(--accent-weak); color:var(--accent); }
     .bnav-tab svg { width:var(--icon-md); height:var(--icon-md); stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
     .bnav-tab.on svg { stroke-width:2.4; }
-    .bnav-l { font:600 9.5px/1 var(--body); letter-spacing:0.01em; }
+    .bnav-l { font:600 10px/1 var(--body); letter-spacing:0.01em; }
     .bnav-tab.on .bnav-l { font-weight:700; }
     .bnav-tab.onair svg { animation:radio-pulse 1.6s ease-in-out infinite; }
     @media (max-width:620px){
@@ -1900,7 +1904,7 @@
 }
 .tb-class{
   font-family:var(--font-mono,ui-monospace,Menlo,monospace);
-  font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;
+  font-size:10px;letter-spacing:.2em;text-transform:uppercase;
   color:var(--accent,var(--accent));
   border:1px solid var(--accent,var(--accent));
   padding:5px 9px;border-radius:var(--radius-xs);white-space:nowrap;flex:0 0 auto;
@@ -1912,7 +1916,7 @@
 .tb-paxL{min-width:0}
 .tb-lbl{
   font-family:var(--font-mono,ui-monospace,Menlo,monospace);
-  font-size:8.5px;letter-spacing:.24em;text-transform:uppercase;
+  font-size:9px;letter-spacing:.24em;text-transform:uppercase;
   color:var(--muted,var(--muted));margin-bottom:6px;display:block;
 }
 .tb-name{
@@ -1949,7 +1953,7 @@
 .tb-code.tb-lead{color:var(--accent,var(--accent))}
 .tb-sub{
   font-family:var(--font-mono,ui-monospace,Menlo,monospace);
-  font-size:7.5px;letter-spacing:.16em;text-transform:uppercase;
+  font-size:8px;letter-spacing:.16em;text-transform:uppercase;
   color:var(--muted,var(--muted));
 }
 .tb-leg{flex:1 1 auto;position:relative;height:24px;min-width:14px}
@@ -2021,7 +2025,7 @@
 }
 .tb-stamp span{
   font-family:var(--font-mono,ui-monospace,Menlo,monospace);
-  font-size:6.5px;letter-spacing:.18em;text-transform:uppercase;margin-top:3px;
+  font-size:7px;letter-spacing:.18em;text-transform:uppercase;margin-top:3px;
 }
 .tb-stamp .tb-tick{
   width:15px;height:15px;border-radius:50%;
@@ -2123,7 +2127,7 @@
 
 .tb-hint{
   font-family:var(--font-mono,ui-monospace,Menlo,monospace);
-  font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;
+  font-size:10px;letter-spacing:.2em;text-transform:uppercase;
   color:var(--muted,var(--muted));text-align:center;
 }
 
@@ -2164,12 +2168,12 @@
 .tb-venue{display:flex;align-items:center;gap:10px;padding:12px 15px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);margin-bottom:16px}
 .tb-venue .tb-lbl{margin-bottom:0;flex:0 0 auto}
 .tb-venue .tb-val{margin-top:0;font-size:17px;line-height:1;color:var(--accent);white-space:nowrap;overflow:visible;flex:0 0 auto}
-.tb-vmeta{margin-left:auto;font-family:var(--font-mono);font-size:8.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);flex:0 0 auto}
+.tb-vmeta{margin-left:auto;font-family:var(--font-mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);flex:0 0 auto}
 /* artist bubbles */
 .tb-artists{margin-bottom:18px}
 .tb-arth{display:flex;align-items:center;justify-content:space-between;margin-bottom:13px}
 .tb-arth .tb-lbl{margin-bottom:0}
-.tb-artn{font-family:var(--font-mono);font-size:8.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent)}
+.tb-artn{font-family:var(--font-mono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent)}
 .tb-abubs{display:grid;grid-template-columns:repeat(6,1fr);gap:14px 6px}
 .tb-abub{display:flex;flex-direction:column;align-items:center;gap:7px;min-width:0}
 .tb-ab{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;font-family:var(--head);font-weight:800;font-size:14px;color:#fff;box-shadow:0 0 0 2px var(--surface),0 0 0 3px var(--border)}
@@ -2206,7 +2210,7 @@
 .pb-brand{font-family:var(--font-mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
 .pb-brand b{color:var(--accent)}
 .pb-cover-actions{display:flex;gap:8px}
-.pb-ghost{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);border:1px solid var(--border);background:var(--surface);padding:8px 12px;border-radius:var(--radius-sm);cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.pb-ghost{font-family:var(--font-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);border:1px solid var(--border);background:var(--surface);padding:8px 12px;border-radius:var(--radius-sm);cursor:pointer;display:inline-flex;align-items:center;gap:6px}
 .pb-ghost:hover{color:var(--fg);border-color:var(--accent)}
 /* HERO CARD */
 .pb-hero{padding:18px 26px 4px}
@@ -2229,23 +2233,23 @@
 .pb-id{display:flex;align-items:center;gap:14px}
 .pb-ava{width:62px;height:62px;border-radius:var(--radius-lg);flex:none;box-shadow:inset 0 0 0 1px rgba(255,255,255,.14);background:linear-gradient(140deg,hsl(8 90% 64%),hsl(330 60% 38%))}
 .pb-name{font-family:var(--head);font-weight:800;font-size:34px;letter-spacing:-.02em;line-height:.98;margin:0}
-.pb-meta{font-size:12.5px;color:var(--muted);margin-top:4px;display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center}
+.pb-meta{font-size:13px;color:var(--muted);margin-top:4px;display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center}
 .pb-meta b{color:var(--fg);font-weight:600}
 .pb-dot{width:3px;height:3px;border-radius:50%;background:var(--border)}
-.pb-seal{margin-left:auto;align-self:flex-start;width:52px;height:52px;border-radius:50%;border:1.5px dashed rgba(255,122,107,.6);display:flex;align-items:center;justify-content:center;text-align:center;font-family:var(--font-mono);font-size:7.5px;line-height:1.15;letter-spacing:.12em;color:var(--accent);text-transform:uppercase;transform:rotate(-9deg)}
+.pb-seal{margin-left:auto;align-self:flex-start;width:52px;height:52px;border-radius:50%;border:1.5px dashed rgba(255,122,107,.6);display:flex;align-items:center;justify-content:center;text-align:center;font-family:var(--font-mono);font-size:8px;line-height:1.15;letter-spacing:.12em;color:var(--accent);text-transform:uppercase;transform:rotate(-9deg)}
 .pb-dna{display:grid;grid-template-columns:1fr 1fr;gap:12px 18px;margin-top:auto}
-.pb-dna-lab{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
+.pb-dna-lab{font-family:var(--font-mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
 .pb-genres{display:flex;flex-wrap:wrap;gap:6px}
-.pb-g{font-size:11.5px;padding:4px 9px;border-radius:var(--radius-xl);border:1px solid var(--border);color:var(--muted);background:rgba(255,255,255,.02)}
+.pb-g{font-size:12px;padding:4px 9px;border-radius:var(--radius-xl);border:1px solid var(--border);color:var(--muted);background:rgba(255,255,255,.02)}
 .pb-g.lead{color:var(--accent-ink);background:var(--accent-grad);border-color:transparent;font-weight:700}
-.pb-vrow{display:flex;align-items:baseline;justify-content:space-between;font-size:12.5px;padding:3px 0;border-bottom:1px dotted var(--border)}
+.pb-vrow{display:flex;align-items:baseline;justify-content:space-between;font-size:13px;padding:3px 0;border-bottom:1px dotted var(--border)}
 .pb-vrow span:first-child{color:var(--fg)}
 .pb-vrow span:last-child{font-family:var(--font-mono);color:var(--muted);font-size:11px}
 /* STUB SIDE */
 .pb-stub{position:relative;padding:20px 18px;display:flex;flex-direction:column;gap:14px;background:linear-gradient(180deg,rgba(255,255,255,.025),transparent)}
-.pb-stub-h{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+.pb-stub-h{font-family:var(--font-mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
 .pb-bignum{font-family:var(--head);font-weight:800;font-size:46px;line-height:.9;letter-spacing:-.03em}
-.pb-bignum small{display:block;font-family:var(--font-mono);font-size:9.5px;letter-spacing:.18em;font-weight:400;color:var(--muted);margin-top:6px;text-transform:uppercase}
+.pb-bignum small{display:block;font-family:var(--font-mono);font-size:10px;letter-spacing:.18em;font-weight:400;color:var(--muted);margin-top:6px;text-transform:uppercase}
 .pb-year{display:flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
 .pb-year b{color:var(--fg)}
 .pb-barcode{margin-top:auto;height:46px;border-radius:var(--radius-xs);background:repeating-linear-gradient(90deg,var(--fg) 0 2px,transparent 2px 4px,var(--fg) 4px 5px,transparent 5px 9px,var(--fg) 9px 11px,transparent 11px 13px);opacity:.82}
@@ -2256,7 +2260,7 @@
 .pb-share:hover{filter:brightness(1.05)}
 .pb-share .pb-ic{width:38px;height:38px;border-radius:var(--radius);background:rgba(26,15,14,.16);display:flex;align-items:center;justify-content:center;font-size:19px;flex:none}
 .pb-share-t{font-family:var(--head);font-weight:800;font-size:16px;letter-spacing:-.01em;line-height:1.05}
-.pb-share-s{font-size:11.5px;opacity:.78;margin-top:2px;font-weight:600}
+.pb-share-s{font-size:12px;opacity:.78;margin-top:2px;font-weight:600}
 .pb-log{display:flex;align-items:center;gap:9px;background:var(--surface-2);color:var(--fg);border:1px solid var(--border);border-radius:var(--radius-md);padding:14px 20px;cursor:pointer;font-family:var(--head);font-weight:800;font-size:15px;white-space:nowrap}
 .pb-log:hover{border-color:var(--accent);color:var(--accent)}
 .pb-log .pb-plus{font-size:20px;line-height:0}
@@ -2308,7 +2312,7 @@
 .pb-artist{display:flex;align-items:center;gap:11px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:9px 12px}
 .pb-artist:hover{border-color:var(--muted)}
 .pb-ava-s{width:38px;height:38px;border-radius:var(--radius);flex:none;box-shadow:inset 0 0 0 1px rgba(255,255,255,.1)}
-.pb-a-name{font-weight:600;font-size:13.5px}
+.pb-a-name{font-weight:600;font-size:14px}
 .pb-a-sub{font-size:11px;color:var(--muted);margin-top:1px}
 .pb-tick{margin-left:auto;width:22px;height:22px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-size:11px;border:1px solid var(--border);color:var(--muted)}
 .pb-tick.seen{background:var(--accent-grad);color:var(--accent-ink);border:none}
@@ -2316,9 +2320,9 @@
 /* diary list */
 .pb-prob{display:flex;align-items:center;gap:13px;background:linear-gradient(150deg,rgba(255,122,107,.13),rgba(255,122,107,.03));border:1px dashed rgba(255,122,107,.5);border-radius:var(--radius-md);padding:13px 15px;margin-bottom:14px}
 .pb-prob-tx{flex:1;min-width:140px}
-.pb-prob-tx b{font-weight:700;font-size:13.5px}
+.pb-prob-tx b{font-weight:700;font-size:14px}
 .pb-prob-tx p{margin:2px 0 0;font-size:12px;color:var(--muted)}
-.pb-prob-btn{background:var(--accent-grad);color:var(--accent-ink);border:none;border-radius:var(--radius-sm);padding:9px 15px;font-weight:700;font-size:12.5px;cursor:pointer;white-space:nowrap}
+.pb-prob-btn{background:var(--accent-grad);color:var(--accent-ink);border:none;border-radius:var(--radius-sm);padding:9px 15px;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap}
 .pb-stubs{display:flex;flex-direction:column;gap:10px}
 .pb-ds{position:relative;display:flex;align-items:stretch;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
 .pb-ds-date{flex:none;width:74px;padding:13px 0;text-align:center;border-right:1px dashed var(--border);background:rgba(255,255,255,.015);display:flex;flex-direction:column;justify-content:center}
@@ -2328,7 +2332,7 @@
 .pb-ds-venue{display:flex;align-items:center;flex-wrap:wrap;gap:4px 8px;font-family:var(--font-mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
 .pb-stamp{border:1px solid rgba(255,122,107,.4);border-radius:5px;padding:1px 6px;color:var(--accent);font-size:9px;letter-spacing:.14em}
 .pb-ds-line{font-size:14px;font-weight:600;margin-top:5px}
-.pb-ds-tags{font-size:11.5px;color:var(--muted);margin-top:3px}
+.pb-ds-tags{font-size:12px;color:var(--muted);margin-top:3px}
 .pb-ds-ser{position:absolute;right:11px;bottom:9px;font-family:var(--font-mono);font-size:9px;letter-spacing:.16em;color:var(--border)}
 .pb-addrow{display:flex;align-items:center;justify-content:center;gap:9px;border:1px dashed var(--border);border-radius:var(--radius);padding:14px;color:var(--muted);font-family:var(--font-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;background:none}
 .pb-addrow:hover{border-color:var(--accent);color:var(--accent)}
@@ -2339,15 +2343,15 @@
 .pb-vbadge{width:60px;height:60px;border-radius:50%;margin:0 auto 11px;display:flex;align-items:center;justify-content:center;font-family:var(--head);font-weight:800;font-size:18px;color:var(--fg);box-shadow:inset 0 0 0 2px rgba(255,255,255,.16),inset 0 0 0 5px rgba(0,0,0,.18)}
 .pb-vname{font-weight:700;font-size:14px}
 .pb-vsub{font-family:var(--font-mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-top:4px}
-.pb-following{display:inline-block;margin-top:9px;font-family:var(--font-mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);border:1px solid rgba(255,122,107,.4);border-radius:7px;padding:4px 9px}
+.pb-following{display:inline-block;margin-top:9px;font-family:var(--font-mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);border:1px solid rgba(255,122,107,.4);border-radius:7px;padding:4px 9px}
 /* saved events strip inside wanna */
 .pb-events{display:flex;flex-direction:column;gap:9px;margin-top:6px}
 .pb-ev{display:flex;align-items:center;gap:11px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px 13px}
 .pb-ev-when{font-family:var(--head);font-weight:800;font-size:13px;width:60px;flex:none;line-height:1.1}
 .pb-ev-when small{display:block;font-family:var(--font-mono);font-size:9px;letter-spacing:.14em;color:var(--muted);font-weight:400;text-transform:uppercase;margin-top:2px}
 .pb-ev-main{flex:1;min-width:0}
-.pb-ev-a{font-weight:600;font-size:13.5px}
-.pb-ev-v{font-size:11.5px;color:var(--muted);margin-top:1px}
+.pb-ev-a{font-weight:600;font-size:14px}
+.pb-ev-v{font-size:12px;color:var(--muted);margin-top:1px}
 .pb-ev-go{font-family:var(--font-mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);border:1px solid rgba(255,122,107,.4);border-radius:var(--radius-sm);padding:7px 11px;white-space:nowrap}
 .pb-subhead{font-family:var(--font-mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin:18px 0 9px}
 /* responsive */
@@ -2407,7 +2411,7 @@
 .diary-stat{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-md);padding:13px 14px;min-width:0}
 .diary-stat b{font-family:var(--head);font-weight:800;font-size:26px;line-height:1;display:block;background:var(--accent-grad);-webkit-background-clip:text;background-clip:text;color:transparent}
 .diary-stat b.sm{font-size:19px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.diary-stat span{font:700 9.5px var(--font-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-top:7px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.diary-stat span{font:700 10px var(--font-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-top:7px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 @media(max-width:560px){.diary-stats{grid-template-columns:repeat(2,1fr)}}
 /* D1 ticket flourishes: perforation notches + barcode foot */
 .diary-page .pb-ds-date::before,.diary-page .pb-ds-date::after{content:"";position:absolute;right:-6px;width:12px;height:12px;border-radius:50%;background:var(--bg);border:1px solid var(--border);z-index:1}
@@ -2586,7 +2590,7 @@
     .fp-erow-body{ min-width:0; }
     .fp-erow-date{ font:700 11px var(--font-mono); letter-spacing:.05em; text-transform:uppercase; color:var(--accent); margin-bottom:3px; }
     .fp-erow-title{ font:800 17px/1.12 var(--head); letter-spacing:-0.01em; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
-    .fp-erow-arts{ font:500 12.5px var(--body); color:var(--muted); margin-top:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .fp-erow-arts{ font:500 13px var(--body); color:var(--muted); margin-top:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     .fp-erow-where{ font:600 12px var(--body); color:var(--muted); margin-top:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     .fp-erow-flag{ font-family:initial; margin-left:2px; }
     .fp-erow-play{ width:40px; height:40px; border-radius:50%; border:1px solid var(--border); background:var(--surface-2); color:var(--fg); font-size:14px; cursor:pointer; }
@@ -2623,7 +2627,7 @@
     .fp-pb:hover{ border-color:var(--accent); }
     .fp-ev-gline{ display:flex; gap:7px; margin-bottom:14px; flex-wrap:wrap; }
     .fp-ev-gtag{ background:var(--surface-2); border:1px solid var(--border); border-radius:var(--radius-pill); font:600 10px var(--font-mono); letter-spacing:.08em; text-transform:uppercase; padding:5px 10px; color:var(--fg); }
-    .fp-ev-blurb{ font:400 15.5px/1.6 var(--body); color:var(--muted); max-width:60ch; margin:0; }
+    .fp-ev-blurb{ font:400 16px/1.6 var(--body); color:var(--muted); max-width:60ch; margin:0; }
     /* lineup rows */
     .fp-lu{ display:flex; align-items:center; gap:16px; padding:13px 18px; border-bottom:1px solid var(--line); }
     .fp-lu:last-child{ border-bottom:0; }
@@ -2631,7 +2635,7 @@
     .fp-lu-face{ width:48px; height:48px; border-radius:50%; border:1px solid var(--border); flex:none; background-size:cover; background-position:center; background-color:var(--surface-3); }
     .fp-lu-tx{ flex:1; min-width:0; cursor:pointer; }
     .fp-lu-nm{ font:700 19px var(--head); letter-spacing:-0.01em; }
-    .fp-lu-why{ font:500 12.5px var(--body); color:var(--muted); margin-top:2px; }
+    .fp-lu-why{ font:500 13px var(--body); color:var(--muted); margin-top:2px; }
     .fp-lu-tag{ background:var(--accent-weak); color:var(--accent); border:1px solid var(--accent); border-radius:var(--radius-pill); font:700 10px var(--body); letter-spacing:.06em; text-transform:uppercase; padding:4px 10px; flex:none; }
     .fp-lu-tag.mid{ background:none; border-color:var(--border); color:var(--muted); }
     .fp-lu-pl{ width:38px; height:38px; border-radius:50%; border:1px solid var(--border); background:var(--surface-2); color:var(--fg); font-size:13px; cursor:pointer; flex:none; }
@@ -2956,7 +2960,7 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
 .pb-rot-title{ text-transform:uppercase; }
 
 </style>
-<meta name="sc-build" content="flyposter-1783370575090">
+<meta name="sc-build" content="flyposter-1783373750477">
 <meta name="robots" content="noindex">
 </head>
 <body>
@@ -3176,19 +3180,6 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
     // South London community CTA — shows on these venues' cards
     var SOLO_WHATSAPP='https://chat.whatsapp.com/Ee2P0HuVne2GOgiK54ujqI?mode=gi_t';
     function isSoloVenue(v){ if(!v) return false; return RE_MOT.test(v)||RE_PHONOX.test(v)||RE_CARPET.test(v); }
-    // "Going solo?" community CTA — temporarily disabled; to be redesigned.
-    // Returns nothing everywhere it's called (cards + event sheet); the WhatsApp
-    // link + venue-matching logic below stay ready for the rebuild.
-    function soloCtaHTML(ev){
-      return '';
-      /* eslint-disable no-unreachable */
-      if(!isSoloVenue(ev.venue)) return '';
-      return '<a class="solo-cta" href="'+SOLO_WHATSAPP+'" target="_blank" rel="noopener">'+
-        '<span class="solo-h">Going solo?</span>'+
-        '<span class="solo-t">Join the South London community for ravers and find people to go with.</span>'+
-        '<span class="solo-btn">Join the WhatsApp group &rarr;</span>'+
-      '</a>';
-    }
 
     // deterministic warm gradient for generated posters
     function hashStr(s){ var h=0; for(var i=0;i<s.length;i++){ h=(h*31+s.charCodeAt(i))>>>0; } return h; }
@@ -3449,9 +3440,6 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
     document.getElementById('skip-back').addEventListener('click',function(){ if(active) seekTo(livePos()-15); });
     document.getElementById('skip-fwd').addEventListener('click',function(){ if(active) seekTo(livePos()+15); });
 
-    // On phones the player opens as the compact bar (audio + transport); the
-    // big video stage is one tap away via the thumb. Desktop still expands.
-    function isSmallScreen(){ return window.matchMedia && matchMedia('(max-width:620px)').matches; }
     // Next-gig line for the expanded dock — fetched by the playing artist's slug (cached),
     // so it shows for EVERY artist play (rails, bill, discover, tune-in), not just ones
     // that happened to carry a venue. date · venue · city; venue taps through to the venue.
@@ -3974,17 +3962,6 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
       var hb=document.getElementById('hero-radio'); if(hb) hb.classList.add('on');
       radioTuneIn();
     }
-    // Per-artist station: lead with the artist, then their frequent collaborators.
-    async function startArtistRadio(slug, name, along){
-      if(!slug) return;
-      if(radio.on && radio.station==='artist:'+slug){ stopActive(); return; } // toggle off
-      if(!(await gateForPlay())) return;
-      var q=[{ slug:slug, name:name||slug, yt:null, tried:false, venue:'', day:'', poster:'', eventId:null }];
-      (along||[]).forEach(function(a){ if(a && a.slug) q.push({ slug:a.slug, name:a.name, yt:null, tried:false, venue:'', day:'', poster:'', eventId:null }); });
-      stopActive();
-      radio.queue=q; radio.on=true; radio.i=-1; radio.station='artist:'+slug;
-      radioTuneIn(0); // start with the artist themselves
-    }
     // Station from an arbitrary artist list — e.g. a profile's wanna-see / seen shelf.
     async function startListRadio(list, stationId){
       list=(list||[]).filter(function(a){ return a && a.slug; });
@@ -4015,15 +3992,6 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
         var ev=nextPlayableEvent(v.upcoming);
         if(!ev){ showToast('No line-up to play yet.'); return; }
         playYtList((ev.lineup||[]).map(function(a){ return { slug:a.slug, name:a.name, poster:ev.poster_url }; }), 0);
-      }).catch(function(){ showToast('Couldn’t load that venue.'); });
-    }
-    // Play a venue's next night from just its slug (lazy fetch → its next playable event).
-    function playVenueNextRadio(slug, name, city){
-      if(!slug) return;
-      authedFetch('/api/venue?slug='+encodeURIComponent(slug)+(city?'&city='+encodeURIComponent(city):'')).then(function(r){ return r.json(); }).then(function(v){
-        var ev=nextPlayableEvent(v.upcoming);
-        if(!ev){ showToast('No line-up to play yet.'); return; }
-        playEventLineupRadio({ id:ev.id, venue:v.name||name||'', event_date:ev.event_date, poster_url:ev.poster_url, lineup:ev.lineup });
       }).catch(function(){ showToast('Couldn’t load that venue.'); });
     }
     // ── mobile bottom nav ──
@@ -4667,7 +4635,6 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
       if(navigator.clipboard){ return navigator.clipboard.writeText(opts.url).then(function(){ showToast('Link copied'); },function(){ window.prompt('Copy this link:', opts.url); }); }
       window.prompt('Copy this link:', opts.url);
     }
-    function myHandle(){ return currentUser ? currentUser.handle : null; }
     function shareArtist(slug, name){
       var url=shareUrl({artist:slug, d:currentDate||null});
       doShare({ title:name||'Listen on soundcheck', text:'Listen to '+(name||'this DJ')+' on soundcheck', url:url });
@@ -4800,16 +4767,6 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
         setActiveNight(j.code);
         if(cb) cb(j.code); else openNight(j.code);
       }catch(_){ showToast('Couldn’t start the night'); }
-    }
-    function addToNight(ev){
-      if(!ev||ev.id==null){ return; }
-      var code=activeNight();
-      if(!code){
-        if(!currentUser){ showToast('Sign in to start a night'); openAuth(); return; }
-        createNight(currentDate||todayISO(), function(c){ addEventToNight(c, ev); });
-        return;
-      }
-      addEventToNight(code, ev);
     }
     async function addEventToNight(code, ev){
       try{
@@ -4946,21 +4903,6 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
       var arts=(ev.lineup||[]).map(function(a){ return {slug:a.slug, name:a.name}; });
       openLog({ date: d.date?String(d.date).slice(0,10):null, venue: ev.venue||'', artists: arts });
     }
-    // Renders "Your nights" into the given container (lives in the ACCOUNT HUB —
-    // deliberately not in My Picks; picks are your taste library, nights are plans).
-    async function loadMyNights(containerId){
-      var el=document.getElementById(containerId||'hub-nights'); if(!el) return;
-      el.innerHTML='<div class="sec-h" style="margin-top:4px">Your nights</div>'+
-        '<button class="hub-row" id="mn-plan" type="button" style="max-width:520px"><span class="hr-tx"><span class="hr-t">＋ Plan a night</span><span class="hr-s">Pick events, share with your mates, decide together</span></span></button>'+
-        '<div id="mn-list"></div>';
-      document.getElementById('mn-plan').addEventListener('click',function(){ createNight(currentDate||todayISO()); });
-      try{
-        var r=await authedFetch('/api/nights'); var j=await r.json(); var rows=j.nights||[];
-        var list=document.getElementById('mn-list'); if(!list) return;
-        list.innerHTML=rows.map(function(n){ return '<button class="hub-row open-night" data-code="'+esc(n.code)+'" type="button" style="max-width:520px"><span class="hr-tx"><span class="hr-t">'+esc(n.title||fmtNightDate(n.night_date))+'</span><span class="hr-s">'+n.events+' event'+(n.events===1?'':'s')+' &middot; '+n.members+' in</span></span></button>'; }).join('');
-        list.querySelectorAll('.open-night').forEach(function(b){ b.addEventListener('click',function(){ openNight(b.dataset.code); }); });
-      }catch(_){}
-    }
 
     // ════════════ Taste card — shareable collage of your hearted artists ════════════
     function tcLoadImg(src){ return new Promise(function(res){ var im=new Image(); im.crossOrigin='anonymous'; im.onload=function(){res(im);}; im.onerror=function(){res(null);}; im.src=src; }); }
@@ -5048,7 +4990,6 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
       log:'<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>',
       out:'<svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg>'
     };
-    function hubRow(id, ic, t, d, cls){ return '<button class="hub-row '+(cls||'')+'" id="'+id+'" type="button"><span class="hr-ic">'+ic+'</span><span class="hr-tx"><span class="hr-t">'+t+'</span>'+(d?'<span class="hr-d">'+d+'</span>':'')+'</span><span class="hr-ch">&rsaquo;</span></button>'; }
     // Account hub — Concept B: stat cards + action tiles + recent diary.
     // Account = your own profile (same header + Shelves/Diary as /u/) plus a Settings
     // tab and quick-action chips. Reuses shelfSecHTML/diaryTLHTML/wireShelfBody.
@@ -5233,19 +5174,7 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
       var badge=(count&&count>=2)?'<span class="ptile-x" title="Seen '+count+' times">&times;'+count+'</span>':'';
       return '<button class="ptile" data-artist="'+esc(slug)+'"><span class="ptile-imgwrap"><span class="ptile-img'+(image?' has-img':'')+'" style="background:'+artGrad(name||slug)+'">'+img+'</span>'+badge+'</span><span class="nm">'+esc(name||slug)+'</span></button>';
     }
-    function hubTile(id,ic,t,d){ return '<button class="hub-tile" id="'+id+'" type="button"><span class="ic">'+ic+'</span><div class="t">'+t+'</div><div class="d">'+d+'</div></button>'; }
 
-    // ---- profile ----
-    // Tidy stat strip — numbers in the display font, muted labels, used on the
-    // profile + account headers.
-    // Evergreen diary stats — "your scene" (gigs, top venues/artists/genres).
-    // "Your scene" = a nightlife-passport stats panel (diary-derived). Ticket stub (nights
-    // logged) + sound passport (genres) + venue stamps (gig counts per venue) + a row of
-    // round artist bubbles (acts seen — avatars, no misleading per-artist counts) + serial.
-    function statLineHTML(seen, wanna, gigs, followers){
-      function unit(n, label){ return '<span><b>'+n+'</b> '+label+'</span>'; }
-      return '<div class="prof-statline">'+unit(seen,'seen')+unit(wanna,'wanna see')+unit(gigs,'gig'+(gigs===1?'':'s'))+unit(followers,'follower'+(followers===1?'':'s'))+'</div>';
-    }
     // Shared shelf + diary renderers — used by the public profile AND the account
     // page so they stay identical (DRY).
     function shelfSecHTML(s, handle){
@@ -5350,7 +5279,6 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
     var TC_CHECK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>';
     function tcInitials(n){ n=String(n||''); var m=n.replace(/[^A-Za-z ]/g,'').trim().split(/\s+/).filter(Boolean); return (m.slice(0,2).map(function(w){return w[0];}).join('')||n.slice(0,2)).toUpperCase(); }
     function tcBub(a){ var nm=(a&&(a.name||a.slug))||''; return a&&a.image ? '<span class="tb-ab" style="background-image:url('+imgUrl(a.image,90)+');background-size:cover;background-position:center"></span>' : '<span class="tb-ab" style="background:'+artGrad(nm)+'">'+esc(tcInitials(nm))+'</span>'; }
-    function tcCityCode(c){ c=String(c||'').replace(/[^A-Za-z]/g,''); return c?c.slice(0,3).toUpperCase():'•••'; }
     function tasteCardHTML(p){
       // A clean, minimal soundcheck card — NOT a boarding pass. No admit-one /
       // season / serial / flight-route / "room" / resident stamp, and no guessed
@@ -5542,42 +5470,6 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
       return '<div class="pf">'+hero+pbRotationHTML(p)+tabsBar+panels+'</div>';
     }
     function pfHead(title, count, actHtml){ return '<div class="pf-h"><span class="pf-h-t">'+esc(title)+'</span>'+(count!=null?'<span class="pf-h-ct">'+count+'</span>':'')+(actHtml||'')+'</div>'; }
-    // "Coming up" — the owner's followed artists' next gigs, flattened + sorted by date.
-    // Reuses the diary ticket-stub (.pb-ds) as a tappable row. Own profile only (needs p.upcoming).
-    function pfComingHTML(p){
-      if(!p.isMe) return '';
-      // /api/upcoming returns three lists — wanna-see artists' gigs, nights at venues you
-      // follow, and friends' interests. Flatten ALL of them (deduped by event) so the section
-      // isn't empty when your upcoming comes from venue-follows rather than hearted artists.
-      var up=p.upcoming||{}, rows=[], seen={};
-      function add(list, kind){ (list||[]).forEach(function(e){ (e.gigs||[]).forEach(function(g){
-        if(!g||!g.event_date) return;
-        var id = g.id!=null ? String(g.id) : null;
-        var key = id || (kind+'|'+String(g.event_date)+'|'+(g.venue||''));
-        var label = kind==='artist' ? (e.name||e.slug) : (g.title || g.venue || 'Club night');
-        if(seen[key]){ if(kind==='artist' && seen[key].kind!=='artist'){ seen[key].act=label; seen[key].kind='artist'; } return; }   // an event via a wanna-see artist wins the "act" label over a venue night
-        var r={ date:String(g.event_date).slice(0,10), act:label, kind:kind, venue:g.venue||'', city:g.city||'', id:id };
-        seen[key]=r; rows.push(r);
-      }); }); }
-      add(up.artists,'artist'); add(up.venues,'venue');   // your direct follows; friends' interests stay on the See-all page
-      if(!rows.length) return '<div class="pf-box" id="pf-coming">'+pfHead('Coming up', 0, '')+'<div class="empty" style="padding:2px">Nothing from your follows yet — heart artists and follow venues to catch their next gigs.</div></div>';
-      rows.sort(function(x,y){ return x.date.localeCompare(y.date); });   // soonest first
-      var act = rows.length>5 ? '<button class="pf-h-act" id="pf-cu-all" type="button">See all ›</button>' : '';
-      var body=rows.slice(0,5).map(function(r){
-        var dt=new Date(r.date+'T12:00:00');
-        var day=String(dt.getDate()).padStart(2,'0'), mon=dt.toLocaleDateString('en-GB',{month:'short'});
-        var subParts=[]; if(r.venue && r.venue!==r.act) subParts.push(r.venue); if(r.city) subParts.push(cityLabel(r.city));
-        var sub=subParts.join(' · ');
-        return '<button class="pb-ds pf-cu-row" type="button"'+(r.id?' data-cu-ev="'+esc(r.id)+'"':'')+'><div class="pb-ds-date"><div class="pb-ds-d">'+day+'</div><div class="pb-ds-m">'+esc(mon)+'</div></div><div class="pb-ds-body"><div class="pb-ds-line">'+esc(r.act)+'</div>'+(sub?'<div class="pb-ds-tags">'+esc(sub)+'</div>':'')+'</div></button>';
-      }).join('');
-      return '<div class="pf-box" id="pf-coming">'+pfHead('Coming up', rows.length, act)+'<div class="pb-stubs" style="margin-top:12px">'+body+'</div></div>';
-    }
-    function pfDiaryHTML(p){
-      var diary=p.diary||[], isMe=p.isMe, gigs=(p.stats&&p.stats.gigs)||diary.length||0;
-      var head=pfHead('Gig diary', gigs, diary.length>4?'<button class="pf-h-act" id="pf-seeall" type="button">See all ›</button>':'');
-      if(!diary.length) return head+(isMe?'<button class="pf-btn primary" id="pf-log2" type="button" style="width:100%"><i class="ti ti-plus" aria-hidden="true"></i> Log your first gig</button>':'<div class="empty" style="padding:2px">No gigs logged yet.</div>');
-      return head+'<div class="pf-stubs">'+diary.slice(0,4).map(pbStubHTML).join('')+'</div>'+(isMe?'<button class="pf-btn primary" id="pf-log2" type="button" style="width:100%;margin-top:14px"><i class="ti ti-plus" aria-hidden="true"></i> Log a gig</button>':'');
-    }
     function pfShelfHTML(id, title, list, seen){
       if(seen) list=list.slice().sort(function(a,b){ return (b.count||0)-(a.count||0); });   // Seen live → most-seen artists first
       var CAP=18, head=pfHead(title, list.length, '');
@@ -6029,7 +5921,6 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
     // Recent searches — device-local, ephemeral UI history (not synced / not picks data).
     function getRecent(){ try{ var r=JSON.parse(localStorage.getItem('sc_recent_searches')||'[]'); return Array.isArray(r)?r:[]; }catch(_){ return []; } }
     function pushRecent(q){ q=(q||'').trim(); if(q.length<2) return; try{ var r=getRecent().filter(function(x){ return String(x).toLowerCase()!==q.toLowerCase(); }); r.unshift(q); localStorage.setItem('sc_recent_searches', JSON.stringify(r.slice(0,6))); }catch(_){ } }
-    function clearRecent(){ try{ localStorage.removeItem('sc_recent_searches'); }catch(_){ } }
     function setSearchQuery(q){ var input=document.getElementById('sx-input'); if(!input) return; input.value=q; input.dispatchEvent(new Event('input')); input.focus(); }
     var _sxDiscoverP=null;
     function sxDiscover(){ if(!_sxDiscoverP) _sxDiscoverP=authedFetch('/api/discover').then(function(r){ return r.json(); }).catch(function(){ return {}; }); return _sxDiscoverP; }
@@ -6655,11 +6546,6 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
       try{ return new Date(String(d).slice(0,10)+'T12:00:00').toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'}); }
       catch(_){ return String(d||'').slice(0,10); }
     }
-    // ── event line-up = ONE ranked "bill": who-not-to-miss folded in (badges on the
-    // standouts), every DJ shown once, each row + the top button play as a youtube queue. ──
-    function billItemsFromEv(ev){
-      return (ev.artists||[]).map(function(a){ var slug=(a.contentUrl||'').split('/').filter(Boolean).pop(); return { slug:slug, name:a.name, image:a.image }; }).filter(function(x){ return x.slug; });
-    }
     // The bill = a YouTube queue. The photo ▶ plays that artist and sets the queue so the
     // dock prev/next walks the whole line-up; the name links to the artist's page.
     // The bill = the Seen/Wanna shelf, enriched: round artist tiles, a ▶ on each photo (plays that
@@ -6681,17 +6567,6 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
             why+
           '</div>';
       }).join('')+'</div>';
-    }
-    function mountBill(items){
-      var box=document.getElementById('ev-bill'); if(!box) return;
-      if(!items.length){ box.innerHTML='<div class="pf-box" style="margin-top:20px">'+pfHead('Lineup',null,'')+'<div class="empty" style="padding:2px 0">To be announced.</div></div>'; return; }
-      box.innerHTML='<div class="pf-box" style="margin-top:20px">'+pfHead('Lineup',items.length,'')+billRowsHTML(items)+'</div>';
-      var q=items.map(function(a){ return { slug:a.slug, name:a.name, poster:a.image }; });
-      // ▶ on the photo → play that artist (jumps the queue to them; dock prev/next walks the rest)
-      box.querySelectorAll('.bill-play[data-bill-i]').forEach(function(el){ el.addEventListener('click',function(e){ e.stopPropagation(); playYtList(q, +el.dataset.billI); }); });
-      // tap the tile → the artist's page
-      box.querySelectorAll('.bill-tile[data-bill-go]').forEach(function(el){ el.addEventListener('click',function(){ openArtist(el.dataset.billGo); }); });
-      var pb=document.getElementById('ev-playbill'); if(pb){ pb.onclick=function(){ playYtList(q,0); }; }
     }
     function musicEventLD(ev){
       var o={ "@context":"https://schema.org","@type":"MusicEvent", name:ev.title||'Event', url:location.origin+SC_BASE+eventPath(ev.id, ev.title||((ev.artists||[])[0]||{}).name, ev.venue)+'/', eventAttendanceMode:"https://schema.org/OfflineEventAttendanceMode" };
@@ -7085,7 +6960,6 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
         var b=e.target.closest('[data-evi]'); if(b){ selectLgEvent(lgEventList[+b.dataset.evi]); document.getElementById('lg-extra').scrollIntoView({behavior:'smooth',block:'nearest'}); }
       });
     }
-    function lgResetEvents(){ lgSel=null; lgEventList=[]; var f=document.getElementById('lg-events-field'); if(f) f.style.display='none'; var x=document.getElementById('lg-extra'); if(x) x.style.display='none'; }
     async function saveLog(){
       if(!currentUser){ openAuth(); return; }
       if(!lgSel){ document.getElementById('lg-err').textContent='Pick a night first.'; return; }
@@ -7299,37 +7173,6 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
 
     afterPicksChanged();
 
-    // ── lineup + card ──
-    function lineupHTML(ev, cap, inSheet){
-      var arts=ev.artists||[];
-      if(!arts.length) return '<li class="tba">Lineup TBA</li>';
-      var n=arts.length, c=cap||n, html='';
-      arts.forEach(function(a,idx){
-        if(idx===c){ html+='<li class="more-li"><button class="more-btn" type="button" data-extra="'+(n-c)+'">+ '+(n-c)+' more</button></li>'; }
-        var slug=a.contentUrl?a.contentUrl.split('/').filter(Boolean).pop():'';
-        var sc=normaliseSc(a.soundcloud);
-        var pos=esc(ev.poster||'');
-        var ytBtn=slug?'<button class="play yt" data-slug="'+esc(slug)+'" data-name="'+esc(a.name)+'" data-poster="'+pos+'" data-venue="'+esc(ev.venue||'')+'" title="Play full set on YouTube">'+YT_SVG+'<span class="state">▶</span></button>':'<span class="no-sc">&mdash;</span>';
-        var picked=slug&&isArtistPicked(slug)?' on':'';
-        // Heart lives only in the roomy event sheet now — the home grid drops it so the row is
-        // one big tap-to-play target (the artist NAME plays their set; see anCls below).
-        var heart=(inSheet&&slug)?'<button class="heart'+picked+'" type="button" data-pick-art="'+esc(slug)+'" data-name="'+esc(a.name)+'" aria-pressed="'+(picked?'true':'false')+'" aria-label="Wanna see '+esc(a.name)+'">'+HEART_SVG+'</button>':'';
-        // Seen toggle — only in the roomy event sheet. Account feature.
-        var seenOn = slug && artStatus(slug)==='seen' ? ' on' : '';
-        var seenBtn = (inSheet && slug) ? '<button class="seen-btn'+seenOn+'" type="button" data-seen-art="'+esc(slug)+'" data-name="'+esc(a.name)+'" aria-label="Seen '+esc(a.name)+' live" title="Seen live">'+CHECK_SVG+'</button>' : '';
-        var shareA = (inSheet && slug) ? '<button class="share-btn" type="button" data-share-art="'+esc(slug)+'" data-name="'+esc(a.name)+'" aria-label="Share '+esc(a.name)+'">'+SHARE_SVG+'</button>' : '';
-        var pickedRow = slug && sharedPicks && (sharedPicks.artists||[]).indexOf(slug)>=0 ? ' picked' : '';
-        // Name tap: in the sheet → open artist page; on the home grid → PLAY the artist's set
-        // (a big tap target next to the small ▶), so the whole row is playable.
-        var anCls, anAttr;
-        if(inSheet && slug){ anCls='an linky'; anAttr=' data-artist="'+esc(slug)+'" data-name="'+esc(a.name)+'"'; }
-        else if(slug){ anCls='an an-play'; anAttr=' data-slug="'+esc(slug)+'" data-name="'+esc(a.name)+'"'; }
-        else { anCls='an'; anAttr=''; }
-        var av = a.image ? '<span class="ln-av" style="background-image:url(\''+imgUrl(a.image,64)+'\')"'+(inSheet&&slug?' data-artist="'+esc(slug)+'"':'')+'></span>' : '';
-        html+='<li'+(idx>=c?' class="hid'+pickedRow+'"':(pickedRow?' class="'+pickedRow.trim()+'"':''))+(slug?' data-slug="'+esc(slug)+'"':'')+'>'+ytBtn+av+'<span class="'+anCls+'"'+anAttr+'>'+esc(a.name)+'</span>'+heart+seenBtn+shareA+'</li>';
-      });
-      return html;
-    }
     // Poster-led event card: poster hero (heart top-right, eyebrow+title+meta bottom-left,
     // salmon play half over the bottom-right) + artist chips (cap 4, then "+N more" → event).
     function cardHTML(ev){
@@ -7556,7 +7399,6 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
     }
     function isoOf(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
     function todayISO(){ return isoOf(new Date()); }
-    function weekendDates(){ var sat=new Date(); sat.setDate(sat.getDate()+((6-sat.getDay()+7)%7)); var fri=new Date(sat); fri.setDate(sat.getDate()-1); return [isoOf(fri), isoOf(sat)]; }
     function fmtDateLabel(iso){ var d=new Date(iso+'T12:00:00'); return d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'}); }
     function fmtRange(a,b){ var da=new Date(a+'T12:00:00'); return da.toLocaleDateString('en-GB',{weekday:'short',day:'numeric'})+' – '+fmtDateLabel(b); }
     var currentDate=null, currentRange=null, mode='weekend', activePick='weekend';
@@ -7915,7 +7757,6 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
     // allowPast unblocks past dates (you log nights that already happened).
     var calOnRange=null, calAllowPast=false;
     var RANGE_CAP=31;                   // max days in a single range (a full month)
-    function inRange(iso, a, b){ return a && b && iso>=a && iso<=b; }
     function buildCal(){
       var tdy=new Date(); tdy.setHours(0,0,0,0);
       var y=calView.getFullYear(), m=calView.getMonth();
