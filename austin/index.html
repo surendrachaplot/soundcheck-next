@@ -2956,7 +2956,7 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
 .pb-rot-title{ text-transform:uppercase; }
 
 </style>
-<meta name="sc-build" content="flyposter-1783369993441">
+<meta name="sc-build" content="flyposter-1783370575090">
 <meta name="robots" content="noindex">
 </head>
 <body>
@@ -5531,8 +5531,8 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
       // Sections as in-page tabs (only render a tab when it has content, matching the
       // per-box empty rules the wiring uses). Boxes keep their ids so wirePbProfile fills them.
       var T=[];
-      if(isMe||diary.length) T.push({k:'diary',l:'Diary',c:nights,html:'<div class="pf-box" id="pf-diary"></div>'});
-      if(isMe) T.push({k:'coming',l:'Coming soon',html:pfComingHTML(p)});
+      if(isMe||diary.length) T.push({k:'diary',l:'Diary',c:nights,html:'<div class="diary-page" id="pf-diary"></div>'});
+      if(isMe) T.push({k:'coming',l:'Coming soon',html:'<div id="pf-coming"><div id="cu-scopebar"></div><div id="cu-lensbody"><div class="empty" style="padding:8px 6px">Loading…</div></div></div>'});
       if(isMe||seenN) T.push({k:'seen',l:'Seen live',c:seenN,html:'<div class="pf-box" id="pf-seen"></div>'});
       if(isMe||wannaN) T.push({k:'wanna',l:'Wanna see',c:wannaN,html:'<div class="pf-box" id="pf-wanna"></div>'});
       if(venN) T.push({k:'venues',l:'Venues',c:venN,html:'<div class="pf-box" id="pf-venues"></div>'});
@@ -5590,25 +5590,16 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
       wireProfile();
       wireRotation(p);
       // In-page tabs (Diary / Coming soon / Seen / Wanna / Venues / Saved).
+      // The Coming soon tab IS the full "Coming up" page — scope filters + Artists/
+      // Venues/Friends sub-tabs — lazy-loaded (one /api/upcoming call) the first time it's opened.
+      var _cuLoaded=false;
+      function loadComingTab(){ if(_cuLoaded||!document.getElementById('cu-scopebar')) return; _cuLoaded=true; upS={ scope:'week', anchor:todayISO(), tab:null }; renderUpcoming(); }
       document.querySelectorAll('.pf-tabs .fp-tab[data-tab]').forEach(function(b){ b.addEventListener('click',function(){ var k=b.dataset.tab;
         document.querySelectorAll('.pf-tabs .fp-tab').forEach(function(x){ var on=x===b; x.classList.toggle('on',on); x.setAttribute('aria-selected',on?'true':'false'); });
         document.querySelectorAll('.pf .fp-tabpanel').forEach(function(pn){ pn.classList.toggle('hide', pn.dataset.panel!==k); });
+        if(k==='coming') loadComingTab();
       }); });
       var sh=document.getElementById('pb-share'); if(sh) sh.addEventListener('click',function(){ pbShareCard(p); });
-      // Coming up: wire rows + See-all. openAccount prefetches /api/upcoming, but openProfile
-      // (/u/<me>) does NOT — so when it's missing (own profile via that path, or a failed
-      // prefetch), fetch it here and refill the box. Makes the section work from EVERY entry point.
-      function wireComing(){
-        document.querySelectorAll('#pf-coming .pf-cu-row[data-cu-ev]').forEach(function(b){ b.addEventListener('click',function(){ if(b.dataset.cuEv) openEvent(b.dataset.cuEv); }); });
-        var cua=document.getElementById('pf-cu-all'); if(cua) cua.addEventListener('click',function(){ openUpcoming(); });
-      }
-      wireComing();
-      if(isMe && !p.upcoming){
-        authedFetch('/api/upcoming').then(function(r){ return r.ok?r.json():null; }).then(function(u){
-          if(!u) return; p.upcoming=u; var box=document.getElementById('pf-coming');
-          if(box){ box.outerHTML=pfComingHTML(p); wireComing(); }
-        }).catch(function(){});
-      }
       var ed=document.getElementById('pb-edit'); if(ed) ed.addEventListener('click',function(){ openActionSheet({ title:'Settings', items:[
         { label:'Change handle', run:function(){ openHandleModal(true); } },
         { label:'Change home city', run:function(){ openCityModal(true); } },
@@ -5617,13 +5608,13 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
         { label:'Feed', run:function(){ openFeed(); } },
         { label:'Sign out', run:function(){ signOut(); } }
       ]}); });
-      // Gig diary box
+      // Gig diary box — identical to the diary page (full ticket stubs + delete),
+      // wrapped in .diary-page so the perforation notches + barcode render.
       var db=document.getElementById('pf-diary');
-      if(db){ if(isMe || diary.length){ db.innerHTML=pfDiaryHTML(p);
-        db.querySelectorAll('.pb-ds[data-venue]').forEach(function(b){ b.addEventListener('click',function(){ if(b.dataset.venue) openVenue(b.dataset.venue); }); });
-        db.querySelectorAll('.pb-ds-ev[data-event-id]').forEach(function(b){ b.addEventListener('click',function(e){ e.stopPropagation(); if(b.dataset.eventId) openEvent(b.dataset.eventId); }); });
-        var l2=document.getElementById('pf-log2'); if(l2) l2.addEventListener('click',function(){ openLog(); });
-        var sa=document.getElementById('pf-seeall'); if(sa) sa.addEventListener('click',function(){ openDiaryPage(p.handle, isMe); });
+      if(db){ if(isMe || diary.length){
+        db.innerHTML=diaryTLHTML(diary, isMe)+(isMe&&diary.length?'<button class="pf-btn primary" id="pf-log2" type="button" style="width:100%;margin-top:14px">＋ Log a gig</button>':'');
+        wireDiary(db, isMe, function(){ openProfile(p.handle); });
+        ['pf-log2','diary-log2'].forEach(function(id){ var b=document.getElementById(id); if(b) b.addEventListener('click',function(){ openLog(); }); });
       } else db.remove(); }
       // Seen live / Wanna see boxes (spacious grids)
       function shelfBox(id, title, list, seen){
