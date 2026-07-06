@@ -1451,6 +1451,8 @@
     .lg-chips { display:flex; flex-wrap:wrap; gap:8px; }
     .lg-chip { background:var(--surface-2); border:1px solid var(--border); color:var(--muted); border-radius:var(--radius-pill); padding:7px 13px; font:600 var(--fs-sm) var(--body); cursor:pointer; -webkit-tap-highlight-color:transparent; transition:border-color .12s, color .12s, background .12s; }
     .lg-chip.on { border-color:var(--accent); color:var(--accent-ink); background:var(--accent); }
+    .lg-chip-all { border-style:dashed; color:var(--fg); }
+    .lg-chip-all.on { border-style:solid; }
     .lg-field label { display:block; font-size:var(--fs-xs); font-weight:700; letter-spacing:0.18em; text-transform:uppercase; color:var(--muted); margin-bottom:7px; }
     .lg-field input, .lg-field textarea { width:100%; background:var(--surface-2); border:1px solid var(--border); color:var(--fg); border-radius:var(--radius); padding:11px 13px; font:500 var(--fs-md) var(--body); outline:none; }
     .lg-field input:focus, .lg-field textarea:focus { border-color:var(--accent); }
@@ -2936,7 +2938,7 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
 .pb-rot-title{ text-transform:uppercase; }
 
 </style>
-<meta name="sc-build" content="flyposter-1783366565402">
+<meta name="sc-build" content="flyposter-1783367508457">
 <meta name="robots" content="noindex">
 </head>
 <body>
@@ -6884,7 +6886,7 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
           '</div>'+
           '<div id="lg-extra" style="display:none">'+
             '<div class="pf-box" style="margin-top:16px">'+
-            '<div class="lg-field" id="lg-lineup-field"><label>Who did you see?</label><div class="lg-chips" id="lg-lineup"></div></div>'+
+            '<div class="lg-field" id="lg-lineup-field"><label>Who did you see? <small class="lg-opt">tap the acts you caught</small></label><div class="lg-chips" id="lg-lineup"></div></div>'+
             '<div class="lg-field"><label>Note (optional)</label><textarea id="lg-note" placeholder="How was it?"></textarea></div>'+
             '<button id="lg-save" type="button" class="pf-btn primary block">Save to diary</button>'+
             '<div class="err" id="lg-err" style="color:var(--accent);font-size:var(--fs-sm);min-height:1em;margin-top:8px"></div>'+
@@ -6918,11 +6920,14 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
       var ln=lgValidLineup(lgSel&&lgSel.lineup);
       if(!ln.length){ if(field) field.style.display='none'; el.innerHTML=''; return; }
       if(field) field.style.display='';
-      el.innerHTML=ln.map(function(a){ return '<button type="button" class="lg-chip'+(lgArtistOn(a.slug)?' on':'')+'" data-aslug="'+esc(a.slug)+'" data-aname="'+esc(a.name||a.slug)+'">'+esc(a.name||a.slug)+'</button>'; }).join('');
+      var allOn=ln.length>0 && lgArtists.length>=ln.length;
+      var chips=ln.map(function(a){ return '<button type="button" class="lg-chip'+(lgArtistOn(a.slug)?' on':'')+'" data-aslug="'+esc(a.slug)+'" data-aname="'+esc(a.name||a.slug)+'">'+esc(a.name||a.slug)+'</button>'; }).join('');
+      // "Saw everyone" shortcut for a full bill — off by default, no acts pre-picked.
+      el.innerHTML=(ln.length>1?'<button type="button" class="lg-chip lg-chip-all'+(allOn?' on':'')+'" data-all="1">'+(allOn?'Clear':'Saw everyone')+'</button>':'')+chips;
     }
     function selectLgEvent(e){
       lgSel={ id:e.id, title:e.title, venue:e.venue, date:e.event_date?String(e.event_date).slice(0,10):null, lineup:e.lineup||[] };
-      lgArtists=lgValidLineup(lgSel.lineup).map(function(a){ return {slug:a.slug, name:a.name||a.slug}; }); // default: saw everyone
+      lgArtists=[];   // start with nobody selected — you tap the acts you actually caught
       document.getElementById('lg-extra').style.display='';
       renderLgLineup(); renderLgEvents();
     }
@@ -7044,10 +7049,13 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
       qBox.addEventListener('input',lgSearchDebounced);
       // Toggle which acts you actually saw (chips); only the lit ones get logged + marked seen.
       document.getElementById('lg-lineup').addEventListener('click',function(e){
+        var all=e.target.closest('[data-all]');
+        if(all){ var ln=lgValidLineup(lgSel&&lgSel.lineup); lgArtists=(lgArtists.length>=ln.length)?[]:ln.map(function(a){ return {slug:a.slug, name:a.name||a.slug}; }); renderLgLineup(); return; }
         var b=e.target.closest('[data-aslug]'); if(!b) return;
         var slug=b.dataset.aslug;
-        if(lgArtistOn(slug)){ lgArtists=lgArtists.filter(function(a){ return a.slug!==slug; }); b.classList.remove('on'); }
-        else { lgArtists.push({ slug:slug, name:b.dataset.aname }); b.classList.add('on'); }
+        if(lgArtistOn(slug)) lgArtists=lgArtists.filter(function(a){ return a.slug!==slug; });
+        else lgArtists.push({ slug:slug, name:b.dataset.aname });
+        renderLgLineup();   // keep the "Saw everyone" chip state in sync
       });
       // City change — re-run the search in the new city if there's a query.
       wireCityPicker('lg-city', function(){
