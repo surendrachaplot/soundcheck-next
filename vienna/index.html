@@ -1364,7 +1364,7 @@
     .artist-actions .act-btn, .artist-actions .act-btn.radio { flex:1 1 calc(50% - 5px); }
     .ah-fests { margin:9px 0 0; color:var(--muted); font:500 var(--fs-sm) var(--body); line-height:1.5; }
     .ah-fests b { color:var(--fg); font-weight:600; text-transform:uppercase; font-size:var(--fs-xs); letter-spacing:.06em; margin-right:6px; }
-    .act-btn { flex:1; min-width:0; white-space:nowrap; display:inline-flex; align-items:center; justify-content:center; gap:7px; height:42px; padding:0 15px; border-radius:var(--radius); border:1px solid var(--border); background:var(--surface-2); color:var(--fg); font:700 11px var(--body); letter-spacing:0.05em; text-transform:uppercase; cursor:pointer; text-decoration:none; transition:background .12s, border-color .12s, color .12s; touch-action:manipulation; -webkit-tap-highlight-color:transparent; }
+    .act-btn { flex:1; min-width:0; }   /* base look: canonical ghost (see .pf-btn group) */
     .act-btn.act-tickets:hover { border-color:var(--accent); color:var(--accent); }
     .act-btn svg { width:var(--icon-sm); height:var(--icon-sm); display:block; }
     .act-btn:hover { border-color:var(--accent); color:var(--accent); }
@@ -1434,7 +1434,7 @@
     .cu-hide { display:none; }
     /* Coming up — date scope bar + jump-to-date; entity rows go two-up on desktop */
     .up-scope { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin:2px 0 16px; }
-    .up-chip { font:700 var(--fs-sm) var(--body); color:var(--muted); background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-pill); padding:8px 14px; cursor:pointer; -webkit-tap-highlight-color:transparent; }
+    .up-chip { font:700 var(--fs-sm) var(--body); color:var(--muted); background:var(--surface-2); border:1px solid var(--border); border-radius:var(--radius-pill); padding:8px 14px; cursor:pointer; -webkit-tap-highlight-color:transparent; }   /* canonical CHIP metrics — matches .lg-chip */
     .up-chip.on { background:var(--accent); border-color:var(--accent); color:var(--accent-ink); }
     .up-reset { padding:8px 12px; font-size:var(--fs-md); line-height:1; }
     .up-jump { position:relative; display:inline-flex; align-items:center; gap:7px; color:var(--muted); background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-pill); padding:8px 14px; cursor:pointer; font:700 var(--fs-sm) var(--body); }
@@ -1453,7 +1453,7 @@
     /* log-a-gig */
     .lg-field { margin-bottom:14px; }
     .lg-chips { display:flex; flex-wrap:wrap; gap:8px; }
-    .lg-chip { background:var(--surface-2); border:1px solid var(--border); color:var(--muted); border-radius:var(--radius-pill); padding:7px 13px; font:600 var(--fs-sm) var(--body); cursor:pointer; -webkit-tap-highlight-color:transparent; transition:border-color .12s, color .12s, background .12s; }
+    .lg-chip { background:var(--surface-2); border:1px solid var(--border); color:var(--muted); border-radius:var(--radius-pill); padding:8px 14px; font:700 var(--fs-sm) var(--body); cursor:pointer; -webkit-tap-highlight-color:transparent; transition:border-color .12s, color .12s, background .12s; }   /* canonical CHIP metrics — matches .up-chip */
     .lg-chip.on { border-color:var(--accent); color:var(--accent-ink); background:var(--accent); }
     .lg-chip-all { border-style:dashed; color:var(--fg); }
     .lg-chip-all.on { border-style:solid; }
@@ -1527,7 +1527,10 @@
     .pf-h-t { font:800 18px var(--head); letter-spacing:-0.01em; }
     .pf-h-ct { font:600 11px var(--font-mono,monospace); color:var(--muted); }
     .pf-h-act { margin-left:auto; background:none; border:none; color:var(--accent); font:700 12px var(--body); cursor:pointer; padding:0; }
-    .pf-btn { display:inline-flex; align-items:center; justify-content:center; gap:7px; height:42px; padding:0 15px; border-radius:var(--radius); font:700 11px var(--body); letter-spacing:0.05em; text-transform:uppercase; cursor:pointer; border:1px solid var(--border); background:var(--surface-2); color:var(--fg); white-space:nowrap; transition:border-color .12s, background .12s; }
+    /* ── canonical GHOST button — one spec shared by the three historical
+       families (.pf-btn profile, .act-btn entity actions, .fp-ab artist hero).
+       Modifiers (.primary/.go/.on) stay per-family below. ── */
+    .pf-btn, .act-btn, .fp-ab { display:inline-flex; align-items:center; justify-content:center; gap:7px; height:42px; padding:0 15px; border-radius:var(--radius); font:700 11px var(--body); letter-spacing:0.05em; text-transform:uppercase; cursor:pointer; border:1px solid var(--border); background:var(--surface-2); color:var(--fg); white-space:nowrap; text-decoration:none; transition:border-color .12s, background .12s, color .12s; touch-action:manipulation; -webkit-tap-highlight-color:transparent; }
     .pf-btn:hover { border-color:var(--accent); }
     .pf-btn.primary { background:var(--accent); border-color:var(--accent); color:var(--accent-ink); }
     .pf-btn.follow.following { background:transparent; color:var(--accent); border-color:var(--accent); }
@@ -2322,7 +2325,7 @@
 .pb-prob-tx{flex:1;min-width:140px}
 .pb-prob-tx b{font-weight:700;font-size:14px}
 .pb-prob-tx p{margin:2px 0 0;font-size:12px;color:var(--muted)}
-.pb-prob-btn{background:var(--accent-grad);color:var(--accent-ink);border:none;border-radius:var(--radius-sm);padding:9px 15px;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap}
+.pb-prob-btn{background:var(--accent);color:var(--accent-ink);border:none;border-radius:var(--radius);padding:9px 15px;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap}   /* canonical primary: solid accent (gradient reserved for play controls + the share hero CTA) */
 .pb-stubs{display:flex;flex-direction:column;gap:10px}
 .pb-ds{position:relative;display:flex;align-items:stretch;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
 .pb-ds-date{flex:none;width:74px;padding:13px 0;text-align:center;border-right:1px dashed var(--border);background:rgba(255,255,255,.015);display:flex;flex-direction:column;justify-content:center}
@@ -2562,7 +2565,7 @@
     .fp-namerow .fp-socials{ margin:0 0 6px; }
     .fp-gemline{ margin:0 0 14px; }
     .fp-acts{ display:flex; flex-wrap:wrap; gap:9px; }
-    .fp-ab{ flex:1; min-width:120px; border:1px solid var(--border); border-radius:var(--radius); background:var(--surface-2); color:var(--fg); font:700 11px var(--body); letter-spacing:.05em; text-transform:uppercase; padding:0 14px; height:42px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:7px; transition:border-color .12s,background .12s; }
+    .fp-ab{ flex:1; min-width:120px; }   /* base look: canonical ghost (see .pf-btn group) */
     .fp-ab svg{ width:16px; height:16px; flex:none; }
     .fp-ab.go{ background:var(--accent); color:var(--accent-ink); border-color:var(--accent); }
     /* toggled ON (wanna-see / seen-live) — unmistakable: solid salmon fill, ink text, a ✓ replaces the outline icon */
@@ -2960,7 +2963,7 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
 .pb-rot-title{ text-transform:uppercase; }
 
 </style>
-<meta name="sc-build" content="flyposter-1783375935488">
+<meta name="sc-build" content="flyposter-1783376448876">
 <meta name="robots" content="noindex">
 </head>
 <body>
