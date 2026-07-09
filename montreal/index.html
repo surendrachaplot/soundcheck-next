@@ -2512,6 +2512,22 @@
     .vp-compose + #vp-updates-list .vp-update:first-child, .pf-h + #vp-updates-list .vp-update:first-child{ border-top:0; }
     .vp-update p{ margin:0 0 5px; font-size:var(--fs-base); line-height:1.5; }
     .vp-update-d{ font:600 10px var(--font-mono); letter-spacing:.08em; text-transform:uppercase; color:var(--faint); }
+    /* owner toolkit (claimed entity page) */
+    .owner-box{ border-color:rgba(255,122,107,.28); background:linear-gradient(180deg,var(--accent-weak),transparent); }
+    .ob-badge{ font:700 9px var(--font-mono); letter-spacing:.14em; color:var(--accent); border:1px solid rgba(255,122,107,.4); border-radius:var(--radius-pill); padding:3px 8px; }
+    .ob-aud{ margin:12px 0 14px; } .ob-load{ color:var(--faint); font-size:var(--fs-sm); }
+    .ob-stats{ display:flex; gap:22px; } .ob-stat b{ font-family:var(--head); font-weight:800; font-size:1.4rem; display:block; line-height:1; }
+    .ob-stat span{ font:700 9.5px var(--font-mono); letter-spacing:.08em; text-transform:uppercase; color:var(--muted); margin-top:5px; display:block; }
+    .ob-cities{ margin-top:12px; display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+    .ob-cl{ font:700 9.5px var(--font-mono); letter-spacing:.1em; text-transform:uppercase; color:var(--faint); margin-right:2px; }
+    .ob-city{ font-size:var(--fs-sm); color:var(--muted); background:var(--surface-2); border:1px solid var(--border); border-radius:var(--radius-pill); padding:4px 10px; } .ob-city b{ color:var(--fg); }
+    .ob-compose textarea{ width:100%; min-height:60px; background:var(--surface-2); border:1px solid var(--border); border-radius:var(--radius); color:var(--fg); padding:10px 12px; font:500 var(--fs-base) var(--body); resize:vertical; outline:none; margin-bottom:9px; }
+    .ob-compose textarea:focus{ border-color:var(--accent); }
+    .ee-box .ee-l{ display:block; font:700 10px var(--font-mono); letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin:12px 0 5px; }
+    .ee-box input, .ee-box textarea{ width:100%; background:var(--surface-2); border:1px solid var(--border); border-radius:var(--radius); color:var(--fg); padding:9px 12px; font:500 var(--fs-base) var(--body); outline:none; }
+    .ee-box textarea{ min-height:60px; resize:vertical; } .ee-box input:focus, .ee-box textarea:focus{ border-color:var(--accent); }
+    .ee-note{ color:var(--faint); font-size:var(--fs-sm); } .ee-check{ display:flex; align-items:center; gap:8px; margin-top:10px; font-size:var(--fs-sm); color:var(--muted); }
+    .ee-check input{ width:auto; }
     /* P1 profile hero */
     .pfh-top{ display:flex; align-items:center; gap:16px; }
     .pfh-av{ width:72px; height:72px; border-radius:50%; background-size:cover; background-position:center; flex:0 0 auto; }
@@ -2970,7 +2986,7 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
 .pb-rot-title{ text-transform:uppercase; }
 
 </style>
-<meta name="sc-build" content="flyposter-1783612295254">
+<meta name="sc-build" content="flyposter-1783637978398">
 <meta name="robots" content="noindex">
 </head>
 <body>
@@ -4467,12 +4483,15 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
     }
 
     // ── claim a venue page (owner / team lead) ──
-    function openClaimModal(venueName, venueSlug){
+    // Generalized claim modal — type is 'venue' | 'artist' | 'promoter'.
+    function openClaimModal(type, name, slug){
+      // Back-compat: old callers pass (name, slug) for venues.
+      if(type!=='venue'&&type!=='artist'&&type!=='promoter'){ slug=name; name=type; type='venue'; }
       var ov=document.createElement('div'); ov.className='auth-overlay show';
       ov.innerHTML='<div class="auth-box">'+
         '<button class="auth-close" type="button" aria-label="Close">&times;</button>'+
-        '<div class="eyebrow">Venue claim</div>'+
-        '<h3>Claim '+esc(venueName)+'</h3>'+
+        '<div class="eyebrow">'+esc(type)+' claim</div>'+
+        '<h3>Claim '+esc(name)+'</h3>'+
         '<p>Drop your details and we&rsquo;ll be in touch to get you set up.</p>'+
         '<input type="text" id="cl-first" placeholder="First name" autocomplete="given-name">'+
         '<input type="text" id="cl-last" placeholder="Last name" autocomplete="family-name" style="margin-top:8px">'+
@@ -4490,12 +4509,12 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
         var email=ov.querySelector('#cl-email').value.trim();
         if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ err.textContent='Enter a valid email.'; return; }
         go.disabled=true; err.textContent='';
-        var payload={ slug:venueSlug||null, name:venueName,
+        var payload={ type:type, slug:slug||null, name:name,
           firstName:ov.querySelector('#cl-first').value.trim(),
           lastName:ov.querySelector('#cl-last').value.trim(),
           email:email, phone:ov.querySelector('#cl-phone').value.trim() };
         try{
-          var r=await authedFetch('/api/venue/claim',{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) });
+          var r=await authedFetch('/api/entity/claim',{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) });
           var j=await r.json();
           if(!r.ok){ err.textContent=j.error||'Could not submit.'; go.disabled=false; return; }
           close(); showToast('Thanks — we’ll be in touch soon.');
@@ -4503,6 +4522,94 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
       });
       setTimeout(function(){ var i=ov.querySelector('#cl-first'); if(i) i.focus(); },50);
     }
+
+    // ── Owner toolkit — shown on an artist/venue page you've claimed. Audience
+    // panel (the hook) + edit-details + broadcast. Public "updates" list is
+    // separate (everyone sees it). type = 'artist' | 'venue'. ──
+    function ownerToolsHTML(type, data){
+      if(!data.isOwner) return '';
+      var fol=type==='venue'?(data.followers||0):((data.updates&&0)||'');
+      return '<div class="pf-box owner-box" style="margin-top:14px">'+
+        '<div class="pf-h"><span class="pf-h-t">Your page</span><span class="ob-badge">OWNER</span><button class="pf-btn" id="ob-edit" type="button" style="margin-left:auto">Edit details</button></div>'+
+        '<div class="ob-aud" id="ob-aud"><span class="ob-load">Loading your audience…</span></div>'+
+        '<div class="ob-compose"><textarea id="ob-bc" maxlength="500" placeholder="Post an update to the people who follow you…"></textarea><button class="pf-btn primary" id="ob-bc-send" type="button">Post update</button><div class="err" id="ob-bc-err" style="color:var(--accent);font-size:var(--fs-sm);min-height:1em;margin-top:6px"></div></div>'+
+      '</div>';
+    }
+    // Public "From the venue / From the artist" updates list (everyone).
+    function entityUpdatesHTML(type, data){
+      var ups=data.updates||[];
+      if(!ups.length) return '';
+      var label=type==='venue'?'From the venue':'From the artist';
+      return '<div class="pf-box" id="ent-updates" style="margin-top:14px"><div class="pf-h"><span class="pf-h-t">'+label+'</span></div><div id="ent-updates-list">'+
+        ups.map(function(u){ return '<div class="vp-update"><p>'+esc(u.body)+'</p><span class="vp-update-d">'+esc(fmtDateLabel(String(u.created_at).slice(0,10)))+'</span></div>'; }).join('')+'</div></div>';
+    }
+    function wireEntityOwner(type, slug, name, data){
+      if(data.isOwner){
+        // Audience panel — lazy; the "you have an audience" reveal.
+        authedFetch('/api/entity/audience?type='+encodeURIComponent(type)+'&slug='+encodeURIComponent(slug)).then(function(r){ return r.ok?r.json():null; }).then(function(a){
+          var box=document.getElementById('ob-aud'); if(!box||!a) return;
+          function stat(n,l){ return '<div class="ob-stat"><b>'+(n||0)+'</b><span>'+l+'</span></div>'; }
+          var stats = type==='venue'
+            ? stat(a.followers,'followers')+stat(a.savesUpcoming,'saved upcoming')
+            : stat(a.wannaSee,'wanna see')+stat(a.seenLive,'seen live');
+          var cities=(a.topCities||[]).filter(function(c){return c.city;});
+          box.innerHTML='<div class="ob-stats">'+stats+'</div>'+
+            (cities.length?'<div class="ob-cities"><span class="ob-cl">Where they are</span>'+cities.map(function(c){ return '<span class="ob-city">'+esc(c.city)+' <b>'+c.n+'</b></span>'; }).join('')+'</div>':'');
+        }).catch(function(){});
+        var eb=document.getElementById('ob-edit'); if(eb) eb.addEventListener('click',function(){ openEntityEditModal(type, slug, name, data); });
+        var bs=document.getElementById('ob-bc-send');
+        if(bs) bs.addEventListener('click',async function(){
+          var ta=document.getElementById('ob-bc'), err=document.getElementById('ob-bc-err'); var text=(ta.value||'').trim(); err.textContent='';
+          if(text.length<3){ err.textContent='Write a little more.'; return; } bs.disabled=true;
+          try{
+            var r=await authedFetch('/api/entity/broadcast',{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ type:type, slug:slug, body:text }) });
+            var j=await r.json().catch(function(){return{};}); if(!r.ok){ err.textContent=(j.error||'Could not post')+'.'; bs.disabled=false; return; }
+            var list=document.getElementById('ent-updates-list');
+            if(!list){ // no updates box yet — create one after the owner box
+              var ob=document.querySelector('.owner-box');
+              if(ob) ob.insertAdjacentHTML('afterend','<div class="pf-box" id="ent-updates" style="margin-top:14px"><div class="pf-h"><span class="pf-h-t">'+(type==='venue'?'From the venue':'From the artist')+'</span></div><div id="ent-updates-list"></div></div>');
+              list=document.getElementById('ent-updates-list');
+            }
+            if(list) list.insertAdjacentHTML('afterbegin','<div class="vp-update"><p>'+esc(text)+'</p><span class="vp-update-d">just now</span></div>');
+            ta.value=''; bs.disabled=false; showToast('Posted to your followers');
+          }catch(_){ err.textContent='Network error.'; bs.disabled=false; }
+        });
+      }
+    }
+    function openEntityEditModal(type, slug, name, data){
+      var ov=document.createElement('div'); ov.className='auth-overlay show';
+      var common='<label class="ee-l">Short blurb</label><textarea id="ee-blurb" maxlength="600" placeholder="Tell people what you’re about…">'+esc(data.blurb||'')+'</textarea>'+
+        '<label class="ee-l">Website</label><input type="url" id="ee-website" value="'+attrEsc(data.website||'')+'" placeholder="https://…">'+
+        '<label class="ee-l">Instagram</label><input type="text" id="ee-instagram" value="'+attrEsc(data.instagram||'')+'" placeholder="@handle or URL">';
+      var extra = type==='venue'
+        ? '<label class="ee-l">Address</label><input type="text" id="ee-address" value="'+attrEsc(data.address||'')+'">'+
+          '<label class="ee-l">Capacity</label><input type="text" id="ee-capacity" value="'+attrEsc(data.capacity||'')+'" placeholder="e.g. 600">'+
+          '<label class="ee-l">Opening hours</label><input type="text" id="ee-hours" value="'+attrEsc(data.hours||'')+'" placeholder="Fri–Sat 11pm–6am">'+
+          '<label class="ee-l">Sound system</label><input type="text" id="ee-soundsystem" value="'+attrEsc(data.soundsystem||'')+'" placeholder="e.g. Void Acoustics">'
+        : '<label class="ee-l">Bio</label><textarea id="ee-bio" maxlength="800" placeholder="Your story…">'+esc(data.bio||'')+'</textarea>'+
+          '<label class="ee-l">Booking email</label><input type="email" id="ee-booking_email" value="'+attrEsc(data.bookingEmail||'')+'" placeholder="bookings@…"><label class="ee-check"><input type="checkbox" id="ee-booking_hidden"> Hide my booking email publicly</label>';
+      ov.innerHTML='<div class="auth-box ee-box"><button class="auth-close" type="button" aria-label="Close">&times;</button>'+
+        '<div class="eyebrow">Edit</div><h3>'+esc(name)+'</h3><p class="ee-note">Your edits show on your page. Our aggregated gig data stays as it is.</p>'+
+        common+extra+'<button class="go" id="ee-save" type="button">Save</button><div class="err" id="ee-err"></div></div>';
+      document.body.appendChild(ov);
+      function close(){ ov.remove(); }
+      ov.querySelector('.auth-close').addEventListener('click',close);
+      ov.addEventListener('click',function(e){ if(e.target===ov) close(); });
+      ov.querySelector('#ee-save').addEventListener('click',async function(){
+        var patch={ blurb:val('ee-blurb'), website:val('ee-website'), instagram:val('ee-instagram') };
+        if(type==='venue'){ patch.address=val('ee-address'); patch.capacity=val('ee-capacity'); patch.hours=val('ee-hours'); patch.soundsystem=val('ee-soundsystem'); }
+        else { patch.bio=val('ee-bio'); patch.booking_email=val('ee-booking_email'); patch.booking_hidden=!!document.getElementById('ee-booking_hidden').checked; }
+        function val(id){ var e=document.getElementById(id); return e?e.value.trim():''; }
+        var err=ov.querySelector('#ee-err'), sv=ov.querySelector('#ee-save'); sv.disabled=true; err.textContent='';
+        try{
+          var r=await authedFetch('/api/entity/edit',{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ type:type, slug:slug, patch:patch }) });
+          if(!r.ok){ var j=await r.json().catch(function(){return{};}); err.textContent=(j.error||'Could not save')+'.'; sv.disabled=false; return; }
+          close(); showToast('Saved'); if(type==='venue') openVenue(slug); else openArtist(slug);
+        }catch(_){ err.textContent='Network error.'; sv.disabled=false; }
+      });
+    }
+    function val(id){ var e=document.getElementById(id); return e?e.value.trim():''; }
+    function attrEsc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
 
     // ── avatar upload (client-side square-crop + resize, then store) ──
     function pickAvatar(){
@@ -6254,8 +6361,13 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
           h+='<div class="fp-tabs" role="tablist">'+secTabs.map(function(t){ var on=t.key===_activeTab; return '<button class="fp-tab'+(on?' on':'')+'" type="button" role="tab" aria-selected="'+on+'" data-tab="'+t.key+'">'+esc(t.label)+(t.count!=null?'<span class="c">'+t.count+'</span>':'')+'</button>'; }).join('')+'</div>'+
             secTabs.map(function(t){ return '<div class="fp-tabpanel'+(t.key===_activeTab?'':' hide')+'" data-panel="'+t.key+'">'+t.html+'</div>'; }).join('');
         } else if(secTabs.length===1){ h+=secTabs[0].html; }
+        // Owner toolkit + public updates, or a claim CTA for the act/their team.
+        h+=ownerToolsHTML('artist', a)+entityUpdatesHTML('artist', a);
+        if(!a.isOwner) h+='<div class="claim-banner"><div class="cb-tx"><div class="cb-h">Are you '+esc(a.name||slug)+' (or your team)?</div><div class="cb-s">Claim this page to edit your bio, confirm your tour dates and post to the people who follow you — free, always.</div></div><button class="cb-btn" id="ap-claim" type="button">Claim this page</button></div>';
         h+='</div>';
         openPanel(h);
+        wireEntityOwner('artist', slug, a.name||slug, a);
+        var apClaim=document.getElementById('ap-claim'); if(apClaim) apClaim.addEventListener('click',function(){ openClaimModal('artist', a.name||slug, slug); });
         var _acanon=location.origin+SC_BASE+'dj/'+slug+'/';
         setSeo((a.name||slug)+' — gigs & upcoming shows | soundcheck', a.description||'', { "@context":"https://schema.org","@type":"MusicGroup", name:(a.name||slug), url:_acanon, description:a.description||'' }, _acanon);
         var apRadio=document.getElementById('ap-radio');
@@ -6528,14 +6640,8 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
             '</div>'+
           '</div>';
         h+='<div id="vp-dna">'+dnaBoxHTML(v.dna)+'</div>';
-        // "From the venue" — owner updates (claim → broadcast; reach is free).
-        if((v.updates||[]).length || v.isOwner){
-          h+='<div class="pf-box vp-updates" id="vp-updates" style="margin-top:14px">'+
-            '<div class="pf-h"><span class="pf-h-t">From the venue</span></div>'+
-            (v.isOwner?'<div class="vp-compose"><textarea id="vp-bc-text" maxlength="500" placeholder="Post an update to your '+(v.followers||0)+' followers…"></textarea><button class="pf-btn primary" id="vp-bc-send" type="button">Post update</button><div class="err" id="vp-bc-err" style="color:var(--accent);font-size:var(--fs-sm);min-height:1em;margin-top:6px"></div></div>':'')+
-            '<div id="vp-updates-list">'+(v.updates||[]).map(function(u){ return '<div class="vp-update"><p>'+esc(u.body)+'</p><span class="vp-update-d">'+esc(fmtDateLabel(String(u.created_at).slice(0,10)))+'</span></div>'; }).join('')+'</div>'+
-          '</div>';
-        }
+        // Owner toolkit (audience + edit + broadcast) + public updates list.
+        h+=ownerToolsHTML('venue', v)+entityUpdatesHTML('venue', v);
         // Content sections as in-page tabs (Upcoming / Past / Location) — same pattern as the artist page.
         var vUp=(v.upcoming||[]), vPast=(v.past||[]), vTabs=[];
         if(vUp.length) vTabs.push({ key:'upcoming', label:'Upcoming', count:vUp.length, html:'<div id="vp-upcoming"></div>' });
@@ -6557,24 +6663,10 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
         var vrb=document.getElementById('vp-radio');
         if(vrb && vNext) vrb.addEventListener('click',function(){ playEventLineupRadio({ id:vNext.id, venue:dispName, event_date:vNext.event_date, poster_url:vNext.poster_url, lineup:vNext.lineup }); });
         armSticky(dispName, (vrb&&vNext)?function(){ vrb.click(); }:null, vrb || document.querySelector('#page-body .fp-hero'));   // sticky title bar: venue name + Play next night (name-only if nothing upcoming)
-        // Owner broadcast: post an update to followers (free reach — the anti-RA wedge).
-        var bcSend=document.getElementById('vp-bc-send');
-        if(bcSend) bcSend.addEventListener('click',async function(){
-          var ta=document.getElementById('vp-bc-text'), err=document.getElementById('vp-bc-err');
-          var text=(ta.value||'').trim(); err.textContent='';
-          if(text.length<3){ err.textContent='Write a little more.'; return; }
-          bcSend.disabled=true;
-          try{
-            var r=await authedFetch('/api/venue/broadcast',{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ slug:v.slug, body:text }) });
-            var j=await r.json().catch(function(){return{};});
-            if(!r.ok){ err.textContent=(j.error||'Could not post')+'.'; bcSend.disabled=false; return; }
-            var list=document.getElementById('vp-updates-list');
-            list.insertAdjacentHTML('afterbegin','<div class="vp-update"><p>'+esc(text)+'</p><span class="vp-update-d">just now</span></div>');
-            ta.value=''; bcSend.disabled=false; showToast('Posted to your followers');
-          }catch(_){ err.textContent='Network error.'; bcSend.disabled=false; }
-        });
+        // Owner toolkit (audience + edit + broadcast) — the anti-RA wedge.
+        wireEntityOwner('venue', v.slug, dispName, v);
         var cbBtn=document.getElementById('vp-claim');
-        if(cbBtn) cbBtn.addEventListener('click',function(){ openClaimModal(dispName, v.slug); });
+        if(cbBtn) cbBtn.addEventListener('click',function(){ openClaimModal('venue', dispName, v.slug); });
         // F7: venue DNA — rendered in place from v.dna (folded into /api/venue), so
         // it paints with the page instead of popping in late. Just wire its links.
         document.querySelectorAll('#vp-dna .vd-vlink[data-venue]').forEach(function(b){ b.addEventListener('click',function(){ openVenue(b.dataset.venue, v.city||currentCity); }); });
@@ -7956,6 +8048,8 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
     //   ?picks=v1.<b64>               — a friend's shortlist (encoded payload includes date)
     renderCityUI(); loadCities();
     var _qs=new URLSearchParams(location.search);
+    // Landed here from a claim link → they now own the page they're on.
+    if(_qs.get('claimed')==='1'){ setTimeout(function(){ showToast('This page is yours now — edit it and post to your followers.'); },900); }
     var _qd=_qs.get('date'), _qe=_qs.get('event'), _qa=_qs.get('artist'), _qp=_qs.get('picks'), _qsd=_qs.get('d');
     var _qfrom=_qs.get('from'), _qto=_qs.get('to');
     sharedPicks = _qp ? decodePicksParam(_qp) : null;
