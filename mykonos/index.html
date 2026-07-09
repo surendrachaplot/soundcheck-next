@@ -2970,7 +2970,7 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
 .pb-rot-title{ text-transform:uppercase; }
 
 </style>
-<meta name="sc-build" content="flyposter-1783378933507">
+<meta name="sc-build" content="flyposter-1783612295254">
 <meta name="robots" content="noindex">
 </head>
 <body>
@@ -5527,6 +5527,11 @@ input,textarea,select,.sg-wrap input,.lg-ev,.lg-rangebtn,.sg-drop{ border:2px so
         { label:'Turn on night alerts', run:function(){ enablePush(); } },
         { label:'Change handle', run:function(){ openHandleModal(true); } },
         { label:'Change home city', run:function(){ openCityModal(true); } },
+        { label:'Hide my profile from search engines', run:function(){
+            authedFetch('/api/prefs',{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ hideFromSearch:true }) })
+              .then(function(r){ showToast(r.ok?'Hidden — your profile drops out of search on the next daily rebuild.':'Couldn’t save that.'); })
+              .catch(function(){ showToast('Network error.'); });
+          } },
         { label:(currentUser&&currentUser.avatar)?'Change photo':'Add a photo', run:function(){ pickAvatar(); } },
         { label:'Add an event', run:function(){ openImport(); } },
         { label:'Feed', run:function(){ openFeed(); } },
