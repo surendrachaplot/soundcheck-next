@@ -2752,17 +2752,48 @@
 :focus-visible{ outline-color:#ffffff; }
 ::selection{ background:#ffffff; color:#0a0a0a; }
 
-/* white controls need an edge: near-black border on every accent-filled
-   control (play buttons overlay posters, which are often bright); flat, no glow */
+/* ── mono emphasis scale ──────────────────────────────────────────────────
+   Colour is gone, so hierarchy carries everything. Four rungs:
+   E1 FILLED  (white fill · ink text · near-black edge) — play, follow, log,
+              radio, selected date. Hover steps DOWN a shade (white can't
+              brighten); press scales.
+   E2 OUTLINE (white 35% border · 8% white tint · white text) — hdr-log,
+              event-radio pills. Hover snaps the border to full white.
+   E3 HAIRLINE (grey border · fg text) — chips, tags, ghost buttons. Hover
+              lifts the border one grey step.
+   ON-STATES  (hearts, seen, nav tab) — 14% white tint + white border/text,
+              which the build-time rgba swap already produces; left as-is. */
+
+/* E1 — filled: dark edge (never vanishes over bright posters), flat */
 .evc-play, .ev-bigplay, .bill-play, .play-main, .psticky-play, .srail-play,
-.card-play, .fp-erow-play, .pd-follow, .pd-loggig, .pb-share, .radio-fab, .dt.on{
+.card-play, .fp-erow-play, .pd-follow, .pd-loggig, .pb-share, .radio-fab,
+.follow-btn, .dt.on{
   border:1.5px solid #0a0a0a;
   box-shadow:none;
+  transition:background-color .15s, transform .1s;
+}
+.evc-play:hover, .ev-bigplay:hover, .bill-play:hover, .play-main:hover,
+.psticky-play:hover, .srail-play:hover, .card-play:hover, .fp-erow-play:hover,
+.pd-follow:hover, .pd-loggig:hover, .pb-share:hover, .radio-fab:hover, .follow-btn:hover{
+  background:#e2e2e2;
+}
+.evc-play:active, .ev-bigplay:active, .bill-play:active, .play-main:active,
+.psticky-play:active, .srail-play:active, .card-play:active, .fp-erow-play:active,
+.pd-follow:active, .pd-loggig:active, .pb-share:active, .radio-fab:active, .follow-btn:active{
+  transform:scale(.96);
 }
 .pd-avatar, .pd-bub{ box-shadow:0 0 0 1.5px #0a0a0a; }
 
+/* E2 — outline pills: crisp white border on hover, slightly deeper tint */
+.hdr-log:hover, .ev-radio:hover, .rf-go:hover{
+  border-color:#ffffff; background:rgba(255,255,255,0.14);
+}
+
+/* E3 — hairline chips/ghosts: one grey step up on hover */
+.evc-chip:hover{ border-color:#9a9a9a; }
+
 </style>
-<meta name="sc-build" content="static-1783865306217">
+<meta name="sc-build" content="static-1783865595725">
 <meta name="robots" content="noindex">
 </head>
 <body>
