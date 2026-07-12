@@ -1,0 +1,459 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>soundcheck design lab — 5 full systems</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:#08080b;color:#ececf0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+.mono{font-family:ui-monospace,"SF Mono",Menlo,monospace}
+.top{max-width:1100px;margin:0 auto;padding:26px 18px 10px}
+.top h1{font-size:20px;font-weight:800;letter-spacing:-.02em;margin:0}
+.top p{font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#77777f;letter-spacing:.05em;line-height:1.7;margin:8px 0 0}
+.tabs{max-width:1100px;margin:14px auto 0;padding:0 18px;display:flex;gap:8px;flex-wrap:wrap;position:sticky;top:0;z-index:50;background:rgba(8,8,11,.94);backdrop-filter:blur(8px);padding-top:10px;padding-bottom:10px}
+.tab{cursor:pointer;font-family:ui-monospace,Menlo,monospace;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#b9b9c2;border:1px solid #26262e;background:#121218;border-radius:99px;padding:9px 15px;display:flex;gap:8px;align-items:center;transition:.15s}
+.tab .d{width:11px;height:11px;border-radius:3px;background:var(--c)}
+.tab:hover{border-color:#4a4a55;color:#fff}
+.tab.on{background:#ececf0;color:#101014;border-color:#ececf0}
+.tab.on .d{outline:1.5px solid #101014}
+.meta{max-width:1100px;margin:6px auto 0;padding:0 18px}
+.pal{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 6px}
+.chip{display:flex;gap:8px;align-items:center;border:1px solid #232329;background:#101015;border-radius:8px;padding:7px 11px;font-family:ui-monospace,Menlo,monospace;font-size:10px;letter-spacing:.05em;color:#a9a9b2}
+.chip i{width:15px;height:15px;border-radius:4px;background:var(--c);border:1px solid rgba(255,255,255,.18)}
+.note{font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#8c8c96;letter-spacing:.04em;line-height:1.8;max-width:760px}
+.stage{display:flex;justify-content:center;padding:22px 12px 90px}
+.phone{width:396px;max-width:100%;height:780px;border-radius:34px;border:1px solid #2a2a32;background:#000;overflow:hidden;position:relative;box-shadow:0 40px 90px -40px rgba(0,0,0,.9)}
+@media(max-width:430px){.phone{height:86vh;border-radius:22px}}
+.frame{position:absolute;inset:0;display:flex;flex-direction:column;overflow:hidden}
+.scroll{flex:1;overflow-y:auto;overscroll-behavior:contain}
+button{font-family:inherit}
+
+/* ═══ shared skeleton bits (styled per system below) ═══ */
+.hd{display:flex;align-items:center;gap:10px;padding:14px 16px 10px;flex:none}
+.wm{font-weight:800;letter-spacing:-.03em;font-size:19px}
+.city{margin-left:auto;font-family:ui-monospace,Menlo,monospace;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:6px 10px;border-radius:99px}
+.dates{display:flex;gap:8px;overflow-x:auto;padding:6px 16px 12px;flex:none;scrollbar-width:none}
+.dates::-webkit-scrollbar{display:none}
+.dt{flex:none;min-width:58px;text-align:center;padding:8px 10px;cursor:pointer}
+.dt .a{font-family:ui-monospace,Menlo,monospace;font-size:9px;letter-spacing:.13em;text-transform:uppercase;opacity:.65}
+.dt .b{font-weight:800;font-size:17px;margin-top:1px}
+.grail{display:flex;gap:10px;overflow-x:auto;padding:2px 16px 14px;flex:none;scrollbar-width:none}
+.grail::-webkit-scrollbar{display:none}
+.feed{padding:2px 16px 130px}
+.bnav{position:absolute;left:0;right:0;bottom:0;display:flex;z-index:30}
+.bnav div{flex:1;text-align:center;padding:12px 0 16px;font-family:ui-monospace,Menlo,monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer}
+.dock{position:absolute;left:10px;right:10px;bottom:64px;z-index:31;display:none;align-items:center;gap:11px;padding:10px 12px;cursor:pointer}
+.dock.up{display:flex}
+.dock .art{width:36px;height:36px;flex:none;border-radius:8px}
+.dock .m{flex:1;min-width:0}
+.dock .t1{font-weight:800;font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dock .t2{font-family:ui-monospace,Menlo,monospace;font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;margin-top:2px}
+.dock .bar{height:3px;border-radius:99px;margin-top:6px;position:relative;overflow:hidden}
+.dock .bar i{position:absolute;left:0;top:0;bottom:0;width:0%}
+.dock .pb{width:34px;height:34px;border-radius:50%;border:none;font-size:12px;cursor:pointer;flex:none}
+.sheet{position:absolute;left:0;right:0;bottom:0;top:14%;z-index:40;transform:translateY(105%);transition:transform .28s cubic-bezier(.3,0,0,1);display:flex;flex-direction:column;overflow:hidden}
+.sheet.up{transform:translateY(0)}
+.shade{position:absolute;inset:0;background:rgba(0,0,0,.5);z-index:39;opacity:0;pointer-events:none;transition:.25s}
+.shade.up{opacity:1;pointer-events:auto}
+.sh-grab{width:40px;height:4px;border-radius:99px;background:rgba(255,255,255,.35);margin:10px auto 4px;flex:none}
+.sh-body{flex:1;overflow-y:auto;padding:8px 18px 30px}
+.sh-kick{font-family:ui-monospace,Menlo,monospace;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;opacity:.7}
+.sh-title{font-weight:800;font-size:24px;letter-spacing:-.02em;line-height:1.05;margin:6px 0 4px}
+.sh-meta{font-size:12.5px;opacity:.75;margin-bottom:14px}
+.sh-cta{display:flex;gap:9px;margin:4px 0 18px}
+.sh-cta button{flex:1;padding:13px;border-radius:12px;font-weight:800;font-size:12px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;border:none}
+.lu{display:flex;align-items:center;gap:11px;padding:10px 0}
+.lu .pp{width:30px;height:30px;border-radius:50%;border:none;font-size:10px;cursor:pointer;flex:none}
+.lu .n{font-weight:700;font-size:14px}
+.lu .g{margin-left:auto;font-family:ui-monospace,Menlo,monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;opacity:.6}
+
+/* ═════════ S1 SPECTRUM — genre is the colour system ═════════ */
+.s-spectrum{background:#0b0b10;color:#f2f2f7}
+.s-spectrum .hd{border-bottom:1px solid #1c1c24}
+.s-spectrum .wm i{font-style:normal;color:#00e5ff}
+.s-spectrum .city{color:#0b0b10;background:#f2f2f7}
+.s-spectrum .dt{background:#13131a;border:1px solid #22222c;border-radius:11px}
+.s-spectrum .dt.on{background:#f2f2f7;color:#0b0b10;border-color:#f2f2f7}
+.s-spectrum .orb{flex:none;text-align:center;cursor:pointer;width:58px}
+.s-spectrum .orb .o{width:52px;height:52px;border-radius:50%;margin:0 auto;border:2.5px solid var(--gc);display:flex;align-items:center;justify-content:center;font-size:17px;background:color-mix(in srgb,var(--gc) 16%,#0b0b10)}
+.s-spectrum .orb .l{font-family:ui-monospace,Menlo,monospace;font-size:8.5px;letter-spacing:.06em;text-transform:uppercase;margin-top:5px;color:#9a9aa6}
+.s-spectrum .orb.on .o{background:var(--gc);color:#0b0b10}
+.s-spectrum .orb.on .l{color:#f2f2f7}
+.s-spectrum .card{display:flex;gap:0;background:#13131a;border:1px solid #22222c;border-radius:14px;overflow:hidden;margin-bottom:11px;cursor:pointer}
+.s-spectrum .card .spine{width:7px;flex:none;background:var(--gc)}
+.s-spectrum .card .bd{flex:1;min-width:0;padding:13px 13px 12px}
+.s-spectrum .card .tt{font-weight:800;font-size:15.5px;letter-spacing:-.01em;line-height:1.15}
+.s-spectrum .card .vn{font-size:12px;color:#9a9aa6;margin-top:3px}
+.s-spectrum .card .row{display:flex;gap:6px;align-items:center;margin-top:9px}
+.s-spectrum .gtag{font-family:ui-monospace,Menlo,monospace;font-size:8.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;background:var(--gc);color:#0b0b10;border-radius:99px;padding:3px 8px}
+.s-spectrum .tm{font-family:ui-monospace,Menlo,monospace;font-size:9.5px;color:#6e6e7a}
+.s-spectrum .hb{margin-left:auto;background:none;border:none;color:#5e5e6a;font-size:15px;cursor:pointer}
+.s-spectrum .hb.on{color:var(--gc)}
+.s-spectrum .play{width:40px;height:40px;border-radius:50%;border:none;background:var(--gc);color:#0b0b10;font-size:13px;cursor:pointer;align-self:center;margin-right:12px;flex:none}
+.s-spectrum .bnav{background:#101016;border-top:1px solid #1c1c24}
+.s-spectrum .bnav div{color:#6e6e7a}.s-spectrum .bnav div.on{color:#00e5ff}
+.s-spectrum .dock{background:#17171f;border:1px solid #26262f;border-radius:14px}
+.s-spectrum .dock .art{background:linear-gradient(135deg,#00e5ff,#9d6bff)}
+.s-spectrum .dock .t2{color:#00e5ff}.s-spectrum .dock .bar{background:#26262f}.s-spectrum .dock .bar i{background:#00e5ff}
+.s-spectrum .dock .pb{background:#f2f2f7;color:#0b0b10}
+.s-spectrum .sheet{background:#111118;border-radius:22px 22px 0 0;border-top:1px solid #26262f}
+.s-spectrum .sh-kick{color:var(--gc,#00e5ff)}
+.s-spectrum .sh-cta .p1{background:var(--gc,#00e5ff);color:#0b0b10}
+.s-spectrum .sh-cta .p2{background:#1d1d26;color:#f2f2f7;border:1px solid #2c2c38!important}
+.s-spectrum .lu{border-bottom:1px solid #1c1c24}
+.s-spectrum .lu .pp{border:1.5px solid var(--gc,#00e5ff);color:var(--gc,#00e5ff);background:transparent}
+
+/* ═════════ S2 FLYPOST — the flyer wall ═════════ */
+.s-flypost{background:#0c0c0c;color:#f6f2ea;
+  background-image:radial-gradient(rgba(255,255,255,.05) 1px,transparent 1.4px);background-size:22px 22px}
+.s-flypost .wm{font-family:"Arial Narrow","Helvetica Neue",Arial,sans-serif;font-weight:900;text-transform:uppercase;font-size:21px}
+.s-flypost .wm i{font-style:normal;color:#e8ff00}
+.s-flypost .city{background:#ff2e88;color:#0c0c0c;transform:rotate(2deg)}
+.s-flypost .dt{background:#161616;border:1.5px solid #2c2c2c;border-radius:4px;transform:rotate(-1deg)}
+.s-flypost .dt:nth-child(2n){transform:rotate(1.2deg)}
+.s-flypost .dt.on{background:#e8ff00;color:#0c0c0c;border-color:#e8ff00}
+.s-flypost .stk{flex:none;cursor:pointer;font-family:"Arial Narrow",Arial,sans-serif;font-weight:900;text-transform:uppercase;font-size:11.5px;letter-spacing:.04em;padding:7px 12px;border-radius:3px;background:#161616;border:1.5px dashed #3a3a3a;color:#c9c4b8;transform:rotate(-1.5deg)}
+.s-flypost .stk:nth-child(2n){transform:rotate(1.5deg)}
+.s-flypost .stk.on{background:var(--gc);color:#0c0c0c;border:1.5px solid #0c0c0c;box-shadow:3px 3px 0 #0c0c0c}
+.s-flypost .card{position:relative;border:2px solid #0c0c0c;outline:1px solid #2c2c2c;border-radius:6px;overflow:hidden;margin-bottom:14px;cursor:pointer;transform:rotate(-.6deg);background:var(--gc)}
+.s-flypost .card:nth-child(2n){transform:rotate(.7deg)}
+.s-flypost .card .art{height:118px;position:relative;
+  background:repeating-linear-gradient(45deg,rgba(0,0,0,.85) 0 8px,transparent 8px 16px)}
+.s-flypost .card:nth-child(3n) .art{background:radial-gradient(rgba(0,0,0,.85) 2.4px,transparent 2.8px);background-size:11px 11px}
+.s-flypost .card .tape{position:absolute;top:-7px;left:50%;transform:translateX(-50%) rotate(-3deg);width:74px;height:18px;background:rgba(246,242,234,.75);z-index:3}
+.s-flypost .card .bd{background:#111;padding:12px 13px 12px;border-top:2px solid #0c0c0c}
+.s-flypost .card .tt{font-family:"Arial Narrow",Arial,sans-serif;font-weight:900;text-transform:uppercase;font-size:18px;line-height:.98;letter-spacing:-.01em}
+.s-flypost .card .tt em{font-style:normal;box-shadow:inset 0 -6px 0 var(--gc)}
+.s-flypost .card .vn{font-family:ui-monospace,Menlo,monospace;font-size:10px;letter-spacing:.06em;color:#b9b4a8;margin-top:6px;text-transform:uppercase}
+.s-flypost .card .row{display:flex;gap:7px;align-items:center;margin-top:9px}
+.s-flypost .gtag{font-family:ui-monospace,Menlo,monospace;font-size:8.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;background:#f6f2ea;color:#0c0c0c;padding:3px 7px;transform:rotate(-1deg)}
+.s-flypost .tm{font-family:ui-monospace,Menlo,monospace;font-size:9.5px;color:#8c877b}
+.s-flypost .hb{margin-left:auto;background:none;border:none;color:#6e6a5e;font-size:16px;cursor:pointer}
+.s-flypost .hb.on{color:var(--gc)}
+.s-flypost .play{position:absolute;right:10px;top:88px;width:44px;height:44px;border-radius:50%;background:#e8ff00;border:2px solid #0c0c0c;color:#0c0c0c;font-size:14px;cursor:pointer;z-index:4;box-shadow:3px 3px 0 #0c0c0c}
+.s-flypost .bnav{background:#0c0c0c;border-top:2px solid #2c2c2c}
+.s-flypost .bnav div{color:#8c877b}.s-flypost .bnav div.on{color:#e8ff00}
+.s-flypost .dock{background:#e8ff00;border:2px solid #0c0c0c;border-radius:8px;box-shadow:4px 4px 0 #0c0c0c;color:#0c0c0c}
+.s-flypost .dock .art{background:repeating-linear-gradient(45deg,#0c0c0c 0 5px,transparent 5px 10px);border:1.5px solid #0c0c0c}
+.s-flypost .dock .t2{color:#0c0c0c;opacity:.7}.s-flypost .dock .bar{background:rgba(12,12,12,.25)}.s-flypost .dock .bar i{background:#0c0c0c}
+.s-flypost .dock .pb{background:#0c0c0c;color:#e8ff00}
+.s-flypost .sheet{background:#f6f2ea;color:#0c0c0c;border-radius:10px 10px 0 0;border-top:3px solid #0c0c0c}
+.s-flypost .sh-grab{background:rgba(12,12,12,.35)}
+.s-flypost .sh-title{font-family:"Arial Narrow",Arial,sans-serif;font-weight:900;text-transform:uppercase;font-size:30px}
+.s-flypost .sh-kick{color:#0c0c0c;background:var(--gc,#e8ff00);display:inline-block;padding:3px 8px;transform:rotate(-1deg)}
+.s-flypost .sh-meta{color:#5c584e}
+.s-flypost .sh-cta .p1{background:#0c0c0c;color:#f6f2ea;box-shadow:3px 3px 0 var(--gc,#e8ff00)}
+.s-flypost .sh-cta .p2{background:transparent;color:#0c0c0c;border:2px solid #0c0c0c!important}
+.s-flypost .lu{border-bottom:1.5px dashed #c9c2b2}
+.s-flypost .lu .pp{border:2px solid #0c0c0c;background:transparent;color:#0c0c0c}
+.s-flypost .lu .g{color:#7a756a}
+
+/* ═════════ S3 ARCADE — CRT game HUD ═════════ */
+.s-arcade{background:#0a0f2e;color:#e8f4ff;
+  background-image:linear-gradient(rgba(51,247,255,.05) 1px,transparent 1px);background-size:100% 4px}
+.s-arcade .wm{font-family:ui-monospace,Menlo,monospace;font-weight:700;font-size:16px;letter-spacing:.06em;text-transform:uppercase}
+.s-arcade .wm i{font-style:normal;color:#ff3df0}
+.s-arcade .city{background:transparent;border:2px solid #33f7ff;color:#33f7ff;border-radius:2px}
+.s-arcade .tick{flex:none;overflow:hidden;background:#ffe83d;color:#0a0f2e;font-family:ui-monospace,Menlo,monospace;font-size:9.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;padding:5px 0;white-space:nowrap}
+.s-arcade .tick span{display:inline-block;animation:tk 16s linear infinite}
+@keyframes tk{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+@media(prefers-reduced-motion:reduce){.s-arcade .tick span{animation:none}}
+.s-arcade .dt{background:#101740;border:2px solid #23306e;border-radius:3px}
+.s-arcade .dt.on{background:#33f7ff;color:#0a0f2e;border-color:#33f7ff;box-shadow:3px 3px 0 #071022}
+.s-arcade .stk{flex:none;cursor:pointer;font-family:ui-monospace,Menlo,monospace;font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:7px 11px;border-radius:2px;background:#101740;border:2px solid #23306e;color:#9fb1e8}
+.s-arcade .stk.on{background:var(--gc);border-color:var(--gc);color:#0a0f2e;box-shadow:3px 3px 0 #071022}
+.s-arcade .card{background:#101740;border:2px solid #23306e;border-radius:6px;margin-bottom:12px;cursor:pointer;overflow:hidden;box-shadow:4px 4px 0 #071022}
+.s-arcade .card .top{display:flex;align-items:center;gap:8px;padding:8px 11px;background:color-mix(in srgb,var(--gc) 22%,#101740);border-bottom:2px solid #23306e}
+.s-arcade .card .lv{font-family:ui-monospace,Menlo,monospace;font-size:8.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gc)}
+.s-arcade .card .go{margin-left:auto;font-family:ui-monospace,Menlo,monospace;font-size:8.5px;color:#ffe83d}
+.s-arcade .card .bd{padding:11px;display:flex;gap:10px;align-items:center}
+.s-arcade .card .tt{font-family:ui-monospace,Menlo,monospace;font-weight:700;font-size:13.5px;letter-spacing:.01em;text-transform:uppercase;line-height:1.25}
+.s-arcade .card .vn{font-family:ui-monospace,Menlo,monospace;font-size:10px;color:#9fb1e8;margin-top:4px}
+.s-arcade .card .row{display:flex;gap:7px;align-items:center;margin-top:8px}
+.s-arcade .gtag{font-family:ui-monospace,Menlo,monospace;font-size:8.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;border:1.5px solid var(--gc);color:var(--gc);padding:2px 6px;border-radius:2px}
+.s-arcade .tm{font-family:ui-monospace,Menlo,monospace;font-size:9px;color:#5f6ea8}
+.s-arcade .hb{margin-left:auto;background:none;border:none;color:#5f6ea8;font-size:15px;cursor:pointer}
+.s-arcade .hb.on{color:#ff3df0}
+.s-arcade .play{width:42px;height:42px;flex:none;border-radius:4px;border:2px solid #0a0f2e;background:var(--gc);color:#0a0f2e;font-size:13px;cursor:pointer;box-shadow:3px 3px 0 #071022}
+.s-arcade .bnav{background:#071022;border-top:2px solid #23306e}
+.s-arcade .bnav div{color:#5f6ea8}.s-arcade .bnav div.on{color:#33f7ff}
+.s-arcade .dock{background:#071022;border:2px solid #33f7ff;border-radius:6px;box-shadow:4px 4px 0 #071022}
+.s-arcade .dock .art{background:repeating-linear-gradient(90deg,#ff3df0 0 4px,#33f7ff 4px 8px,#ffe83d 8px 12px,#4dff88 12px 16px);border-radius:3px}
+.s-arcade .dock .t1{font-family:ui-monospace,Menlo,monospace;text-transform:uppercase;font-size:11px}
+.s-arcade .dock .t2{color:#33f7ff}.s-arcade .dock .bar{background:#101740}.s-arcade .dock .bar i{background:#33f7ff}
+.s-arcade .dock .pb{background:#ffe83d;color:#0a0f2e;border-radius:4px}
+.s-arcade .sheet{background:#0d1338;border:2px solid #33f7ff;border-bottom:none;border-radius:8px 8px 0 0}
+.s-arcade .sh-title{font-family:ui-monospace,Menlo,monospace;text-transform:uppercase;font-size:20px}
+.s-arcade .sh-kick{color:var(--gc,#33f7ff)}
+.s-arcade .sh-cta .p1{background:var(--gc,#33f7ff);color:#0a0f2e;border-radius:4px;box-shadow:3px 3px 0 #071022}
+.s-arcade .sh-cta .p2{background:transparent;color:#e8f4ff;border:2px solid #23306e!important;border-radius:4px}
+.s-arcade .lu{border-bottom:1px solid #1a2450}
+.s-arcade .lu .pp{border:2px solid var(--gc,#33f7ff);color:var(--gc,#33f7ff);background:transparent;border-radius:4px}
+.s-arcade .lu .n{font-family:ui-monospace,Menlo,monospace;text-transform:uppercase;font-size:12px}
+
+/* ═════════ S4 SUNSET — Miami warmth, juicy rounded ═════════ */
+.s-sunset{background:#16102a;color:#fdf3ec}
+.s-sunset .hd{padding-top:16px}
+.s-sunset .wm{font-size:20px}
+.s-sunset .wm i{font-style:normal;background:linear-gradient(90deg,#ff5e7e,#ff9a3d);-webkit-background-clip:text;background-clip:text;color:transparent}
+.s-sunset .city{background:rgba(255,154,61,.15);color:#ff9a3d}
+.s-sunset .dt{background:#211840;border-radius:16px}
+.s-sunset .dt.on{background:linear-gradient(135deg,#ff5e7e,#ff9a3d);color:#2a0d14}
+.s-sunset .stk{flex:none;cursor:pointer;font-size:11.5px;font-weight:700;padding:8px 14px;border-radius:99px;background:#211840;color:#c9b8e0}
+.s-sunset .stk.on{background:var(--gc);color:#2a0d14}
+.s-sunset .hero{margin:2px 16px 16px;border-radius:24px;padding:18px;background:linear-gradient(135deg,#ff5e7e 0%,#ff9a3d 55%,#ffd166 100%);color:#2a0d14;flex:none}
+.s-sunset .hero .k{font-family:ui-monospace,Menlo,monospace;font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;opacity:.75}
+.s-sunset .hero .t{font-weight:800;font-size:22px;letter-spacing:-.02em;line-height:1.05;margin-top:5px}
+.s-sunset .hero .s{font-size:12px;margin-top:5px;opacity:.8}
+.s-sunset .card{display:flex;gap:12px;background:#211840;border-radius:20px;padding:12px;margin-bottom:12px;cursor:pointer;align-items:center}
+.s-sunset .card .av{width:62px;height:62px;flex:none;border-radius:16px;background:linear-gradient(135deg,var(--gc),color-mix(in srgb,var(--gc) 40%,#16102a))}
+.s-sunset .card .tt{font-weight:800;font-size:15px;letter-spacing:-.01em;line-height:1.15}
+.s-sunset .card .vn{font-size:12px;color:#b8a8d0;margin-top:3px}
+.s-sunset .card .row{display:flex;gap:6px;align-items:center;margin-top:8px}
+.s-sunset .gtag{font-size:9.5px;font-weight:700;background:color-mix(in srgb,var(--gc) 24%,#211840);color:var(--gc);border-radius:99px;padding:3px 9px}
+.s-sunset .tm{font-family:ui-monospace,Menlo,monospace;font-size:9px;color:#8d7fa8}
+.s-sunset .hb{margin-left:auto;background:none;border:none;color:#6f628a;font-size:16px;cursor:pointer}
+.s-sunset .hb.on{color:#ff5e7e}
+.s-sunset .play{width:40px;height:40px;flex:none;border-radius:50%;border:none;background:linear-gradient(135deg,#ff5e7e,#ff9a3d);color:#2a0d14;font-size:13px;cursor:pointer}
+.s-sunset .bnav{background:rgba(22,16,42,.92);backdrop-filter:blur(8px);border-top:1px solid #2a2050}
+.s-sunset .bnav div{color:#8d7fa8}.s-sunset .bnav div.on{color:#ff9a3d}
+.s-sunset .dock{background:#241a48;border-radius:18px;border:1px solid #332664}
+.s-sunset .dock .art{background:linear-gradient(135deg,#ff5e7e,#ffd166);border-radius:12px}
+.s-sunset .dock .t2{color:#ff9a3d}.s-sunset .dock .bar{background:#332664}.s-sunset .dock .bar i{background:linear-gradient(90deg,#ff5e7e,#ff9a3d)}
+.s-sunset .dock .pb{background:linear-gradient(135deg,#ff5e7e,#ff9a3d);color:#2a0d14}
+.s-sunset .sheet{background:#1d1438;border-radius:28px 28px 0 0}
+.s-sunset .sh-kick{color:var(--gc,#ff9a3d)}
+.s-sunset .sh-cta .p1{background:linear-gradient(135deg,#ff5e7e,#ff9a3d);color:#2a0d14;border-radius:99px}
+.s-sunset .sh-cta .p2{background:#2a2050;color:#fdf3ec;border-radius:99px}
+.s-sunset .lu{border-bottom:1px solid #2a2050}
+.s-sunset .lu .pp{border:1.5px solid var(--gc,#ff9a3d);color:var(--gc,#ff9a3d);background:transparent}
+
+/* ═════════ S5 AURORA — glass night ═════════ */
+.s-aurora{background:#070b14;color:#eef2fa;position:relative}
+.s-aurora::before{content:"";position:absolute;inset:-20% -30% auto;height:420px;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse at 20% 30%,rgba(46,242,196,.20),transparent 55%),
+             radial-gradient(ellipse at 75% 15%,rgba(139,92,255,.24),transparent 55%),
+             radial-gradient(ellipse at 55% 60%,rgba(255,126,212,.14),transparent 60%);
+  filter:blur(30px)}
+.s-aurora .hd,.s-aurora .dates,.s-aurora .grail,.s-aurora .scroll{position:relative;z-index:1}
+.s-aurora .wm i{font-style:normal;background:linear-gradient(90deg,#2ef2c4,#8b5cff,#ff7ed4);-webkit-background-clip:text;background-clip:text;color:transparent}
+.s-aurora .city{background:rgba(255,255,255,.08);color:#eef2fa;border:1px solid rgba(255,255,255,.14)}
+.s-aurora .dt{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.10);border-radius:13px;backdrop-filter:blur(6px)}
+.s-aurora .dt.on{background:rgba(255,255,255,.92);color:#0a0e18;border-color:transparent}
+.s-aurora .stk{flex:none;cursor:pointer;font-size:11px;font-weight:700;padding:8px 13px;border-radius:99px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:#c6cde0;backdrop-filter:blur(6px)}
+.s-aurora .stk.on{background:color-mix(in srgb,var(--gc) 30%,transparent);border-color:var(--gc);color:#fff}
+.s-aurora .card{position:relative;border-radius:18px;overflow:hidden;margin-bottom:12px;cursor:pointer;
+  background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.11);backdrop-filter:blur(10px)}
+.s-aurora .card::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at top right,color-mix(in srgb,var(--gc) 26%,transparent),transparent 65%);pointer-events:none}
+.s-aurora .card .bd{position:relative;padding:14px 14px 13px;display:flex;gap:12px;align-items:center}
+.s-aurora .card .tt{font-weight:800;font-size:15.5px;letter-spacing:-.015em;line-height:1.15}
+.s-aurora .card .vn{font-size:12px;color:#a7b0c8;margin-top:3px}
+.s-aurora .card .row{display:flex;gap:6px;align-items:center;margin-top:9px}
+.s-aurora .gtag{font-size:9px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--gc);border:1px solid color-mix(in srgb,var(--gc) 55%,transparent);border-radius:99px;padding:3px 8px}
+.s-aurora .tm{font-family:ui-monospace,Menlo,monospace;font-size:9px;color:#77809a}
+.s-aurora .hb{margin-left:auto;background:none;border:none;color:#5e6884;font-size:15px;cursor:pointer}
+.s-aurora .hb.on{color:var(--gc)}
+.s-aurora .play{width:42px;height:42px;flex:none;border-radius:50%;border:1px solid rgba(255,255,255,.25);background:color-mix(in srgb,var(--gc) 35%,rgba(255,255,255,.08));color:#fff;font-size:13px;cursor:pointer;backdrop-filter:blur(6px)}
+.s-aurora .bnav{background:rgba(7,11,20,.6);backdrop-filter:blur(14px);border-top:1px solid rgba(255,255,255,.08)}
+.s-aurora .bnav div{color:#77809a}.s-aurora .bnav div.on{color:#2ef2c4}
+.s-aurora .dock{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:16px;backdrop-filter:blur(16px)}
+.s-aurora .dock .art{background:linear-gradient(135deg,#2ef2c4,#8b5cff)}
+.s-aurora .dock .t2{color:#2ef2c4}.s-aurora .dock .bar{background:rgba(255,255,255,.14)}.s-aurora .dock .bar i{background:linear-gradient(90deg,#2ef2c4,#8b5cff,#ff7ed4)}
+.s-aurora .dock .pb{background:rgba(255,255,255,.92);color:#0a0e18}
+.s-aurora .sheet{background:rgba(13,18,32,.92);backdrop-filter:blur(20px);border-radius:24px 24px 0 0;border-top:1px solid rgba(255,255,255,.14)}
+.s-aurora .sh-kick{color:var(--gc,#2ef2c4)}
+.s-aurora .sh-cta .p1{background:linear-gradient(90deg,#2ef2c4,#8b5cff);color:#0a0e18;border-radius:14px}
+.s-aurora .sh-cta .p2{background:rgba(255,255,255,.08);color:#eef2fa;border:1px solid rgba(255,255,255,.16)!important;border-radius:14px}
+.s-aurora .lu{border-bottom:1px solid rgba(255,255,255,.08)}
+.s-aurora .lu .pp{border:1.5px solid var(--gc,#2ef2c4);color:var(--gc,#2ef2c4);background:transparent}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <h1>soundcheck design lab · 5 full systems</h1>
+  <p>Full-palette, nightlife-first, mobile-first. Everything in the phone works: dates, genre filters, tap a card for the event sheet, play into the dock, hearts. Open this URL on your phone — the frame goes full-width.</p>
+</div>
+<div class="tabs" id="tabs"></div>
+<div class="meta">
+  <div class="pal" id="pal"></div>
+  <div class="note" id="note"></div>
+</div>
+<div class="stage">
+  <div class="phone">
+    <div class="frame" id="frame">
+      <div class="hd"><span class="wm">sound<i>check</i></span><span class="city">◉ London</span></div>
+      <div class="tick" id="tick" style="display:none"><span></span></div>
+      <div class="dates" id="dates"></div>
+      <div class="grail" id="grail"></div>
+      <div class="scroll"><div class="feed" id="feed"></div></div>
+      <div class="hero-slot" id="heroslot" style="display:contents"></div>
+      <div class="dock" id="dock">
+        <div class="art"></div>
+        <div class="m"><div class="t1" id="dk1"></div><div class="t2">● on air</div><div class="bar"><i id="dkbar"></i></div></div>
+        <button class="pb" id="dkpb">⏸</button>
+      </div>
+      <div class="bnav" id="bnav"><div class="on">Tonight</div><div>Search</div><div>Radio</div><div>You</div></div>
+      <div class="shade" id="shade"></div>
+      <div class="sheet" id="sheet">
+        <div class="sh-grab"></div>
+        <div class="sh-body" id="shbody"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ── data ── */
+const A={objekt:"Objekt",anz:"Anz",benufo:"Ben UFO",peach:"Peach",bz:"Bradley Zero",shanti:"Shanti Celeste",flowdan:"Flowdan",priku:"Priku"};
+const EVENTS=[
+ {id:1,d:0,t:"Objekt all night long",v:"FOLD · Canning Town",time:"22:00–06:00",g:"Techno",go:73,a:["objekt"]},
+ {id:2,d:0,t:"Rhythm Section",v:"Corsica Studios · Elephant",time:"23:00–05:00",g:"House",go:41,a:["bz","peach"]},
+ {id:3,d:0,t:"fabric: Terrace",v:"fabric · Farringdon",time:"23:00–07:00",g:"Bass",go:128,a:["anz","benufo","peach"]},
+ {id:4,d:0,t:"Cosmic Slop",v:"MOT · Bermondsey",time:"22:00–04:00",g:"Disco",go:29,a:["bz"]},
+ {id:5,d:1,t:"UNFOLD",v:"FOLD · Canning Town",time:"23:00–07:00",g:"Techno",go:55,a:["shanti","objekt"]},
+ {id:6,d:1,t:"Hessle Audio night",v:"Corsica Studios",time:"22:00–04:00",g:"Bass",go:88,a:["benufo","flowdan"]},
+ {id:7,d:1,t:"Peach & friends",v:"Phonox · Brixton",time:"23:00–06:00",g:"Trance",go:34,a:["peach","anz"]},
+ {id:8,d:2,t:"Sunday Cookout",v:"Corsica Studios",time:"14:00–22:00",g:"Disco",go:29,a:["bz","shanti"]},
+ {id:9,d:2,t:"Closing ritual",v:"FOLD · Canning Town",time:"20:00–02:00",g:"Electro",go:19,a:["objekt","anz"]},
+];
+const DATES=[["Fri","Now"],["Sat","11"],["Sun","12"]];
+const GENRES=["All","Techno","House","Bass","Disco","Trance","Electro"];
+const GICON={Techno:"⚙",House:"⌂",Bass:"◎",Disco:"✦",Trance:"◠",Electro:"⚡",All:"∞"};
+
+/* ── systems ── */
+const SYS=[
+ {id:"spectrum",name:"Spectrum",tag:"#00E5FF",
+  gc:{Techno:"#00E5FF",House:"#FFB300",Bass:"#FF3D8A",Disco:"#B8FF3D",Trance:"#9D6BFF",Electro:"#8AF7C9",All:"#F2F2F7"},
+  pal:[["#00E5FF","techno"],["#FFB300","house"],["#FF3D8A","bass"],["#B8FF3D","disco"],["#9D6BFF","trance"],["#8AF7C9","electro"]],
+  note:"GENRE IS THE COLOUR SYSTEM — every sound owns a hue, used on story-style filter orbs, card spines, chips and the event sheet. The UI itself stays ink-dark so six colours never fight. Filter by tapping an orb.",
+  orbs:true,hero:false,tick:false},
+ {id:"flypost",name:"Flyer Wall",tag:"#FF2E88",
+  gc:{Techno:"#23D6FF",House:"#FF7A1F",Bass:"#FF2E88",Disco:"#E8FF00",Trance:"#C589FF",Electro:"#7CFFB5",All:"#F6F2EA"},
+  pal:[["#FF2E88","hot pink"],["#E8FF00","acid"],["#23D6FF","cyan"],["#FF7A1F","orange"],["#F6F2EA","paper"]],
+  note:"THE WALL OUTSIDE THE CLUB — every card is a mini flyer: rotated, taped up, loud. Sticker genre filters, marker-pen underlines, hard offset shadows. The sheet flips to paper like picking the flyer up.",
+  orbs:false,hero:false,tick:false},
+ {id:"arcade",name:"Arcade",tag:"#33F7FF",
+  gc:{Techno:"#33F7FF",House:"#FFE83D",Bass:"#FF3DF0",Disco:"#4DFF88",Trance:"#C589FF",Electro:"#FF9A3D",All:"#E8F4FF"},
+  pal:[["#FF3DF0","magenta"],["#33F7FF","cyan"],["#FFE83D","yellow"],["#4DFF88","green"],["#0A0F2E","navy CRT"]],
+  note:"CRT GAME HUD — scanlines, chunky 2px borders, hard drop shadows, a marquee ticker, mono type. Each night is a 'level' card headed by its genre colour. Loudest and most gamified of the five.",
+  orbs:false,hero:false,tick:true},
+ {id:"sunset",name:"Sunset",tag:"#FF9A3D",
+  gc:{Techno:"#7C5CFF",House:"#FF9A3D",Bass:"#FF5E7E",Disco:"#FFD166",Trance:"#C589FF",Electro:"#5CE0D8",All:"#FDF3EC"},
+  pal:[["#FF5E7E","pink"],["#FF9A3D","orange"],["#FFD166","gold"],["#7C5CFF","violet"],["#16102A","dusk"]],
+  note:"GOLDEN HOUR INTO NIGHT — a sunset-gradient hero owns 'tonight', everything is pill-round and juicy, genre tints stay warm. The friendliest, most mainstream-appealing read; gradients allowed only in the sunset family.",
+  orbs:false,hero:true,tick:false},
+ {id:"aurora",name:"Aurora",tag:"#2EF2C4",
+  gc:{Techno:"#2EF2C4",House:"#FFB86B",Bass:"#FF7ED4",Disco:"#FFD166",Trance:"#8B5CFF",Electro:"#4DA6FF",All:"#EEF2FA"},
+  pal:[["#2EF2C4","teal"],["#8B5CFF","violet"],["#FF7ED4","pink"],["#4DA6FF","blue"],["#070B14","night"]],
+  note:"NORTHERN-LIGHTS GLASS — an aurora wash breathes behind frosted-glass cards; each card glows faintly in its genre hue. Translucent dock and sheet. The most 'premium app' of the five while still reading nightlife.",
+  orbs:false,hero:true,tick:false},
+];
+
+/* ── state ── */
+const S={sys:0,date:0,genre:"All",hearts:new Set([3]),playing:false,pos:0,queue:[],track:0,sheet:null};
+const $=id=>document.getElementById(id);
+const sys=()=>SYS[S.sys];
+const gcol=g=>sys().gc[g]||sys().gc.All;
+
+/* ── chrome (tabs + palette + note) ── */
+SYS.forEach((s,i)=>{const b=document.createElement("div");b.className="tab";b.style.setProperty("--c",s.tag);
+ b.innerHTML='<span class="d"></span>'+s.name;b.onclick=()=>{S.sys=i;S.genre="All";S.sheet=null;paintChrome();render()};$("tabs").appendChild(b)});
+function paintChrome(){
+ [...$("tabs").children].forEach((el,i)=>el.classList.toggle("on",i===S.sys));
+ $("pal").innerHTML=sys().pal.map(p=>'<span class="chip" style="--c:'+p[0]+'"><i></i>'+p[0]+' · '+p[1]+'</span>').join("");
+ $("note").textContent=sys().note;
+}
+
+/* ── per-system card renderers ── */
+function cardSpectrum(e){const c=gcol(e.g);
+ return '<div class="card" style="--gc:'+c+'" data-ev="'+e.id+'"><div class="spine"></div><div class="bd">'
+ +'<div class="tt">'+e.t+'</div><div class="vn">'+e.v+'</div>'
+ +'<div class="row"><span class="gtag">'+e.g+'</span><span class="tm">'+e.time+'</span>'
+ +'<button class="hb'+(S.hearts.has(e.id)?" on":"")+'" data-hb="'+e.id+'">'+(S.hearts.has(e.id)?"♥":"♡")+'</button></div>'
+ +'</div><button class="play" data-play="'+e.id+'">▶</button></div>';}
+function cardFlypost(e){const c=gcol(e.g);const words=e.t.split(" ");const em=words.shift();
+ return '<div class="card" style="--gc:'+c+'" data-ev="'+e.id+'"><div class="art"><span class="tape"></span></div>'
+ +'<button class="play" data-play="'+e.id+'">▶</button>'
+ +'<div class="bd"><div class="tt"><em>'+em+'</em> '+words.join(" ")+'</div><div class="vn">'+e.v+'</div>'
+ +'<div class="row"><span class="gtag">'+e.g+'</span><span class="tm">'+e.time+'</span>'
+ +'<button class="hb'+(S.hearts.has(e.id)?" on":"")+'" data-hb="'+e.id+'">'+(S.hearts.has(e.id)?"♥":"♡")+'</button></div></div></div>';}
+function cardArcade(e){const c=gcol(e.g);
+ return '<div class="card" style="--gc:'+c+'" data-ev="'+e.id+'">'
+ +'<div class="top"><span class="lv">▸ '+e.g+'</span><span class="go">'+e.go+' IN</span></div>'
+ +'<div class="bd"><div style="flex:1;min-width:0"><div class="tt">'+e.t+'</div><div class="vn">'+e.v+'</div>'
+ +'<div class="row"><span class="gtag">'+e.time+'</span>'
+ +'<button class="hb'+(S.hearts.has(e.id)?" on":"")+'" data-hb="'+e.id+'">'+(S.hearts.has(e.id)?"♥":"♡")+'</button></div></div>'
+ +'<button class="play" data-play="'+e.id+'">▶</button></div></div>';}
+function cardSunset(e){const c=gcol(e.g);
+ return '<div class="card" style="--gc:'+c+'" data-ev="'+e.id+'"><div class="av"></div>'
+ +'<div style="flex:1;min-width:0"><div class="tt">'+e.t+'</div><div class="vn">'+e.v+'</div>'
+ +'<div class="row"><span class="gtag">'+e.g+'</span><span class="tm">'+e.time+'</span>'
+ +'<button class="hb'+(S.hearts.has(e.id)?" on":"")+'" data-hb="'+e.id+'">'+(S.hearts.has(e.id)?"♥":"♡")+'</button></div></div>'
+ +'<button class="play" data-play="'+e.id+'">▶</button></div>';}
+function cardAurora(e){const c=gcol(e.g);
+ return '<div class="card" style="--gc:'+c+'" data-ev="'+e.id+'"><div class="bd">'
+ +'<div style="flex:1;min-width:0"><div class="tt">'+e.t+'</div><div class="vn">'+e.v+'</div>'
+ +'<div class="row"><span class="gtag">'+e.g+'</span><span class="tm">'+e.time+'</span>'
+ +'<button class="hb'+(S.hearts.has(e.id)?" on":"")+'" data-hb="'+e.id+'">'+(S.hearts.has(e.id)?"♥":"♡")+'</button></div></div>'
+ +'<button class="play" data-play="'+e.id+'">▶</button></div></div>';}
+const CARD={spectrum:cardSpectrum,flypost:cardFlypost,arcade:cardArcade,sunset:cardSunset,aurora:cardAurora};
+
+/* ── render ── */
+function render(){
+ const s=sys(),f=$("frame");
+ f.className="frame s-"+s.id;
+ $("dates").innerHTML=DATES.map((d,i)=>'<div class="dt'+(i===S.date?" on":"")+'" data-dt="'+i+'"><div class="a">'+d[0]+'</div><div class="b">'+d[1]+'</div></div>').join("")
+   +'<div class="dt" style="opacity:.45"><div class="a">···</div><div class="b">+</div></div>';
+ if(s.orbs){
+  $("grail").innerHTML=GENRES.map(g=>'<div class="orb'+(S.genre===g?" on":"")+'" style="--gc:'+gcol(g)+'" data-g="'+g+'"><div class="o">'+GICON[g]+'</div><div class="l">'+g+'</div></div>').join("");
+ }else{
+  $("grail").innerHTML=GENRES.map(g=>'<div class="stk'+(S.genre===g?" on":"")+'" style="--gc:'+gcol(g)+'" data-g="'+g+'">'+g+'</div>').join("");
+ }
+ $("tick").style.display=s.tick?"":"none";
+ if(s.tick){const T="TONIGHT IN LONDON ─ "+EVENTS.filter(e=>e.d===S.date).length+" NIGHTS ─ INSERT COIN ─ ";$("tick").firstElementChild.textContent=T+T;}
+ const list=EVENTS.filter(e=>e.d===S.date&&(S.genre==="All"||e.g===S.genre));
+ let hero="";
+ if(s.hero&&list[0]){const h=list[0];
+  hero='<div class="hero" data-ev="'+h.id+'"><div class="k">Pick of '+(S.date===0?"tonight":"the night")+'</div><div class="t">'+h.t+'</div><div class="s">'+h.v+' · '+h.time+'</div></div>';}
+ $("feed").innerHTML=hero+(list.length?list.map(CARD[s.id]).join(""):'<div style="padding:40px 10px;text-align:center;opacity:.5;font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:.08em">NOTHING IN '+S.genre.toUpperCase()+' — TRY ANOTHER FILTER</div>');
+ /* sheet */
+ const ev=S.sheet!=null?EVENTS.find(x=>x.id===S.sheet):null;
+ $("sheet").classList.toggle("up",!!ev);$("shade").classList.toggle("up",!!ev);
+ if(ev){const c=gcol(ev.g);$("sheet").style.setProperty("--gc",c);
+  $("shbody").innerHTML='<div class="sh-kick">'+ev.g+' · '+DATES[ev.d][0]+' '+DATES[ev.d][1]+'</div>'
+  +'<div class="sh-title">'+ev.t+'</div><div class="sh-meta">'+ev.v+' · '+ev.time+' · '+ev.go+' going</div>'
+  +'<div class="sh-cta"><button class="p1" data-playall="'+ev.id+'">▶ Play the lineup</button>'
+  +'<button class="p2" data-hb2="'+ev.id+'">'+(S.hearts.has(ev.id)?"♥ Saved":"♡ Save")+'</button></div>'
+  +ev.a.map(k=>'<div class="lu"><button class="pp" data-pa="'+k+'">▶</button><span class="n">'+A[k]+'</span><span class="g">'+ev.g+'</span></div>').join("");
+ }
+ /* dock */
+ $("dock").classList.toggle("up",S.queue.length>0);
+ if(S.queue.length){$("dk1").textContent=S.queue[S.track];$("dkpb").textContent=S.playing?"⏸":"▶";$("dkbar").style.width=S.pos+"%";}
+}
+
+/* ── interactions (delegated) ── */
+$("frame").addEventListener("click",ev=>{
+ const t=ev.target;
+ if(t.dataset.dt!=null){S.date=+t.dataset.dt;render();return}
+ const dtEl=t.closest("[data-dt]");if(dtEl){S.date=+dtEl.dataset.dt;render();return}
+ const gEl=t.closest("[data-g]");if(gEl){S.genre=gEl.dataset.g;render();return}
+ if(t.dataset.hb){ev.stopPropagation();const id=+t.dataset.hb;S.hearts.has(id)?S.hearts.delete(id):S.hearts.add(id);render();return}
+ const hb2=t.closest("[data-hb2]");if(hb2){const id=+hb2.dataset.hb2;S.hearts.has(id)?S.hearts.delete(id):S.hearts.add(id);render();return}
+ if(t.dataset.play){ev.stopPropagation();playEvent(+t.dataset.play);return}
+ const pall=t.closest("[data-playall]");if(pall){playEvent(+pall.dataset.playall);return}
+ const pa=t.closest("[data-pa]");if(pa){S.queue=[A[pa.dataset.pa]+" — live set"];S.track=0;S.pos=0;S.playing=true;render();return}
+ if(t.id==="dkpb"){S.playing=!S.playing;render();return}
+ if(t.id==="shade"||t.closest("#shade")){S.sheet=null;render();return}
+ const card=t.closest("[data-ev]");if(card){S.sheet=+card.dataset.ev;render();return}
+});
+function playEvent(id){const e=EVENTS.find(x=>x.id===id);S.queue=e.a.map(k=>A[k]+" — live from "+e.v.split("·")[0].trim());S.track=0;S.pos=0;S.playing=true;render()}
+setInterval(()=>{if(S.playing&&S.queue.length){S.pos+=0.8;if(S.pos>=100){S.track=(S.track+1)%S.queue.length;S.pos=0}
+ const b=$("dkbar");if(b){b.style.width=S.pos+"%";$("dk1").textContent=S.queue[S.track]}}},200);
+
+paintChrome();render();
+</script>
+</body>
+</html>
