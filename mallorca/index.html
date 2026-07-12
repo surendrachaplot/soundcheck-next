@@ -1369,7 +1369,7 @@
     .act-btn svg { width:var(--icon-sm); height:var(--icon-sm); display:block; }
     .act-btn:hover { border-color:var(--accent); color:var(--accent); }
     .act-btn.on { background:var(--surface-2); border-color:var(--accent); color:var(--accent); }   /* toggled-on = outline accent, matching .pf-btn.follow.following */
-    /* primary action (Tune in / Play next night) = accent-filled, matching .pf-btn.primary */
+    /* primary action (Tune in / Play next lineup) = accent-filled, matching .pf-btn.primary */
     .act-btn.radio { flex-basis:100%; background:var(--accent); border-color:var(--accent); color:var(--accent-ink); }
     .act-btn.radio:hover { color:var(--accent-ink); border-color:var(--accent); filter:brightness(1.06); }
     .act-btn.radio.on { background:var(--accent); border-color:var(--accent); color:var(--accent-ink); }
@@ -2494,7 +2494,7 @@
     .fp-sech{ display:flex; justify-content:space-between; align-items:center; gap:12px; padding:13px 18px; border-bottom:1px solid var(--border); background:var(--surface-2); color:var(--fg); font:800 18px var(--head); letter-spacing:-0.01em; }
     .fp-sech span{ color:var(--accent); font:600 11px var(--font-mono); letter-spacing:.12em; text-transform:uppercase; }
     @media(max-width:560px){ .fp-sech{ flex-direction:column; align-items:flex-start; gap:3px; font-size:16px; padding:12px 15px; } .fp-sech span{ font-size:10px; } }
-    /* artist-page section tabs (Upcoming / Past sets / Similar) — swap the panel below in place */
+    /* artist-page section tabs (Upcoming / Past events / Similar) — swap the panel below in place */
     .fp-tabs{ display:flex; gap:0; border-bottom:1px solid var(--border); margin-top:22px; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
     .fp-tabs::-webkit-scrollbar{ display:none; }
     .fp-tab{ padding:14px 2px; margin-right:26px; font:700 14px var(--body); color:var(--muted); background:none; border:0; border-bottom:2px solid transparent; margin-bottom:-1px; cursor:pointer; white-space:nowrap; transition:color .12s; }
@@ -2789,7 +2789,7 @@
 .evc-chip:hover{ border-color:#6a5f9a; }
 
 </style>
-<meta name="sc-build" content="static-1783866864236">
+<meta name="sc-build" content="static-1783880863857">
 <meta name="robots" content="noindex">
 </head>
 <body>
@@ -5541,7 +5541,7 @@
 
     // ---- feed ----
     // Coming up — one compact row per entity (artist / venue / friend) with its
-    // next few gigs stacked beside it, like the artist-page "Past sets". Sections
+    // next few gigs stacked beside it, like the artist-page "Past events". Sections
     // run Artists → Venues → Friends down a single scrolling page.
     // Coming up — entity rows (Artists / Venues / Friends) under a date scope bar
     // (Today · Week · Month · All) + a "jump to date" anchor. Windowed scopes hit
@@ -5794,7 +5794,7 @@
         var img=v.image?('background-image:url('+imgUrl(v.image,360)+')'):('background:'+sceneTone(v.venue_slug||v.venue));
         // Per-item city (global search): drives both the label and the correct link target.
         var vcity=v.city||'';
-        return '<div class="srail-ven" data-venue="'+esc(v.venue)+'" data-vcity="'+esc(vcity)+'" style="'+img+'"><span class="srail-ven-n">'+esc(v.venue)+(vcity?'<em class="srail-ven-c">'+esc(cityLabel(vcity))+'</em>':'')+'</span><span class="srail-play br" data-vplay="'+esc(v.venue)+'" aria-label="Play next night at '+esc(v.venue)+'">&#9654;</span></div>';
+        return '<div class="srail-ven" data-venue="'+esc(v.venue)+'" data-vcity="'+esc(vcity)+'" style="'+img+'"><span class="srail-ven-n">'+esc(v.venue)+(vcity?'<em class="srail-ven-c">'+esc(cityLabel(vcity))+'</em>':'')+'</span><span class="srail-play br" data-vplay="'+esc(v.venue)+'" aria-label="Play next lineup at '+esc(v.venue)+'">&#9654;</span></div>';
       }).join('')+'</div>';
       el.querySelectorAll('.srail-ven[data-venue]').forEach(function(c){ c.addEventListener('click',function(e){ if(e.target.closest('.srail-play')) return; openVenue(c.dataset.venue, c.dataset.vcity||city); }); });
       el.querySelectorAll('.srail-play[data-vplay]').forEach(function(b){ b.addEventListener('click',function(e){ e.stopPropagation(); var vc=b.closest('.srail-ven'); playVenueNextYt(b.dataset.vplay, (vc&&vc.dataset.vcity)||city); }); });
@@ -6150,8 +6150,8 @@
         var up=a.upcoming||[], secTabs=[];
         if(up.length) secTabs.push({ key:'upcoming', label:'Upcoming', count:up.length,
           html:'<div class="fp-sec"><div class="fp-sech">Upcoming events <span>'+up.length+' upcoming · ▶ previews the sound</span></div>'+up.map(function(g){ return fpEventRowHTML(g, true); }).join('')+'</div>' });
-        if((a.history||[]).length) secTabs.push({ key:'past', label:'Past sets', count:a.history.length,
-          html:'<div class="fp-sec"><div class="fp-sech">Past sets <span>logged by the scene</span></div>'+a.history.map(function(g){ return fpEventRowHTML(g, false); }).join('')+'</div>' });
+        if((a.history||[]).length) secTabs.push({ key:'past', label:'Past events', count:a.history.length,
+          html:'<div class="fp-sec"><div class="fp-sech">Past events <span>logged by the scene</span></div>'+a.history.map(function(g){ return fpEventRowHTML(g, false); }).join('')+'</div>' });
         // "Sets" — the artist's full YouTube sets; lazy-loaded on first tab open (one YT search per artist, cached).
         secTabs.push({ key:'sets', label:'Sets', count:null,
           html:'<div class="fp-sec"><div class="fp-sech">Sets <span>full sets · pick one to play</span></div><div class="fp-sets" id="fp-sets"><div class="fp-sets-load">Loading sets…</div></div></div>' });
@@ -6367,7 +6367,7 @@
         if(p.youLike) h+='<div class="pp-affinity">You’ve saved <b>'+p.youLike+'</b> artist'+(p.youLike===1?'':'s')+' this promoter books — you probably like their nights.</div>';
         if((p.genres||[]).length) h+='<div class="ev-genres" style="margin-top:12px">'+p.genres.slice(0,6).map(function(g){ return '<span class="gchip">'+esc(g)+'</span>'; }).join('')+'</div>';
         var pNext=nextPlayableEvent(p.upcoming);
-        if(pNext) h+='<div class="artist-actions" style="max-width:240px;margin-top:12px"><button class="ev-radio" id="pp-radio" type="button">'+RADIO_SVG+'<span>Play next night</span></button></div>';
+        if(pNext) h+='<div class="artist-actions" style="max-width:240px;margin-top:12px"><button class="ev-radio" id="pp-radio" type="button">'+RADIO_SVG+'<span>Play next lineup</span></button></div>';
         h+='<div id="pp-upcoming"></div><div id="pp-artists"></div><div id="pp-venues"></div><div id="pp-similar"></div><div id="pp-past"></div>';
         openPanel(h);
         var prb=document.getElementById('pp-radio');
@@ -6430,7 +6430,7 @@
         if(v.slug){
           var vFollow='<button class="fp-ab'+(v.following?' on':'')+'" id="vf-btn" type="button" aria-pressed="'+(v.following?'true':'false')+'">'+HEART_SVG+'<span>'+(v.following?'Following':'Follow')+'</span></button>';
           var vBeen='<button class="fp-ab'+(v.myReview?' on':'')+'" id="vp-been" type="button">'+CHECK_SVG+'<span>'+(v.myReview?'You&rsquo;ve been':'I&rsquo;ve been')+'</span></button>';
-          vActs='<div class="fp-acts">'+(vNext?('<button class="fp-ab go" id="vp-radio" type="button">'+RADIO_SVG+'<span>Play next night</span></button>'):'')+vFollow+vBeen+'</div>';
+          vActs='<div class="fp-acts">'+(vNext?('<button class="fp-ab go" id="vp-radio" type="button">'+RADIO_SVG+'<span>Play next lineup</span></button>'):'')+vFollow+vBeen+'</div>';
         }
         var h='<div class="fp-artist">'+
           '<div class="fp-hero">'+
@@ -6465,7 +6465,7 @@
         if(beenBtn) beenBtn.addEventListener('click',function(){ openVenueReview(v); });
         var vrb=document.getElementById('vp-radio');
         if(vrb && vNext) vrb.addEventListener('click',function(){ playEventLineupRadio({ id:vNext.id, venue:dispName, event_date:vNext.event_date, poster_url:vNext.poster_url, lineup:vNext.lineup }); });
-        armSticky(dispName, (vrb&&vNext)?function(){ vrb.click(); }:null, vrb || document.querySelector('#page-body .fp-hero'));   // sticky title bar: venue name + Play next night (name-only if nothing upcoming)
+        armSticky(dispName, (vrb&&vNext)?function(){ vrb.click(); }:null, vrb || document.querySelector('#page-body .fp-hero'));   // sticky title bar: venue name + Play next lineup (name-only if nothing upcoming)
         // Owner toolkit (audience + edit + broadcast) — the anti-RA wedge.
         wireEntityOwner('venue', v.slug, dispName, v);
         var cbBtn=document.getElementById('vp-claim');
@@ -6484,7 +6484,7 @@
           vu.innerHTML='<div id="vp-cards" style="margin-top:16px"></div>';
           mountEventCards(document.getElementById('vp-cards'), up);
         }
-        // Past events — same gig-history list pattern as "Past sets" on the artist page.
+        // Past events — same gig-history list pattern as "Past events" on the artist page.
         var pst=(v.past||[]), vpst=document.getElementById('vp-past');
         if(vpst && pst.length){
           vpst.innerHTML='<div class="pf-box" style="margin-top:16px"><ul class="gig-history">'+pst.map(function(g){
