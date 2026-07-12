@@ -2732,7 +2732,7 @@
 /* ── STATIC skin (next.soundcheck.club) ── */
 /* ═══════════════════════════════════════════════════════════════════════════
    STATIC skin — #FFFFFF on PLUM. Brand-lab recipe (2026-07-12, r2):
-   white accent on deep plum · Bricolage (untouched) · soft corners · GLOW ·
+   white accent on deep plum · Bricolage (untouched) · soft corners · FLAT ·
    tiny ultraviolet (#8B5CFF) whisper (focus rings, selection, poster-fallback
    partner) · the LOGO stays salmon #FF7A6B — the one heritage note.
    Every accent-filled control carries a dark-plum border so white buttons
@@ -2762,16 +2762,16 @@
 ::selection{ background:var(--uv); color:#fff; }
 
 /* white controls need an edge: dark-plum border on every accent-filled
-   control (play buttons overlay posters, which are often bright) + glow */
+   control (play buttons overlay posters, which are often bright); flat, no glow */
 .evc-play, .ev-bigplay, .bill-play, .play-main, .psticky-play, .srail-play,
 .card-play, .fp-erow-play, .pd-follow, .pd-loggig, .pb-share, .radio-fab, .dt.on{
   border:1.5px solid #120a16;
-  box-shadow:0 0 24px -6px rgba(255,255,255,0.7);
+  box-shadow:none;
 }
-.pd-avatar, .pd-bub{ box-shadow:0 0 0 1.5px #120a16, 0 0 24px -6px rgba(255,255,255,0.55); }
+.pd-avatar, .pd-bub{ box-shadow:0 0 0 1.5px #120a16; }
 
 </style>
-<meta name="sc-build" content="static-1783864903868">
+<meta name="sc-build" content="static-1783865058162">
 <meta name="robots" content="noindex">
 </head>
 <body>
