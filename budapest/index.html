@@ -33,7 +33,7 @@
       /* DS v2 — brightness-stepped surfaces (no shadows), text-opacity hierarchy */
       --bg:#0e0d12; --surface:#16141b; --surface-2:#1f1c26; --surface-3:#2a2633;
       --fg:#f4efe9; --muted:#a39fab; --faint:#6d6976;
-      --accent:#ffffff; --accent-weak:rgba(255,255,255,0.12); --border:#322e3b; --line:#322e3b; --ink:#0a0a0a; --accent-ink:#0a0a0a;
+      --accent:#ffffff; --accent-weak:rgba(255,255,255,0.12); --border:#322e3b; --line:#322e3b; --ink:#120a16; --accent-ink:#120a16;
       --accent-grad:linear-gradient(140deg, #ffffff 0%, #ffffff 100%);   /* subtle salmon sheen — play buttons */
       /* corner radius scale */
       --radius-2xs:4px; --radius-xs:6px; --radius-sm:8px; --radius:11px; --radius-md:14px; --radius-lg:16px; --radius-xl:20px; --radius-pill:999px;
@@ -2731,26 +2731,26 @@
     
 /* ── STATIC skin (next.soundcheck.club) ── */
 /* ═══════════════════════════════════════════════════════════════════════════
-   STATIC skin — pure monochrome. Brand-lab recipe (2026-07-12, r4):
-   #FFFFFF on carbon · Bricolage (untouched) · soft corners · FLAT ·
-   NO colour anywhere — logo included. Every accent-filled control carries a
+   STATIC skin — monochrome UI on PLUM. Brand-lab recipe (2026-07-12, r6):
+   #FFFFFF on deep plum · Bricolage (untouched) · soft corners · FLAT ·
+   no accent colour, logo included — the plum GROUND is the only hue. Every accent-filled control carries a
    near-black border so white buttons never vanish over bright posters.
    Hardcoded salmon values are swapped to white by build-next.mjs.
    ═══════════════════════════════════════════════════════════════════════════ */
 :root{
-  --bg:#0a0a0a; --surface:#141414; --surface-2:#1b1b1b; --surface-3:#232323;
-  --fg:#f4f4f4; --muted:#9a9a9a; --faint:#5e5e5e;
+  --bg:#120a16; --surface:#1d1122; --surface-2:#231529; --surface-3:#2a1a31;
+  --fg:#f6eef8; --muted:#ae96b8; --faint:#6e5a78;
   --accent:#ffffff; --accent-weak:rgba(255,255,255,0.10);
-  --border:#272727; --line:#272727; --ink:#0a0a0a; --accent-ink:#0a0a0a;
+  --border:#372243; --line:#372243; --ink:#120a16; --accent-ink:#120a16;
   --accent-grad:#ffffff;
   /* soft corner scale (lab: s6 · m9 · l13 · btn9) */
   --radius-2xs:4px; --radius-xs:5px; --radius-sm:6px; --radius:9px; --radius-md:11px; --radius-lg:13px; --radius-xl:15px;
 }
-.wrap > nav.scrolled{ background:rgba(10,10,10,0.85); }
+.wrap > nav.scrolled{ background:rgba(18,10,22,0.85); }
 
 /* monochrome interaction states */
 :focus-visible{ outline-color:#ffffff; }
-::selection{ background:#ffffff; color:#0a0a0a; }
+::selection{ background:#ffffff; color:#120a16; }
 
 /* ── mono emphasis scale ──────────────────────────────────────────────────
    Colour is gone, so hierarchy carries everything. Four rungs:
@@ -2768,7 +2768,7 @@
 .evc-play, .ev-bigplay, .bill-play, .play-main, .psticky-play, .srail-play,
 .card-play, .fp-erow-play, .pd-follow, .pd-loggig, .pb-share, .radio-fab,
 .follow-btn, .dt.on{
-  border:1.5px solid #0a0a0a;
+  border:1.5px solid #120a16;
   box-shadow:none;
   transition:background-color .15s, transform .1s;
 }
@@ -2782,7 +2782,7 @@
 .pd-follow:active, .pd-loggig:active, .pb-share:active, .radio-fab:active, .follow-btn:active{
   transform:scale(.96);
 }
-.pd-avatar, .pd-bub{ box-shadow:0 0 0 1.5px #0a0a0a; }
+.pd-avatar, .pd-bub{ box-shadow:0 0 0 1.5px #120a16; }
 
 /* E2 — outline pills: crisp white border on hover, slightly deeper tint */
 .hdr-log:hover, .ev-radio:hover, .rf-go:hover{
@@ -2790,10 +2790,10 @@
 }
 
 /* E3 — hairline chips/ghosts: one grey step up on hover */
-.evc-chip:hover{ border-color:#9a9a9a; }
+.evc-chip:hover{ border-color:#8a7595; }
 
 </style>
-<meta name="sc-build" content="static-1783865595725">
+<meta name="sc-build" content="static-1783865795548">
 <meta name="robots" content="noindex">
 </head>
 <body>
@@ -6509,7 +6509,7 @@
             var _rt=currentRoute(); if((_rt.indexOf('club/')!==0 && _rt.indexOf('v/')!==0) || !document.getElementById('venue-loc')) return;   // path-routed, not hash
             var map=L.map(locEl,{ scrollWheelZoom:false }).setView([v.lat,v.lng], 15); _venueMap=map;
             L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{ attribution:'&copy; OpenStreetMap, &copy; CARTO', subdomains:'abcd', maxZoom:19 }).addTo(map);
-            L.circleMarker([v.lat,v.lng],{ radius:9, color:'#0a0a0a', weight:2, fillColor:'#ffffff', fillOpacity:1 }).addTo(map).bindPopup('<b>'+esc(dispName)+'</b>'+(v.address?'<br><span style="color:var(--muted)">'+esc(v.address)+'</span>':''));
+            L.circleMarker([v.lat,v.lng],{ radius:9, color:'#120a16', weight:2, fillColor:'#ffffff', fillOpacity:1 }).addTo(map).bindPopup('<b>'+esc(dispName)+'</b>'+(v.address?'<br><span style="color:var(--muted)">'+esc(v.address)+'</span>':''));
             setTimeout(function(){ map.invalidateSize(); },120);
           });
         }
@@ -6580,7 +6580,7 @@
         var isPast=ev.event_date && String(ev.event_date).slice(0,10) < todayISO();
         var when=[(ev._day||(ev.event_date?fmtDateLabel(String(ev.event_date).slice(0,10)):'')), formatTimeRange(ev.startTime,ev.endTime,ev._time)].filter(Boolean).join(' · ');
         var price=formatPrice(ev.minPrice, ev.maxPrice, ev.currency);
-        var posterBg=ev.poster?'background-image:url('+imgUrl(ev.poster,1000)+')':'background:linear-gradient(150deg,#ffffff,#3a3a3a)';
+        var posterBg=ev.poster?'background-image:url('+imgUrl(ev.poster,1000)+')':'background:linear-gradient(150deg,#ffffff,#372243)';
         var stamp=isPickVenue(ev.venue)?'<div class="fp-ev-stamp">Pick</div>':'';
         var blurb=ev.content||ev.description||'';
         var evPicked=isEventPicked(id);
@@ -6633,7 +6633,7 @@
             var el=document.getElementById('fp-ev-map'); if(!el||currentRoute().indexOf('e/')!==0) return;
             try{ var map=L.map(el,{scrollWheelZoom:false}).setView([ev.venueLat,ev.venueLng],15);
               L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{ subdomains:'abcd', maxZoom:19 }).addTo(map);
-              L.circleMarker([ev.venueLat,ev.venueLng],{ radius:9, color:'#0a0a0a', weight:2, fillColor:'#ffffff', fillOpacity:1 }).addTo(map);
+              L.circleMarker([ev.venueLat,ev.venueLng],{ radius:9, color:'#120a16', weight:2, fillColor:'#ffffff', fillOpacity:1 }).addTo(map);
               setTimeout(function(){ map.invalidateSize(); },120);
             }catch(_){}
           });
