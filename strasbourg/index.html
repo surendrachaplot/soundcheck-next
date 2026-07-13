@@ -2766,13 +2766,24 @@ body::before{
 /* glass on the floating chrome (not on every card — mobile perf) */
 .dock{ backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); }
 
-/* ── emphasis scale (from STATIC r5, aurora-tinted) ── */
-.evc-play, .ev-bigplay, .bill-play, .play-main, .psticky-play, .srail-play,
-.card-play, .fp-erow-play, .pd-follow, .pd-loggig, .pb-share, .radio-fab,
-.follow-btn, .dt.on{
-  border:1.5px solid #070b14;
-  box-shadow:none;
+/* ── emphasis scale, tuned to the DESIGN-LAB AURORA mock ──
+   The mock does NOT paint everything with the gradient:
+   · gradient (teal→violet, night ink) = PRIMARY CTAs only (follow, log, share, radio)
+   · play buttons = teal-tinted GLASS with a white glyph + hairline
+   · selected date tile + dock main button = WHITE glass with night ink  */
+.pd-follow, .pd-loggig, .pb-share, .radio-fab, .follow-btn{
+  background:var(--accent-grad); color:#0a0e18;
+  border:1.5px solid #070b14; box-shadow:none;
   transition:filter .15s, transform .1s;
+}
+.evc-play, .ev-bigplay, .bill-play, .card-play, .srail-play, .psticky-play, .fp-erow-play{
+  background:color-mix(in srgb, #2ef2c4 32%, rgba(255,255,255,0.09));
+  color:#ffffff; border:1px solid rgba(255,255,255,0.28); box-shadow:none;
+  transition:filter .15s, transform .1s;
+}
+.play-main, .dt.on{
+  background:rgba(255,255,255,0.92); color:#0a0e18;
+  border:1px solid rgba(255,255,255,0.5); box-shadow:none;
 }
 .evc-play:hover, .ev-bigplay:hover, .bill-play:hover, .play-main:hover,
 .psticky-play:hover, .srail-play:hover, .card-play:hover, .fp-erow-play:hover,
@@ -2804,14 +2815,14 @@ body::before{
 .lvr .lv-m{ display:block; font-size:.78rem; color:var(--muted); margin-top:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .lvr .lv-a{ display:block; font-size:.78rem; color:var(--accent); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .lvr .lv-r{ display:flex; flex-direction:column; justify-content:center; align-items:center; gap:7px; flex:none; }
-.lvr .evc-play{ position:static; width:38px; height:38px; box-shadow:none; border:1.5px solid #070b14; }
+.lvr .evc-play{ position:static; width:38px; height:38px; box-shadow:none; }
 .lvr .evc-play svg{ width:20px; height:20px; margin-left:2px; }
 .lvr .heart.evc-heart{ position:static; width:32px; height:26px; display:inline-flex; align-items:center; justify-content:center; background:transparent; border:0; padding:0; color:var(--muted); }
 .lvr .heart.evc-heart.on{ color:var(--accent); }
 .lvr .heart.evc-heart svg{ width:17px; height:17px; }
 
 </style>
-<meta name="sc-build" content="aurora-1783962168540">
+<meta name="sc-build" content="aurora-1783962958181">
 <meta name="robots" content="noindex">
 </head>
 <body>
