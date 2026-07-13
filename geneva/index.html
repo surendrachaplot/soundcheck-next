@@ -2777,8 +2777,29 @@
 }
 .evc-chip:hover{ border-color:#5a4d85; }
 
+/* ── mobile LIST VIEW on the home grid (#grid) — markup from sunset-list.js;
+   .lvr rows only ever exist ≤640px, desktop keeps the poster grid ── */
+@media (max-width:640px){
+  #grid{ grid-template-columns:1fr; gap:10px; }
+}
+.lvr{ display:flex; flex-direction:row; align-items:center; gap:8px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:9px 10px; }
+.lvr .lv-main{ position:static; inset:auto; width:auto; height:auto; display:flex; align-items:center; gap:12px; flex:1; min-width:0; background:none; border:0; padding:0; margin:0; text-align:left; color:inherit; cursor:pointer; font-family:inherit; -webkit-tap-highlight-color:transparent; }
+.lvr .lv-th{ position:relative; width:64px; height:64px; flex:none; border-radius:12px; overflow:hidden; display:block; }
+.lvr .lv-th .poster{ position:absolute; inset:0; width:100%; height:100%; margin:0; border-radius:0; aspect-ratio:auto; }
+.lvr .lv-th .poster .gen .gt{ display:none; }
+.lvr .lv-bd{ flex:1; min-width:0; display:block; }
+.lvr .lv-tt{ display:block; font-family:var(--head); font-weight:800; font-size:1rem; line-height:1.2; letter-spacing:-.01em; color:var(--fg); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.lvr .lv-m{ display:block; font-size:.78rem; color:var(--muted); margin-top:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.lvr .lv-a{ display:block; font-size:.78rem; color:var(--accent); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.lvr .lv-r{ display:flex; flex-direction:column; justify-content:center; align-items:center; gap:7px; flex:none; }
+.lvr .evc-play{ position:static; width:38px; height:38px; box-shadow:none; border:1.5px solid #16102a; }
+.lvr .evc-play svg{ width:20px; height:20px; margin-left:2px; }
+.lvr .heart.evc-heart{ position:static; width:32px; height:26px; display:inline-flex; align-items:center; justify-content:center; background:transparent; border:0; padding:0; color:var(--muted); }
+.lvr .heart.evc-heart.on{ color:var(--accent); }
+.lvr .heart.evc-heart svg{ width:17px; height:17px; }
+
 </style>
-<meta name="sc-build" content="sunset-1783956003398">
+<meta name="sc-build" content="sunset-1783956981579">
 <meta name="robots" content="noindex">
 </head>
 <body>
@@ -7869,5 +7890,60 @@
       handleRoute();
     }
   </script>
+<script>
+/* SUNSET render overrides */
+/* ═══════════════════════════════════════════════════════════════════════════
+   SUNSET list view (next.soundcheck.club only) — on MOBILE the home grid
+   (#grid) renders LIST ROWS instead of poster cards; desktop keeps posters,
+   and every other card site (artist / venue / search) keeps posters on all
+   sizes. Injected after the main app script; wraps paintCurrentGrid so only
+   home paints are affected, and keeps every wireEvcCards hook (.evc-poster
+   opens the sheet — here it wraps the whole row — .evc-play queues the
+   line-up, .heart[data-pick-evt] saves).
+   ═══════════════════════════════════════════════════════════════════════════ */
+(function(){
+  if(typeof cardHTML!=='function' || typeof paintCurrentGrid!=='function') return;
+  var MQ=window.matchMedia('(max-width:640px)');
+  var origCard=window.cardHTML, painting=false;
+
+  function listRow(ev){
+    var eid=ev.id!=null?String(ev.id):'';
+    var arts=ev.artists||[];
+    var isTon=currentDate && currentDate===todayISO();
+    var dayLab=ev._day||(isTon?'Tonight':'');
+    var tRange=formatTimeRange(ev.startTime, ev.endTime, ev._time);
+    var when=[dayLab,tRange].filter(Boolean).join(' &middot; ');
+    var names=arts.slice(0,3).map(function(a){ return esc(a.name); }).join(', ')+(arts.length>3?' +'+(arts.length-3):'');
+    var picked=eid && isEventPicked(eid)?' on':'';
+    return '<article class="gcard evc lvr"'+(eid?' data-evt="'+esc(eid)+'"':'')+'>'
+      +'<button class="evc-poster lv-main" type="button" aria-label="View '+esc(ev.title)+'">'
+        +'<span class="lv-th">'+posterHTML(ev)+'</span>'
+        +'<span class="lv-bd">'
+          +'<span class="lv-tt">'+esc(ev.title)+'</span>'
+          +'<span class="lv-m">'+(when?when+' &middot; ':'')+esc(ev.venue||'TBA')+'</span>'
+          +(names?'<span class="lv-a">'+names+'</span>':'')
+        +'</span>'
+      +'</button>'
+      +'<span class="lv-r">'
+        +(eid?'<button class="heart evc-heart'+picked+'" type="button" data-pick-evt="'+esc(eid)+'" data-title="'+esc(ev.title||'')+'" data-venue="'+esc(ev.venue||'')+'" data-day="'+esc(ev._day||'')+'" aria-pressed="'+(picked?'true':'false')+'" aria-label="Save this event">'+BOOKMARK_SVG+'</button>':'')
+        +(eid&&arts.length?'<button class="evc-play" type="button" aria-label="Play the lineup"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>':'')
+      +'</span></article>';
+  }
+
+  window.cardHTML=function(ev){
+    return (painting && MQ.matches) ? listRow(ev) : origCard(ev);
+  };
+  var origPaint=window.paintCurrentGrid;
+  window.paintCurrentGrid=function(){ painting=true; try{ origPaint(); } finally{ painting=false; } };
+
+  // crossing the breakpoint re-paints the grid in the right mode
+  try{
+    var mq=MQ;
+    var onchg=function(){ try{ window.paintCurrentGrid(); }catch(_){} };
+    if(mq.addEventListener) mq.addEventListener('change',onchg); else if(mq.addListener) mq.addListener(onchg);
+  }catch(_){}
+})();
+
+</script>
 </body>
 </html>
