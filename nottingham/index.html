@@ -2753,6 +2753,15 @@ body::before{
   background:linear-gradient(rgba(255,154,61,.05) 1px, transparent 1px); background-size:100% 4px;
 }
 .wrap > nav.scrolled{ background:rgba(22,16,42,0.85); }
+
+/* gradient wordmark (whole "soundcheck"); the cassette icon warm too.
+   Hover → the entire logo (icon + wordmark) goes solid white. */
+.logo-wm{ background:var(--accent-grad); -webkit-background-clip:text; background-clip:text;
+  -webkit-text-fill-color:transparent; color:transparent; transition:opacity .15s; }
+.logo-wm .ac{ -webkit-text-fill-color:transparent; color:transparent; }
+.logo-ic{ color:#ff7a4d; transition:color .15s; }
+.logo:hover .logo-wm, .logo:hover .logo-wm .ac{ background:none; -webkit-text-fill-color:#fff; color:#fff; }
+.logo:hover .logo-ic{ color:#fff; }
 ::selection{ background:#ff9a3d; color:#2a0d14; }
 
 /* ── emphasis scale (sunset, flat) — dusk edges on filled controls ── */
@@ -2800,7 +2809,7 @@ body::before{
 .lvr .heart.evc-heart svg{ width:17px; height:17px; }
 
 </style>
-<meta name="sc-build" content="sunsetcrt-1783964551628">
+<meta name="sc-build" content="sunsetcrt-1783965298243">
 <meta name="robots" content="noindex">
 </head>
 <body>
