@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>sunset accent lab — pick the primary</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:#0d0a18;color:#f3edf7;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+.top{max-width:1000px;margin:0 auto;padding:24px 18px 8px}
+.top h1{font-size:19px;font-weight:800;letter-spacing:-.02em;margin:0}
+.top p{font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#8b83a0;letter-spacing:.05em;line-height:1.7;margin:8px 0 0}
+.tabs{max-width:1000px;margin:12px auto 4px;padding:10px 18px;display:flex;gap:8px;flex-wrap:wrap;position:sticky;top:0;z-index:50;background:rgba(13,10,24,.94);backdrop-filter:blur(8px)}
+.tab{cursor:pointer;font-family:ui-monospace,Menlo,monospace;font-size:10.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#c2bad4;border:1px solid #2c2545;background:#171230;border-radius:99px;padding:9px 14px;display:flex;gap:8px;align-items:center;transition:.15s}
+.tab .d{width:14px;height:14px;border-radius:4px;background:var(--g)}
+.tab:hover{border-color:#584d85;color:#fff}
+.tab.on{background:#f3edf7;color:#171230;border-color:#f3edf7}
+.meta{max-width:1000px;margin:0 auto;padding:0 18px}
+.note{font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#8b83a0;letter-spacing:.04em;line-height:1.8;max-width:720px}
+.hex{font-family:ui-monospace,Menlo,monospace;font-size:10.5px;color:#c2bad4;margin-top:6px}
+.stage{display:flex;justify-content:center;gap:26px;padding:20px 12px 90px;flex-wrap:wrap}
+.phone{width:396px;max-width:100%;height:780px;border-radius:34px;border:1px solid #322a52;background:#000;overflow:hidden;position:relative;box-shadow:0 40px 90px -40px rgba(0,0,0,.9)}
+@media(max-width:430px){.phone{height:86vh;border-radius:22px}}
+
+/* ── the CURRENT sunset app (dusk ground, round, list view) ── */
+.frame{position:absolute;inset:0;display:flex;flex-direction:column;overflow:hidden;background:#16102a;color:#fdf3ec;
+ --grad:linear-gradient(135deg,#ff5e7e,#ff9a3d); --acc:#ff9a3d; --ink:#2a0d14}
+.scroll{flex:1;overflow-y:auto}
+.hd{display:flex;align-items:center;gap:10px;padding:15px 16px 10px;flex:none}
+.wm{font-weight:800;font-size:19px;letter-spacing:-.03em}
+.wm i{font-style:normal;color:var(--acc)}
+.city{margin-left:auto;font-family:ui-monospace,Menlo,monospace;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:6px 11px;border-radius:99px;background:color-mix(in srgb,var(--acc) 16%,#16102a);color:var(--acc)}
+.dates{display:flex;gap:8px;overflow-x:auto;padding:6px 16px 14px;flex:none;scrollbar-width:none}
+.dates::-webkit-scrollbar{display:none}
+.dt{flex:none;min-width:60px;text-align:center;padding:9px 11px;background:#211840;border-radius:16px}
+.dt .a{font-family:ui-monospace,Menlo,monospace;font-size:9px;letter-spacing:.13em;text-transform:uppercase;opacity:.6}
+.dt .b{font-weight:800;font-size:17px;margin-top:1px}
+.dt.on{background:var(--grad);color:var(--ink)}
+.feed{padding:0 14px 150px}
+.lvr{display:flex;align-items:center;gap:10px;background:#211840;border:1px solid #2a2050;border-radius:18px;padding:9px 10px;margin-bottom:10px}
+.lv-th{width:62px;height:62px;flex:none;border-radius:12px;background:linear-gradient(135deg,#3a2d63,#241a48);position:relative;overflow:hidden}
+.lv-th::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(45deg,rgba(255,255,255,.09) 0 4px,transparent 4px 11px)}
+.lv-bd{flex:1;min-width:0}
+.lv-tt{font-weight:800;font-size:15.5px;line-height:1.15;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lv-m{font-size:12px;color:#b8a8d0;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lv-a{font-size:12px;color:var(--acc);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lv-r{display:flex;flex-direction:column;align-items:center;gap:7px;flex:none}
+.bmk{width:20px;height:18px;color:#8d7fa8}
+.bmk.on{color:var(--acc)}
+.pp{width:38px;height:38px;border-radius:50%;border:1.5px solid #16102a;background:var(--grad);color:var(--ink);font-size:12px;display:inline-flex;align-items:center;justify-content:center}
+.cta{margin:6px 2px 14px;display:flex;gap:9px}
+.cta .b1{flex:1;text-align:center;padding:13px;border-radius:99px;background:var(--grad);color:var(--ink);font-weight:800;font-size:12px;letter-spacing:.06em;text-transform:uppercase;border:1.5px solid #16102a}
+.cta .b2{flex:1;text-align:center;padding:13px;border-radius:99px;background:#211840;color:#fdf3ec;font-weight:800;font-size:12px;letter-spacing:.06em;text-transform:uppercase;border:1px solid #332664}
+.radio{position:absolute;right:14px;bottom:76px;z-index:5;display:flex;gap:8px;align-items:center;background:var(--grad);color:var(--ink);font-family:ui-monospace,Menlo,monospace;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:12px 16px;border-radius:99px;border:1.5px solid #16102a}
+.dock{position:absolute;left:10px;right:10px;bottom:64px;z-index:4;display:flex;align-items:center;gap:11px;background:#241a48;border:1px solid #332664;border-radius:18px;padding:10px 12px}
+.dock .art{width:36px;height:36px;border-radius:12px;background:var(--grad);flex:none}
+.dock .m{flex:1;min-width:0}
+.dock .t1{font-weight:800;font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dock .t2{font-family:ui-monospace,Menlo,monospace;font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--acc);margin-top:2px}
+.dock .bar{height:3px;border-radius:99px;background:#332664;margin-top:6px;position:relative;overflow:hidden}
+.dock .bar i{position:absolute;left:0;top:0;bottom:0;width:42%;background:var(--grad)}
+.dock .pb{width:34px;height:34px;border-radius:50%;border:1.5px solid #16102a;background:var(--grad);color:var(--ink);font-size:12px;flex:none;display:inline-flex;align-items:center;justify-content:center}
+.bnav{position:absolute;left:0;right:0;bottom:0;display:flex;background:rgba(22,16,42,.94);backdrop-filter:blur(8px);border-top:1px solid #2a2050;z-index:6}
+.bnav div{flex:1;text-align:center;padding:12px 0 16px;font-family:ui-monospace,Menlo,monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:#8d7fa8}
+.bnav div.on{color:var(--acc)}
+.gtag{display:inline-block;font-size:9.5px;font-weight:700;background:color-mix(in srgb,var(--acc) 22%,#211840);color:var(--acc);border-radius:99px;padding:3px 9px;margin-right:5px}
+</style>
+</head>
+<body>
+<div class="top">
+  <h1>sunset accent lab · pick the primary</h1>
+  <p>Everything else stays exactly as next.soundcheck.club is today — dusk-purple ground, round corners, mobile list view, Bricolage. Only the PRIMARY changes. Tap through.</p>
+</div>
+<div class="tabs" id="tabs"></div>
+<div class="meta"><div class="note" id="note"></div><div class="hex" id="hex"></div></div>
+<div class="stage">
+  <div class="phone"><div class="frame" id="frame">
+    <div class="hd"><span class="wm">sound<i>check</i></span><span class="city">◉ London</span></div>
+    <div class="dates">
+      <div class="dt on"><div class="a">Sun</div><div class="b">Now</div></div>
+      <div class="dt"><div class="a">Fri</div><div class="b">17</div></div>
+      <div class="dt"><div class="a">Sat</div><div class="b">18</div></div>
+      <div class="dt"><div class="a">Sun</div><div class="b">19</div></div>
+      <div class="dt" style="opacity:.5"><div class="a">···</div><div class="b">+</div></div>
+    </div>
+    <div class="scroll"><div class="feed">
+      <div class="cta"><span class="b1">▶ Play the lineup</span><span class="b2">♡ Save</span></div>
+      <div class="lvr">
+        <span class="lv-th"></span>
+        <span class="lv-bd">
+          <span class="lv-tt" style="display:block">DARKSIDE (early show)</span>
+          <span class="lv-m" style="display:block">Tonight · 18:00 – 20:00 · EartH</span>
+          <span class="lv-a" style="display:block">DARKSIDE, Nicolas Jaar</span>
+        </span>
+        <span class="lv-r"><svg class="bmk on" viewBox="0 0 24 24" fill="currentColor"><path d="M6 2h12v20l-6-4-6 4z"/></svg><span class="pp">▶</span></span>
+      </div>
+      <div class="lvr">
+        <span class="lv-th"></span>
+        <span class="lv-bd">
+          <span class="lv-tt" style="display:block">MOTION Every Monday</span>
+          <span class="lv-m" style="display:block">Tonight · 23:00 – 03:00 · XOYO</span>
+          <span class="lv-a" style="display:block">Major Rager, Charlie B2B</span>
+        </span>
+        <span class="lv-r"><svg class="bmk" viewBox="0 0 24 24" fill="currentColor"><path d="M6 2h12v20l-6-4-6 4z"/></svg><span class="pp">▶</span></span>
+      </div>
+      <div class="lvr">
+        <span class="lv-th"></span>
+        <span class="lv-bd">
+          <span class="lv-tt" style="display:block">Pindrop: Folk in the Round</span>
+          <span class="lv-m" style="display:block">Tonight · 19:30 – 23:30 · M.O.T</span>
+          <span class="lv-a" style="display:block">Emily Theodora, Fernando</span>
+        </span>
+        <span class="lv-r"><svg class="bmk" viewBox="0 0 24 24" fill="currentColor"><path d="M6 2h12v20l-6-4-6 4z"/></svg><span class="pp">▶</span></span>
+      </div>
+      <div style="margin:14px 2px 8px;font-family:ui-monospace,Menlo,monospace;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:#8d7fa8">Genre chips</div>
+      <div><span class="gtag">Techno</span><span class="gtag">House</span><span class="gtag">Bass</span><span class="gtag">Disco</span></div>
+    </div></div>
+    <div class="radio">((•)) Radio</div>
+    <div class="dock">
+      <div class="art"></div>
+      <div class="m"><div class="t1">DARKSIDE — live from EartH</div><div class="t2">● on air</div><div class="bar"><i></i></div></div>
+      <span class="pb">⏸</span>
+    </div>
+    <div class="bnav"><div class="on">Home</div><div>Search</div><div>Scenes</div><div>Coming up</div><div>You</div></div>
+  </div></div>
+</div>
+<script>
+const OPTS=[
+ ["Current — Sunset","linear-gradient(135deg,#ff5e7e,#ff9a3d)","#ff9a3d","#2a0d14",
+  "The one that's live now: pink → orange. Warm, friendly, golden-hour.","#FF5E7E → #FF9A3D · solid #FF9A3D"],
+ ["Solar","linear-gradient(135deg,#ffd166,#ff9a3d)","#ffd166","#2a1503",
+  "Gold-led: honey → orange. Softer and richer than the pink; reads premium, less candy.","#FFD166 → #FF9A3D · solid #FFD166"],
+ ["Tequila Sunrise","linear-gradient(135deg,#ff3d5e,#ffd166)","#ff5e7e","#2a0d14",
+  "Cherry → gold, the widest sunset span. Punchiest of the warm options.","#FF3D5E → #FFD166 · solid #FF5E7E"],
+ ["Dusk Violet","linear-gradient(135deg,#8b5cff,#c589ff)","#c589ff","#1d0a33",
+  "Tonal: violet on the dusk-purple ground. Calm, seamless, most 'one world' — the quietest option.","#8B5CFF → #C589FF · solid #C589FF"],
+ ["Sunset → Night","linear-gradient(135deg,#ff5e7e,#8b5cff)","#ff7ea8","#26082a",
+  "Pink fading INTO the ground's violet — the sky at the exact moment the night starts. Poetic middle path.","#FF5E7E → #8B5CFF · solid #FF7EA8"],
+ ["Magenta Hour","linear-gradient(135deg,#ff3d9e,#ff7e5e)","#ff3d9e","#2a0619",
+  "Hot magenta → coral. Louder, clubbier; furthest from 'friendly', closest to nightlife.","#FF3D9E → #FF7E5E · solid #FF3D9E"],
+ ["Mint Dusk","linear-gradient(135deg,#2ef2c4,#4da6ff)","#2ef2c4","#03211a",
+  "The cold option: aurora mint → sky on the warm dusk ground. Maximum contrast, most tech.","#2EF2C4 → #4DA6FF · solid #2EF2C4"],
+ ["Blue Hour","linear-gradient(135deg,#4da6ff,#7c5cff)","#6db4ff","#071630",
+  "Blue → violet: the sky 20 minutes after the sun's gone. Cool, moody, premium.","#4DA6FF → #7C5CFF · solid #6DB4FF"],
+];
+const tabs=document.getElementById('tabs'),f=document.getElementById('frame');
+OPTS.forEach((o,i)=>{const b=document.createElement('div');b.className='tab'+(i===0?' on':'');b.style.setProperty('--g',o[1]);
+ b.innerHTML='<span class="d"></span>'+o[0];
+ b.onclick=()=>{f.style.setProperty('--grad',o[1]);f.style.setProperty('--acc',o[2]);f.style.setProperty('--ink',o[3]);
+  document.getElementById('note').textContent=o[4];document.getElementById('hex').textContent=o[5];
+  [...tabs.children].forEach((x,j)=>x.classList.toggle('on',j===i))};
+ tabs.appendChild(b)});
+document.getElementById('note').textContent=OPTS[0][4];document.getElementById('hex').textContent=OPTS[0][5];
+</script>
+</body>
+</html>
