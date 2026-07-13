@@ -2778,7 +2778,7 @@
 .evc-chip:hover{ border-color:#5a4d85; }
 
 </style>
-<meta name="sc-build" content="sunset-1783954606221">
+<meta name="sc-build" content="sunset-1783956003398">
 <meta name="robots" content="noindex">
 </head>
 <body>
@@ -5896,21 +5896,16 @@
       renderSearchEmpty(results); showing='empty'; // default state on open
       setTimeout(function(){ input.focus(); },60);
     }
-    // Default (empty) state — a mini-Discover: recent + trending taps, then suggested
-    // artists / events / venues via the shared rails.
+    // Default (empty) state — a mini-Discover: events coming up first, then
+    // suggested artists / venues via the shared rails. (Trending removed.)
     function renderSearchEmpty(el){
-      el.innerHTML='<div id="sx-trend"></div><div id="sx-sg-art"></div><div id="sx-sg-evt"></div><div id="sx-sg-ven"></div>';
+      el.innerHTML='<div id="sx-sg-evt"></div><div id="sx-sg-art"></div><div id="sx-sg-ven"></div>';
       sxDiscover().then(function(j){
         var arts=(j.artists||[]).slice(0,12).map(function(x){ return { slug:x.slug, name:x.name, image:x.image, nextDate:(x.next&&x.next.event_date)||null, nextVenue:(x.next&&x.next.venue)||null, nextCity:(x.next&&x.next.city)||null }; });
-        var tr=document.getElementById('sx-trend');
-        if(tr && arts.length){
-          tr.innerHTML=secH('Trending', '18px')+'<div class="pillrow">'+arts.slice(0,6).map(function(a){ return '<button class="qchip" type="button" data-q="'+esc(a.name)+'">'+esc(a.name)+'</button>'; }).join('')+'</div>';
-          tr.querySelectorAll('.qchip[data-q]').forEach(function(b){ b.addEventListener('click',function(){ setSearchQuery(b.dataset.q); }); });
-        }
-        mountArtistRail(document.getElementById('sx-sg-art'), arts, {title:'Artists you might like', wrap:true, wide:true, mt:'22px', emptyLabel:'No upcoming dates'});
+        mountArtistRail(document.getElementById('sx-sg-art'), arts, {title:'Artists you might like', wrap:true, wide:true, mt:'24px', emptyLabel:'No upcoming dates'});
       });
       dcScene().then(function(s){
-        mountEventRail(document.getElementById('sx-sg-evt'), (s.upcomingEvents||[]).slice(0,10), {title:'Happening soon', mt:'24px'});
+        mountEventRail(document.getElementById('sx-sg-evt'), (s.upcomingEvents||[]).slice(0,10), {title:'Happening soon', mt:'18px'});
         mountVenueRail(document.getElementById('sx-sg-ven'), (s.bestVenues||[]).slice(0,8), {title:'Venues to explore', city:currentCity, mt:'24px'});
       });
     }
