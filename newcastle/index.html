@@ -2812,7 +2812,7 @@ body::before{
 .lvr .heart.evc-heart svg{ width:17px; height:17px; }
 
 </style>
-<meta name="sc-build" content="sunsetcrt-1783966757226">
+<meta name="sc-build" content="sunsetcrt-1783967110132">
 <meta name="robots" content="noindex">
 </head>
 <body>
@@ -7915,6 +7915,11 @@ body::before{
    line-up, .heart[data-pick-evt] saves).
    ═══════════════════════════════════════════════════════════════════════════ */
 (function(){
+  /* Android renders rem/em noticeably larger than iOS (system Font/Display size
+     + Chrome text-scaling). Pull the whole app back to 90% on Android so it
+     reads like the iPhone. zoom scales text + px + icons together and keeps
+     layout flow (unlike transform:scale). */
+  try{ if(/Android/i.test(navigator.userAgent||'')) document.documentElement.style.zoom='0.9'; }catch(_){}
   if(typeof cardHTML!=='function' || typeof paintCurrentGrid!=='function') return;
   var MQ=window.matchMedia('(max-width:640px)');
   var origCard=window.cardHTML, painting=false;
