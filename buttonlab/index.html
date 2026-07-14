@@ -4,13 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex">
-<title>soundcheck button system · sunset</title>
+<title>soundcheck button system v2 · sunset</title>
 <style>
 :root{
   --bg:#16102a; --surface:#211840; --surface-2:#241a48; --surface-3:#2f2258; --line:#2a2050; --line-2:#3a2f66;
   --fg:#fdf3ec; --muted:#b8a8d0; --faint:#8d7fa8;
   --accent:#ff9a3d; --accent-weak:rgba(255,154,61,.15); --pink:#ff5e7e;
   --grad:linear-gradient(135deg,#ff5e7e,#ff9a3d); --ink:#2a0d14; --danger:#ff5e7e;
+  --sel:#7c5cff; --sel-weak:rgba(124,92,255,.16); --sel-ink:#fff;
   --head:"Bricolage Grotesque","Arial Narrow",Arial,sans-serif;
   --body:"Inter",system-ui,-apple-system,sans-serif;
 }
@@ -58,7 +59,7 @@ h1 i{font-style:normal;background:var(--grad);-webkit-background-clip:text;backg
 
 /* OUTLINE — bordered, low fill */
 .btn--outline{background:transparent;color:var(--fg);border-color:var(--line-2)}
-.btn--outline:hover,.btn--outline.s-hover{border-color:var(--accent);color:var(--accent);background:var(--accent-weak)}
+.btn--outline:hover,.btn--outline.s-hover{border-color:var(--sel);color:var(--fg);background:var(--sel-weak)}
 .btn--outline:active,.btn--outline.s-active{transform:scale(.96)}
 
 /* GHOST — text only, lowest emphasis */
@@ -72,9 +73,9 @@ h1 i{font-style:normal;background:var(--grad);-webkit-background-clip:text;backg
 
 /* TOGGLE — Follow / Wanna see (off = outline, on = accent-tinted) */
 .btn--toggle{background:transparent;color:var(--fg);border-color:var(--line-2)}
-.btn--toggle:hover,.btn--toggle.s-hover{border-color:var(--accent);color:var(--accent)}
-.btn--toggle.on{background:var(--accent-weak);color:var(--accent);border-color:var(--accent)}
-.btn--toggle.on .heart{fill:var(--accent)}
+.btn--toggle:hover,.btn--toggle.s-hover{border-color:var(--sel);background:var(--sel-weak)}
+.btn--toggle.on{background:var(--sel);color:var(--sel-ink);border-color:var(--sel)}
+.btn--toggle.on .heart{fill:var(--sel-ink)}
 
 /* spinner for loading state */
 .spin{width:15px;height:15px;border:2px solid rgba(42,13,20,.35);border-top-color:var(--ink);border-radius:50%;animation:sp .7s linear infinite}
@@ -96,27 +97,27 @@ h1 i{font-style:normal;background:var(--grad);-webkit-background-clip:text;backg
 .icb--ctrl svg{width:16px;height:16px}
 .icb--icononly{width:38px;height:38px;background:transparent;color:var(--muted);border:0}
 .icb--icononly:hover,.icb--icononly.s-hover{background:rgba(255,255,255,.06);color:var(--fg)}
-.icb--icononly.on{color:var(--accent)}
+.icb--icononly.on{color:var(--sel)}
 .icb--icononly svg{width:19px;height:19px}
 
 /* PILLS */
 .pill{font-family:var(--head);font-weight:800;font-size:12px;letter-spacing:.04em;text-transform:uppercase;
   border-radius:999px;padding:8px 15px;border:1.5px solid var(--line);background:var(--surface-2);color:var(--muted);cursor:pointer;
   transition:.14s;-webkit-tap-highlight-color:transparent}
-.pill:hover,.pill.s-hover{border-color:var(--line-2);color:var(--fg)}
-.pill.on{background:var(--accent-weak);color:var(--accent);border-color:var(--accent)}
-/* date tile (sharp square, gradient when selected) */
+.pill:hover,.pill.s-hover{border-color:var(--sel);color:var(--fg)}
+.pill.on{background:var(--sel);color:var(--sel-ink);border-color:var(--sel)}
+/* date tile (sharp square, VIOLET when selected — gradient is reserved for play) */
 .dtile{width:66px;text-align:center;border:1.5px solid var(--line);background:var(--surface-2);border-radius:6px;padding:9px 8px;cursor:pointer;transition:.14s}
-.dtile:hover,.dtile.s-hover{border-color:var(--line-2)}
+.dtile:hover,.dtile.s-hover{border-color:var(--sel)}
 .dtile .d{font-family:ui-monospace,Menlo,monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint)}
 .dtile .n{font-family:var(--head);font-weight:800;font-size:18px;margin-top:1px}
-.dtile.on{background:var(--grad);border-color:var(--ink);color:var(--ink)}
-.dtile.on .d{color:var(--ink);opacity:.8}
+.dtile.on{background:var(--sel);border-color:var(--sel);color:var(--sel-ink)}
+.dtile.on .d{color:var(--sel-ink);opacity:.85}
 /* filter chip (with caret) */
 .fchip{display:inline-flex;align-items:center;gap:6px;font-family:var(--body);font-weight:600;font-size:12.5px;
   border-radius:999px;padding:8px 14px;border:1px solid var(--line-2);background:var(--surface-2);color:var(--fg);cursor:pointer;transition:.14s}
-.fchip:hover,.fchip.s-hover{border-color:var(--accent)}
-.fchip.on{background:var(--accent-weak);border-color:var(--accent);color:var(--accent)}
+.fchip:hover,.fchip.s-hover{border-color:var(--sel)}
+.fchip.on{background:var(--sel);border-color:var(--sel);color:var(--sel-ink)}
 .fchip svg{width:13px;height:13px;fill:currentColor;opacity:.7}
 /* input (for context) */
 .field{background:var(--surface-2);border:1px solid var(--line);border-radius:6px;color:var(--fg);font-size:13px;padding:11px 14px;font-family:var(--body);min-width:240px;outline:none;transition:.14s}
@@ -130,8 +131,8 @@ h1 i{font-style:normal;background:var(--grad);-webkit-background-clip:text;backg
 <body>
 <div class="wrap">
 
-  <h1>soundcheck button system · <i>sunset</i></h1>
-  <p class="lede">A single hierarchy for every button on the site. Rule of thumb: <b>one PRIMARY per view</b> (the gradient), everything else is quieter so the main action always wins. Each button below is shown in every state — and they're all live, so hover / tap them too. Sharp corners, Bricolage, dusk ground, no glow.</p>
+  <h1>soundcheck button system <i>v2</i> · sunset</h1>
+  <p class="lede">A single hierarchy for every button on the site. Two colours, two meanings: the <b>gradient means "press to play or act"</b> (one primary per view) and <b>violet means "this is chosen / on"</b> — so a selected toggle can never clash with the page&rsquo;s Play CTA. Each button below is shown in every state — and they're all live, so hover / tap them too. Sharp corners, Bricolage, dusk ground, no glow.</p>
 
   <div class="tokrow">
     <span class="tok"><i style="background:#16102a"></i>#16102A ground</span>
@@ -139,23 +140,24 @@ h1 i{font-style:normal;background:var(--grad);-webkit-background-clip:text;backg
     <span class="tok"><i style="background:linear-gradient(135deg,#ff5e7e,#ff9a3d)"></i>#FF5E7E→#FF9A3D gradient</span>
     <span class="tok"><i style="background:#ff9a3d"></i>#FF9A3D accent</span>
     <span class="tok"><i style="background:#2a0d14"></i>#2A0D14 ink-on-accent</span>
+    <span class="tok"><i style="background:#7c5cff"></i>#7C5CFF selected (violet)</span>
   </div>
 
   <!-- PRIMARY -->
   <div class="sec">
     <div class="sec-h">01 · Primary</div>
-    <p class="sec-d">The main action of a screen — Tune in, Play the lineup, Send magic link, Save a gig. Gradient fill with a dusk edge so it never disappears over a bright poster. Use exactly one per view.</p>
+    <p class="sec-d">The main action of a screen — always labelled just <b>Play</b> on artist/venue/event pages (plus Send magic link, Save a gig in forms). Gradient fill with a dusk edge so it never disappears over a bright poster. Use exactly one per view.</p>
     <div class="panel">
       <div class="staterow">
-        <div class="st"><button class="btn btn--primary"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>Tune in</button><span class="lbl">Default</span></div>
-        <div class="st"><button class="btn btn--primary s-hover"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>Tune in</button><span class="lbl">Hover</span></div>
-        <div class="st"><button class="btn btn--primary s-active"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>Tune in</button><span class="lbl">Pressed</span></div>
-        <div class="st"><button class="btn btn--primary s-focus"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>Tune in</button><span class="lbl">Focus</span></div>
-        <div class="st"><button class="btn btn--primary s-disabled"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>Tune in</button><span class="lbl">Disabled</span></div>
+        <div class="st"><button class="btn btn--primary"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>Play</button><span class="lbl">Default</span></div>
+        <div class="st"><button class="btn btn--primary s-hover"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>Play</button><span class="lbl">Hover</span></div>
+        <div class="st"><button class="btn btn--primary s-active"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>Play</button><span class="lbl">Pressed</span></div>
+        <div class="st"><button class="btn btn--primary s-focus"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>Play</button><span class="lbl">Focus</span></div>
+        <div class="st"><button class="btn btn--primary s-disabled"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>Play</button><span class="lbl">Disabled</span></div>
         <div class="st"><button class="btn btn--primary"><span class="spin"></span>Loading</button><span class="lbl">Loading</span></div>
       </div>
       <div class="staterow">
-        <div class="st"><button class="btn btn--primary btn--lg">Play the lineup</button><span class="lbl">Large</span></div>
+        <div class="st"><button class="btn btn--primary btn--lg">Play</button><span class="lbl">Large</span></div>
         <div class="st"><button class="btn btn--primary">Log a gig</button><span class="lbl">Default</span></div>
         <div class="st"><button class="btn btn--primary btn--sm">Save</button><span class="lbl">Small</span></div>
       </div>
@@ -200,7 +202,7 @@ h1 i{font-style:normal;background:var(--grad);-webkit-background-clip:text;backg
   <!-- TOGGLES -->
   <div class="sec">
     <div class="sec-h">04 · Toggles</div>
-    <p class="sec-d">Two-state actions — Follow, Wanna see, Going. Off is an outline; On fills with the accent tint + a check/filled icon, so the "I've done this" state is unmistakable. Tap them to flip.</p>
+    <p class="sec-d">Two-state actions — Follow, Wanna see, Going. Off is an outline; hover hints violet; On fills solid VIOLET + a check/filled icon, so the "I've done this" state is unmistakable. Tap them to flip.</p>
     <div class="panel">
       <div class="note">FOLLOW</div>
       <div class="staterow">
@@ -272,8 +274,8 @@ h1 i{font-style:normal;background:var(--grad);-webkit-background-clip:text;backg
       </div>
       <div class="note">RADIO PILL (Play next lineup)</div>
       <div class="staterow">
-        <div class="st"><button class="btn btn--primary" style="border-radius:999px"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 5a5 5 0 110 10 5 5 0 010-10zm0 3a2 2 0 100 4 2 2 0 000-4z"/></svg>Play next lineup</button><span class="lbl">Default</span></div>
-        <div class="st"><button class="btn btn--primary s-hover" style="border-radius:999px"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 5a5 5 0 110 10 5 5 0 010-10zm0 3a2 2 0 100 4 2 2 0 000-4z"/></svg>Play next lineup</button><span class="lbl">Hover</span></div>
+        <div class="st"><button class="btn btn--primary" style="border-radius:999px"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 5a5 5 0 110 10 5 5 0 010-10zm0 3a2 2 0 100 4 2 2 0 000-4z"/></svg>Play</button><span class="lbl">Default</span></div>
+        <div class="st"><button class="btn btn--primary s-hover" style="border-radius:999px"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 5a5 5 0 110 10 5 5 0 010-10zm0 3a2 2 0 100 4 2 2 0 000-4z"/></svg>Play</button><span class="lbl">Hover</span></div>
       </div>
     </div>
   </div>

@@ -33,8 +33,12 @@
       /* DS v2 — brightness-stepped surfaces (no shadows), text-opacity hierarchy */
       --bg:#16102a; --surface:#211840; --surface-2:#241a48; --surface-3:#2a2050;
       --fg:#fdf3ec; --muted:#b8a8d0; --faint:#8d7fa8;
-      --accent:#ff9a3d; --accent-weak:rgba(255,154,61,0.15); --border:#2a2050; --line:#2a2050; --ink:#2a0d14; --accent-ink:#2a0d14;
+      --accent:#ff9a3d; --accent-weak:rgba(255,154,61,0.15); --border:#2a2050; --line:#2a2050; --line-2:#3a2f66; --ink:#2a0d14; --accent-ink:#2a0d14;
       --accent-grad:linear-gradient(135deg, #ff5e7e 0%, #ff9a3d 100%);   /* sunset — pink into orange */
+      /* SELECTED = sunset violet. One rule across the whole app: the gradient/orange
+         means "press to play or act", violet means "this is chosen/on" — so a selected
+         toggle can never fight the page's Play CTA. */
+      --sel:#7c5cff; --sel-weak:rgba(124,92,255,0.16); --sel-ink:#fff; --sel-text:#a78bfa;
       /* corner radius scale */
       --radius-2xs:2px; --radius-xs:3px; --radius-sm:3px; --radius:4px; --radius-md:5px; --radius-lg:6px; --radius-xl:8px; --radius-pill:999px;
       /* type — Bricolage = display/voice, Inter = dense body/metadata */
@@ -2776,25 +2780,25 @@
     .logo:hover .logo-wm .ac{ background:none; -webkit-text-fill-color:#fff; color:#fff; }
     .logo:hover .logo-ic{ color:#fff; }
     ::selection{ background:#ff9a3d; color:#2a0d14; }
-    /* filled/primary buttons: sunset gradient + dusk edge, hover deepen, press scale */
+    /* PRIMARY = play/act only: sunset gradient + dusk edge, hover deepen, press scale.
+       (Toggles, follows and selected states moved to the violet system below —
+       the gradient is reserved for the ONE main action of a view.) */
     .evc-play, .ev-bigplay, .bill-play, .play-main, .psticky-play, .srail-play, .card-play,
-    .fp-erow-play, .fp-ev-play, .rf-play, .vrow-play, .follow-btn, .fp-ab.go, .fp-pb.go,
-    .pf-btn.primary, .pd-follow, .pd-loggig, .pb-share, .radio-fab, .rf-go, .bt.go, .dt.on{
+    .fp-erow-play, .fp-ev-play, .rf-play, .vrow-play, .fp-ab.go, .fp-pb.go,
+    .fp-sets-all, .radio-fab, .auth-box .go, .pb-prob-btn{
       background:var(--accent-grad); color:var(--accent-ink); border:1.5px solid #16102a;
       box-shadow:none; transition:filter .15s, transform .1s; }
     .evc-play:hover, .ev-bigplay:hover, .bill-play:hover, .play-main:hover, .psticky-play:hover,
     .srail-play:hover, .card-play:hover, .fp-erow-play:hover, .fp-ev-play:hover, .rf-play:hover,
-    .vrow-play:hover, .follow-btn:hover, .fp-ab.go:hover, .fp-pb.go:hover, .pf-btn.primary:hover,
-    .pd-follow:hover, .pd-loggig:hover, .pb-share:hover, .radio-fab:hover, .rf-go:hover,
-    .bt.go:hover, .dt.on:hover{ filter:brightness(.92) saturate(1.08); }
+    .vrow-play:hover, .fp-ab.go:hover, .fp-pb.go:hover, .fp-sets-all:hover, .radio-fab:hover,
+    .auth-box .go:hover, .pb-prob-btn:hover{ filter:brightness(.92) saturate(1.08); }
     .evc-play:active, .ev-bigplay:active, .bill-play:active, .play-main:active, .psticky-play:active,
     .srail-play:active, .card-play:active, .fp-erow-play:active, .fp-ev-play:active, .rf-play:active,
-    .vrow-play:active, .follow-btn:active, .fp-ab.go:active, .fp-pb.go:active, .pf-btn.primary:active,
-    .pd-follow:active, .pd-loggig:active, .pb-share:active, .radio-fab:active, .rf-go:active,
-    .bt.go:active, .dt.on:active{ transform:scale(.96); }
+    .vrow-play:active, .fp-ab.go:active, .fp-pb.go:active, .fp-sets-all:active, .radio-fab:active,
+    .auth-box .go:active, .pb-prob-btn:active{ transform:scale(.96); }
     .pd-avatar, .pd-bub{ box-shadow:0 0 0 1.5px #16102a; }
     .hdr-log:hover, .ev-radio:hover{ border-color:#ff9a3d; background:rgba(255,154,61,0.18); }
-    .evc-chip:hover{ border-color:#5a4d85; }
+    .evc-chip:hover{ border-color:var(--sel); }
     /* ── mobile LIST VIEW: home (#grid) + every mountEventCards grid (.grid) ── */
     @media (max-width:640px){ #grid, .grid{ grid-template-columns:1fr; gap:10px; } }
     .lvr{ display:flex; flex-direction:row; align-items:center; gap:8px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:9px 10px; }
@@ -2810,8 +2814,78 @@
     .lvr .evc-play{ position:static; width:38px; height:38px; box-shadow:none; border:1.5px solid #16102a; }
     .lvr .evc-play svg{ width:20px; height:20px; margin-left:2px; }
     .lvr .heart.evc-heart{ position:static; width:32px; height:26px; display:inline-flex; align-items:center; justify-content:center; background:transparent; border:0; padding:0; color:var(--muted); }
-    .lvr .heart.evc-heart.on{ color:var(--accent); }
     .lvr .heart.evc-heart svg{ width:17px; height:17px; }
+
+    /* ═══ BUTTON SYSTEM v2 (2026-07-14) — one rule everywhere:
+       GRADIENT/ORANGE = "press to play or act" (one primary per view)
+       VIOLET (--sel)  = "this is chosen / on" (selection can never clash with the CTA)
+       Every interactive control has: unselected (quiet outline/surface),
+       hover (violet hint), selected (violet fill + ✓ where textual). ═══ */
+
+    /* 0 · non-follow .pf-btn.primary (Save to diary, settings saves…) joins the
+       primary family: gradient, one per view */
+    .pf-btn.primary:not(.follow){ background:var(--accent-grad); color:var(--accent-ink); border:1.5px solid #16102a; }
+    .pf-btn.primary:not(.follow):hover{ filter:brightness(.92) saturate(1.08); background:var(--accent-grad); }
+    .pf-btn.primary:not(.follow):active{ transform:scale(.96); }
+
+    /* 1 · textual toggles — Follow / Wanna see / I've been / Interested / I'm going */
+    .fp-ab:not(.go), .fp-pb.tgl, .follow-btn, .pf-btn.primary.follow, .fp-ev-follow, .act-btn,
+    .pd-follow, .hdr-log{
+      background:transparent; color:var(--fg); border:1.5px solid var(--line-2); transition:border-color .14s, background .14s, color .14s, transform .1s; }
+    .fp-ab:not(.go):hover, .fp-pb.tgl:hover, .follow-btn:hover, .pf-btn.primary.follow:hover,
+    .fp-ev-follow:hover, .act-btn:hover, .pd-follow:hover, .hdr-log:hover{
+      border-color:var(--sel); background:var(--sel-weak); color:var(--fg); filter:none; }
+    .fp-ab:not(.go):active, .fp-pb.tgl:active, .follow-btn:active, .fp-ev-follow:active{ transform:scale(.96); }
+    .fp-ab.on, .fp-pb.on, .fp-pb.going, .follow-btn.following, .pf-btn.primary.follow.following,
+    .pf-btn.follow.following, .fp-ev-follow.on, .act-btn.on{
+      background:var(--sel); border-color:var(--sel); color:var(--sel-ink); }
+    .fp-ab.on:hover, .fp-pb.on:hover, .fp-pb.going:hover, .follow-btn.following:hover,
+    .fp-ev-follow.on:hover, .act-btn.on:hover{ background:var(--sel); border-color:var(--sel); color:var(--sel-ink); filter:brightness(1.12); }
+    .fp-card-btns .pf-btn.primary.follow{ background:transparent!important; color:var(--fg)!important; border:1.5px solid var(--line-2)!important; }
+    .fp-card-btns .pf-btn.primary.follow.following{ background:var(--sel)!important; color:var(--sel-ink)!important; border-color:var(--sel)!important; }
+
+    /* 2 · icon toggles — hearts, bookmarks, seen ticks */
+    .heart:hover, .seen-btn:hover{ color:var(--sel); }
+    .heart.on, .seen-btn.on{ color:var(--sel); }
+    .heart.on svg{ fill:var(--sel); stroke:var(--sel); }
+    .lvr .heart.evc-heart.on{ color:var(--sel); }
+    .evc-heart.on{ background:var(--sel); color:var(--sel-ink); }
+    .dock.expanded .dock-acts .heart.on, .dock.expanded .dock-acts .seen-btn.on{
+      border-color:var(--sel); color:var(--sel-text); background:var(--sel-weak); }
+    .radio-fab .heart.on{ color:var(--sel-text); }
+
+    /* 3 · selection chips + date tiles (state, not action) */
+    .dt:hover{ border-color:var(--sel); }
+    .dt.on, .dt.dscal.on{ background:var(--sel); border-color:var(--sel); color:var(--sel-ink); }
+    .dt.on .dt-w{ color:var(--sel-ink); opacity:.85; }
+    .dt.on:hover{ filter:brightness(1.12); }
+    .up-chip:hover, .lg-chip:hover, .vrv-chip:hover{ border-color:var(--sel); color:var(--fg); }
+    .up-chip.on, .lg-chip.on, .vrv-chip.on{ background:var(--sel); border-color:var(--sel); color:var(--sel-ink); }
+    .ds-filt:hover{ border-color:var(--sel); }
+    .ds-filt.on{ border-color:var(--sel); color:var(--sel-text); }
+
+    /* 4 · nav location state (desktop underline + mobile bottom nav) */
+    .nl.on{ border-bottom-color:var(--sel); }
+    .bnav-tab.on{ background:var(--sel-weak); color:var(--sel-text); }
+    .bnav-tab.onair{ color:var(--accent); }   /* live/playing stays orange — it's a play state, not a selection */
+
+    /* 5 · tabs → segmented pills (artist + profile). Pills read as buttons — that's
+       the discovery fix — and the right-edge fade hints there are more offscreen. */
+    .fp-tabs{ display:flex; gap:8px; border-bottom:0; margin-top:22px; padding:2px 2px 6px; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
+    .fp-tab{ flex:none; padding:9px 15px; margin:0; border:1px solid var(--line-2); border-radius:var(--radius-pill); background:var(--surface-2); color:var(--muted); font:700 13px var(--body); cursor:pointer; white-space:nowrap; transition:border-color .14s, background .14s, color .14s; }
+    .fp-tab:hover{ border-color:var(--sel); color:var(--fg); }
+    .fp-tab.on{ background:var(--sel); border-color:var(--sel); color:var(--sel-ink); }
+    .fp-tab .c{ font:700 11px var(--font-mono); color:var(--faint); margin-left:6px; }
+    .fp-tab.on .c{ color:rgba(255,255,255,.75); }
+    .fp-tabs.fade-r{ -webkit-mask-image:linear-gradient(90deg,#000 86%,transparent); mask-image:linear-gradient(90deg,#000 86%,transparent); }
+
+    /* 6 · keyboard focus — violet ring on toggles/selection, sunset ring on primaries */
+    .fp-ab:focus-visible, .fp-pb:focus-visible, .follow-btn:focus-visible, .fp-ev-follow:focus-visible,
+    .dt:focus-visible, .up-chip:focus-visible, .lg-chip:focus-visible, .vrv-chip:focus-visible,
+    .fp-tab:focus-visible, .heart:focus-visible, .seen-btn:focus-visible{
+      outline:none; box-shadow:0 0 0 3px rgba(124,92,255,.45); }
+    .evc-play:focus-visible, .fp-ab.go:focus-visible, .fp-pb.go:focus-visible, .play-main:focus-visible,
+    .radio-fab:focus-visible, .auth-box .go:focus-visible{ outline:none; box-shadow:0 0 0 3px rgba(255,154,61,.45); }
 
 /* ── SUNSETCRT skin (next.soundcheck.club) ── */
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -2954,7 +3028,7 @@ body::before{
 .lvr .heart.evc-heart svg{ width:17px; height:17px; }
 
 </style>
-<meta name="sc-build" content="sunsetcrt-1784000880708">
+<meta name="sc-build" content="sunsetcrt-1784006574093">
 <meta name="robots" content="noindex">
 </head>
 <body>
@@ -4221,7 +4295,7 @@ body::before{
       var ib=document.querySelector('#fp-ev-int[data-evt="'+k+'"]');
       if(ib){ ib.classList.toggle('on', st==='saved'); ib.innerHTML=(st==='saved'?'Interested ✓':'Interested'); }
       var gb=document.querySelector('#fp-ev-going[data-evt="'+k+'"]');
-      if(gb){ gb.classList.toggle('go', st==='going'); gb.innerHTML=(st==='going'?'I&rsquo;m going ✓':'I&rsquo;m going'); }
+      if(gb){ gb.classList.toggle('going', st==='going'); gb.innerHTML=(st==='going'?'I&rsquo;m going ✓':'I&rsquo;m going'); }
     }
     function afterPicksChanged(){
       // The bottom-right float is the radio now; picks live in the bottom nav
@@ -5181,6 +5255,16 @@ body::before{
     // un-sticks the global nav (body.has-psticky), and reveals the bar once `sentinel`
     // (the hero's play button) scrolls above the top. playFn null → hide the play button.
     var _psObs=null;
+    // Tab discovery: while more tab pills sit offscreen to the right, the row's
+    // right edge fades out (mask) — an "there's more, scroll me" hint. The fade
+    // lifts as soon as the user reaches the end.
+    function markTabsFade(el){
+      if(!el) return;
+      var f=function(){ el.classList.toggle('fade-r', el.scrollWidth - el.clientWidth - el.scrollLeft > 12); };
+      el.addEventListener('scroll', f, { passive:true });
+      window.addEventListener('resize', f, { passive:true });
+      f();
+    }
     function armSticky(name, playFn, sentinel){
       var ps=document.getElementById('psticky'); if(!ps) return;
       var nm=document.getElementById('psticky-nm'), pb=document.getElementById('psticky-play');
@@ -5242,6 +5326,7 @@ body::before{
       if(j.reviews){
         rows+='<div class="vd-row"><span class="vd-k">Sound</span><span>'+j.reviews.sound+'/5 <span style="color:var(--muted)">· '+j.reviews.n+' been</span></span></div>';
         if(j.reviews.crowd!=null) rows+='<div class="vd-row"><span class="vd-k">Crowd</span><span>'+j.reviews.crowd+'/5</span></div>';
+        if(j.reviews.toilets!=null) rows+='<div class="vd-row"><span class="vd-k">Toilets</span><span>'+j.reviews.toilets+'/5</span></div>';
         if(j.reviews.goBack!=null) rows+='<div class="vd-row"><span class="vd-k">Return</span><span>'+j.reviews.goBack+'% <span style="color:var(--muted)">would go back</span></span></div>';
       }
       if((j.similar||[]).length) rows+='<div class="vd-row"><span class="vd-k">Similar</span><span class="vd-sim">'+j.similar.map(function(s){ return '<button class="vd-vlink" type="button" data-venue="'+esc(s.venue)+'">'+esc(s.venue)+'</button>'; }).join('')+'</span></div>';
@@ -5720,6 +5805,7 @@ body::before{
       wireProfile();
       wireRotation(p);
       if(isMe) fillLogNudges();
+      markTabsFade(document.querySelector('.pf-tabs'));
       // In-page tabs (Diary / Coming soon / Seen / Wanna / Venues / Saved).
       // The Coming soon tab IS the full "Coming up" page — scope filters + Artists/
       // Venues/Friends sub-tabs — lazy-loaded (one /api/upcoming call) the first time it's opened.
@@ -6333,20 +6419,6 @@ body::before{
       ov.addEventListener('click',function(e){ if(e.target===ov) close(); });
       ov.querySelectorAll('.as-row[data-i]').forEach(function(b){ b.addEventListener('click',function(){ var it=items[+b.dataset.i]; close(); if(it&&it.run) it.run(); }); });
     }
-    function venueReviewSheet(v, mine){
-      mine=mine||{};
-      var wr=[[2,'Definitely'],[1,'Maybe'],[0,'Nah']].map(function(o){ return '<button class="vrv-chip'+(mine.would_return===o[0]?' on':'')+'" type="button" data-wr="'+o[0]+'">'+o[1]+'</button>'; }).join('');
-      var myT=(mine.tags||[]).map(function(t){ return String(t).toLowerCase(); });
-      var tags=VENUE_TAGS.map(function(t){ return '<button class="vrv-chip'+(myT.indexOf(t.toLowerCase())>=0?' on':'')+'" type="button" data-tag="'+esc(t)+'">'+esc(t)+'</button>'; }).join('');
-      var posted=(mine.sound||mine.crowd||mine.would_return!=null||(mine.tags||[]).length);
-      return '<div class="eyebrow">You&rsquo;ve been</div><h3>How was '+esc(v.name||'this venue')+'?</h3>'+
-        '<p class="vrv-sub">A quick read on the room — it sharpens the venue&rsquo;s DNA for everyone.</p>'+
-        vrvStars('sound','The sound system', mine.sound)+
-        vrvStars('crowd','The crowd &amp; energy', mine.crowd)+
-        '<div class="vrv-q">Would you go back?</div><div class="vrv-chips" data-wr>'+wr+'</div>'+
-        '<div class="vrv-q">What&rsquo;s it like? <span class="vrv-opt">optional</span></div><div class="vrv-chips" data-tags>'+tags+'</div>'+
-        '<button class="go" id="vrv-post" type="button">'+(posted?'Update':'Post')+'</button><div class="rv-msg" id="vrv-msg"></div>';
-    }
     function refreshVenueDNA(v){
       var el=document.getElementById('vp-dna'); if(!el||!v||!v.slug) return;
       authedFetch('/api/venue/dna?slug='+encodeURIComponent(v.slug)).then(function(r){ return r.json(); }).then(function(j){
@@ -6354,44 +6426,6 @@ body::before{
         el.querySelectorAll('.vd-vlink[data-venue]').forEach(function(b){ b.addEventListener('click',function(){ openVenue(b.dataset.venue, v.city||currentCity); }); });
       }).catch(function(){});
     }
-    function openVenueReview(v){
-      if(!currentUser){ openAuth(); return; }
-      var ov=document.createElement('div'); ov.className='auth-overlay show vrev-pick';
-      ov.innerHTML='<div class="auth-box"><button class="auth-close" type="button" aria-label="Close">&times;</button>'+venueReviewSheet(v, v.myReview)+'</div>';
-      document.body.appendChild(ov);
-      function close(){ ov.remove(); }
-      ov.querySelector('.auth-close').addEventListener('click',close);
-      ov.addEventListener('click',function(e){ if(e.target===ov) close(); });
-      var m=v.myReview||{};
-      var sel={ sound:m.sound||null, crowd:m.crowd||null, wouldReturn:(m.would_return!=null?m.would_return:null), tags:((m.tags||[]).slice()) };
-      ov.querySelectorAll('[data-stars]').forEach(function(row){
-        row.querySelectorAll('.vrv-star').forEach(function(b){ b.addEventListener('click',function(){
-          var k=b.dataset.k, val=parseInt(b.dataset.v,10); sel[k]=val;
-          row.querySelectorAll('.vrv-star').forEach(function(s){ s.classList.toggle('on', parseInt(s.dataset.v,10)<=val); });
-        }); });
-      });
-      ov.querySelectorAll('[data-wr] .vrv-chip').forEach(function(b){ b.addEventListener('click',function(){
-        sel.wouldReturn=parseInt(b.dataset.wr,10);
-        ov.querySelectorAll('[data-wr] .vrv-chip').forEach(function(x){ x.classList.toggle('on', x===b); });
-      }); });
-      ov.querySelectorAll('[data-tags] .vrv-chip').forEach(function(b){ b.addEventListener('click',function(){
-        var t=b.dataset.tag, i=sel.tags.map(function(x){ return String(x).toLowerCase(); }).indexOf(t.toLowerCase());
-        if(i>=0){ sel.tags.splice(i,1); b.classList.remove('on'); } else { sel.tags.push(t); b.classList.add('on'); }
-      }); });
-      document.getElementById('vrv-post').addEventListener('click',function(){
-        if(sel.sound==null&&sel.crowd==null&&sel.wouldReturn==null&&!sel.tags.length){ document.getElementById('vrv-msg').textContent='Answer at least one.'; return; }
-        var btn=document.getElementById('vrv-post'); btn.disabled=true;
-        authedFetch('/api/venue/review',{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ slug:v.slug, sound:sel.sound, crowd:sel.crowd, wouldReturn:sel.wouldReturn, tags:sel.tags }) })
-          .then(function(r){ return r.json(); }).then(function(o){
-            if(o&&o.ok){
-              v.myReview={ sound:sel.sound, crowd:sel.crowd, would_return:sel.wouldReturn, tags:sel.tags.slice() };
-              var bb=document.getElementById('vp-been'); if(bb){ bb.classList.add('on'); var sp=bb.querySelector('span'); if(sp) sp.innerHTML='You&rsquo;ve been'; }
-              close(); showToast('Thanks — added to '+(v.name||'the venue')+'.'); refreshVenueDNA(v);
-            } else { document.getElementById('vrv-msg').textContent=(o&&o.error)||'Could not save.'; btn.disabled=false; }
-          }).catch(function(){ document.getElementById('vrv-msg').textContent='Could not save.'; btn.disabled=false; });
-      });
-    }
-
     // D1: behavioural telemetry — a viewed artist/event is a weak positive that feeds the
     // taste profile + collaborative filtering. Fire-and-forget; server ignores anon users.
     function trackView(t,id){ try{ authedFetch('/api/track',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({kind:'view',subjectType:t,subjectId:String(id)})}).catch(function(){}); }catch(_){ } }
@@ -6447,7 +6481,7 @@ body::before{
               (a.bio?'<p class="fp-bio">'+esc(a.bio)+'</p>':(a.description?'<p class="fp-bio">'+esc(a.description)+'</p>':''))+
               festLine+gemLine+
               '<div class="fp-acts">'+
-                '<button class="fp-ab go" id="ap-radio" data-slug="'+esc(slug)+'" data-name="'+esc(a.name||slug)+'"'+(a.image?' data-poster="'+esc(a.image)+'"':'')+nextVenueAttr+' type="button">'+YT_SVG+'<span>Tune in</span></button>'+
+                '<button class="fp-ab go" id="ap-radio" data-slug="'+esc(slug)+'" data-name="'+esc(a.name||slug)+'"'+(a.image?' data-poster="'+esc(a.image)+'"':'')+nextVenueAttr+' type="button" aria-label="Play '+esc(a.name||slug)+'&rsquo;s sets">'+YT_SVG+'<span>Play</span></button>'+
                 '<button class="fp-ab'+(mine==='wanna_see'?' on':'')+'" id="ap-wanna" data-ap-wanna="'+esc(slug)+'" type="button" aria-pressed="'+(mine==='wanna_see')+'">'+HEART_SVG+'<span>Wanna see</span></button>'+
                 '<button class="fp-ab" id="ap-log" type="button">'+logSvg+'<span>Log a gig</span></button>'+
               '</div>'+
@@ -6554,6 +6588,7 @@ body::before{
         }); });
         // If Sets is the initially-visible panel (e.g. it's the only section), load it now.
         if(document.getElementById('fp-sets') && !document.querySelector('#page-body .fp-tabpanel[data-panel="sets"].hide')) loadSetsTab();
+        markTabsFade(document.querySelector('#page-body .fp-tabs'));
         document.querySelectorAll('#page-body .fp-erow[data-ev]').forEach(function(tr){ tr.addEventListener('click',function(){ openEvent(tr.dataset.ev); }); });
         document.querySelectorAll('#page-body .fp-erow-play[data-play]').forEach(function(pl){ var g=up.filter(function(x){ return String(x.id)===pl.dataset.play; })[0]; var q=(g&&g.lineup||[]).map(function(x){ return { slug:x.slug, name:x.name, poster:g.poster_url }; }).filter(function(x){ return x.slug; }); pl.addEventListener('click',function(e){ e.stopPropagation(); if(q.length) playYtList(q,0); else openEvent(pl.dataset.play); }); });
         document.querySelectorAll('#page-body .fp-row[data-ev]').forEach(function(row){ row.addEventListener('click',function(){ openEvent(row.dataset.ev); }); });
@@ -6697,7 +6732,7 @@ body::before{
         if(p.youLike) h+='<div class="pp-affinity">You’ve saved <b>'+p.youLike+'</b> artist'+(p.youLike===1?'':'s')+' this promoter books — you probably like their nights.</div>';
         if((p.genres||[]).length) h+='<div class="ev-genres" style="margin-top:12px">'+p.genres.slice(0,6).map(function(g){ return '<span class="gchip">'+esc(g)+'</span>'; }).join('')+'</div>';
         var pNext=nextPlayableEvent(p.upcoming);
-        if(pNext) h+='<div class="artist-actions" style="max-width:240px;margin-top:12px"><button class="ev-radio" id="pp-radio" type="button">'+RADIO_SVG+'<span>Play next lineup</span></button></div>';
+        if(pNext) h+='<div class="artist-actions" style="max-width:240px;margin-top:12px"><button class="ev-radio" id="pp-radio" type="button" aria-label="Play the next lineup">'+RADIO_SVG+'<span>Play</span></button></div>';
         h+='<div id="pp-upcoming"></div><div id="pp-artists"></div><div id="pp-venues"></div><div id="pp-similar"></div><div id="pp-past"></div>';
         openPanel(h);
         var prb=document.getElementById('pp-radio');
@@ -6760,7 +6795,7 @@ body::before{
         if(v.slug){
           var vFollow='<button class="fp-ab'+(v.following?' on':'')+'" id="vf-btn" type="button" aria-pressed="'+(v.following?'true':'false')+'">'+HEART_SVG+'<span>'+(v.following?'Following':'Follow')+'</span></button>';
           var vBeen='<button class="fp-ab'+(v.myReview?' on':'')+'" id="vp-been" type="button">'+CHECK_SVG+'<span>'+(v.myReview?'You&rsquo;ve been':'I&rsquo;ve been')+'</span></button>';
-          vActs='<div class="fp-acts">'+(vNext?('<button class="fp-ab go" id="vp-radio" type="button">'+RADIO_SVG+'<span>Play next lineup</span></button>'):'')+vFollow+vBeen+'</div>';
+          vActs='<div class="fp-acts">'+(vNext?('<button class="fp-ab go" id="vp-radio" type="button" aria-label="Play the next lineup at '+esc(dispName)+'">'+RADIO_SVG+'<span>Play</span></button>'):'')+vFollow+vBeen+'</div>';
         }
         var h='<div class="fp-artist">'+
           '<div class="fp-hero">'+
@@ -6919,9 +6954,9 @@ body::before{
               '<div class="fp-ev-venue">at <button class="venue-link" type="button" data-venue="'+esc(ev.venue||'')+'">'+esc(ev.venue||'TBA')+'</button></div>'+
               '<div class="fp-ev-meta">'+[ev.city?cityLabel(ev.city):'', (ev.genres||[]).slice(0,3).join(' / ')].filter(Boolean).map(esc).join(' · ')+'</div>'+
               '<div class="fp-ev-playbar">'+
-                ((ev.artists||[]).length?'<button class="fp-pb go" id="fp-ev-play" type="button">▶ Play the lineup</button>':'')+
-                (isPast?'':'<button class="fp-pb'+(evtStatus(id)==='saved'?' on':'')+'" id="fp-ev-int" data-evt="'+esc(id)+'" type="button">'+(evtStatus(id)==='saved'?'Interested ✓':'Interested')+'</button>'+
-                  '<button class="fp-pb'+(evtStatus(id)==='going'?' go':'')+'" id="fp-ev-going" data-evt="'+esc(id)+'" type="button">'+(evtStatus(id)==='going'?'I&rsquo;m going ✓':'I&rsquo;m going')+'</button>')+
+                ((ev.artists||[]).length?'<button class="fp-pb go" id="fp-ev-play" type="button">▶ Play</button>':'')+
+                (isPast?'':'<button class="fp-pb tgl'+(evtStatus(id)==='saved'?' on':'')+'" id="fp-ev-int" data-evt="'+esc(id)+'" type="button">'+(evtStatus(id)==='saved'?'Interested ✓':'Interested')+'</button>'+
+                  '<button class="fp-pb tgl'+(evtStatus(id)==='going'?' going':'')+'" id="fp-ev-going" data-evt="'+esc(id)+'" type="button">'+(evtStatus(id)==='going'?'I&rsquo;m going ✓':'I&rsquo;m going')+'</button>')+
                 (isPast?'':'<a class="fp-pb" href="https://www.google.com/search?q='+encodeURIComponent((ev.title||'')+' tickets')+'" target="_blank" rel="noopener">Tickets ↗</a>')+
                 '<button class="fp-pb" id="fp-ev-share" type="button">Share</button>'+
               '</div>'+
@@ -7085,6 +7120,7 @@ body::before{
           '<div id="lg-extra" style="display:none">'+
             '<div class="pf-box" style="margin-top:16px">'+
             '<div class="lg-field" id="lg-lineup-field"><label>Who did you see? <small class="lg-opt">tap the acts you caught</small></label><div class="lg-chips" id="lg-lineup"></div></div>'+
+            '<div class="lg-field" id="lg-vrev-field" style="display:none"><label>How was <span id="lg-vrev-nm">the venue</span>? <small class="lg-opt">optional — sharpens its Venue DNA</small></label><div id="lg-vrev"></div></div>'+
             '<div class="lg-field"><label>Note (optional)</label><textarea id="lg-note" placeholder="How was it?"></textarea></div>'+
             '<button id="lg-save" type="button" class="pf-btn primary block">Save to diary</button>'+
             '<div class="err" id="lg-err" style="color:var(--accent);font-size:var(--fs-sm);min-height:1em;margin-top:8px"></div>'+
@@ -7134,6 +7170,37 @@ body::before{
       lgArtists=[];   // start with nobody selected — you tap the acts you actually caught
       document.getElementById('lg-extra').style.display='';
       renderLgLineup(); renderLgEvents();
+      // fresh venue quick-read for this night, prefilled with any earlier answers
+      lgVRev={ sound:null, crowd:null, toilets:null, wouldReturn:null, tags:[] };
+      renderLgVenueRev();
+      if(currentUser && lgSel.venue_slug){
+        var seq=++_lgVRevSeq;
+        authedFetch('/api/venue/review?slug='+encodeURIComponent(lgSel.venue_slug)).then(function(r){ return r.json(); }).then(function(j){
+          if(seq!==_lgVRevSeq || !(j&&j.mine)) return;
+          lgVRev={ sound:j.mine.sound||null, crowd:j.mine.crowd||null, toilets:j.mine.toilets||null, wouldReturn:(j.mine.would_return!=null?j.mine.would_return:null), tags:(j.mine.tags||[]).slice() };
+          renderLgVenueRev();
+        }).catch(function(){});
+      }
+    }
+    // Inline venue quick-read inside the log form — sound / crowd / toilets stars,
+    // would-you-go-back, vibe tags. Saved alongside the diary entry (one POST to
+    // /api/venue/review); replaced the old post-save popup sheet.
+    var lgVRev={ sound:null, crowd:null, toilets:null, wouldReturn:null, tags:[] }, _lgVRevSeq=0;
+    function lgVRevAnswered(){ return lgVRev.sound!=null||lgVRev.crowd!=null||lgVRev.toilets!=null||lgVRev.wouldReturn!=null||lgVRev.tags.length>0; }
+    function renderLgVenueRev(){
+      var el=document.getElementById('lg-vrev'), field=document.getElementById('lg-vrev-field');
+      if(!el||!field) return;
+      if(!lgSel||!lgSel.venue){ field.style.display='none'; el.innerHTML=''; return; }
+      field.style.display='';
+      var nm=document.getElementById('lg-vrev-nm'); if(nm) nm.textContent=lgSel.venue;
+      var lcTags=lgVRev.tags.map(function(x){ return String(x).toLowerCase(); });
+      var wr=[[2,'Definitely'],[1,'Maybe'],[0,'Nah']].map(function(o){ return '<button class="vrv-chip'+(lgVRev.wouldReturn===o[0]?' on':'')+'" type="button" data-wr="'+o[0]+'">'+o[1]+'</button>'; }).join('');
+      var tags=VENUE_TAGS.map(function(t){ return '<button class="vrv-chip'+(lcTags.indexOf(t.toLowerCase())>=0?' on':'')+'" type="button" data-tag="'+esc(t)+'">'+esc(t)+'</button>'; }).join('');
+      el.innerHTML=vrvStars('sound','The sound system', lgVRev.sound)+
+        vrvStars('crowd','The crowd &amp; energy', lgVRev.crowd)+
+        vrvStars('toilets','The toilets', lgVRev.toilets)+
+        '<div class="vrv-q">Would you go back?</div><div class="vrv-chips" data-wrrow>'+wr+'</div>'+
+        '<div class="vrv-q">What&rsquo;s it like? <span class="vrv-opt">optional</span></div><div class="vrv-chips" data-tagrow>'+tags+'</div>';
     }
     // Search-first: one box, free-text across venue + lineup (server ranks the
     // best match to the top), scoped to the chosen city. Debounced; the newest
@@ -7239,6 +7306,7 @@ body::before{
       setRoute('log');
       lgArtists=[]; lgSel=null; lgEventList=[];
       lgPickedArtist=null; lgVenue=null; lgRange=null;
+      lgVRev={ sound:null, crowd:null, toilets:null, wouldReturn:null, tags:[] }; _lgVRevSeq++;
       _logHint = (prefill&&prefill.seenName) ? prefill.seenName : (prefill&&prefill.artist?prefill.artist.name:(prefill&&prefill.venue?prefill.venue.name:null));
       _logHintAt = !!(prefill&&prefill.venue);
       showPage(logFormHTML());
@@ -7270,6 +7338,17 @@ body::before{
         else lgArtists.push({ slug:slug, name:b.dataset.aname });
         renderLgLineup();   // keep the "Saw everyone" chip state in sync
       });
+      // Venue quick-read: stars (tap same star to clear), go-back chips, vibe tags.
+      var vr=document.getElementById('lg-vrev');
+      if(vr) vr.addEventListener('click',function(e){
+        var st=e.target.closest('.vrv-star');
+        if(st){ var k=st.dataset.k, v=+st.dataset.v; lgVRev[k]=(lgVRev[k]===v)?null:v; renderLgVenueRev(); return; }
+        var w=e.target.closest('.vrv-chip[data-wr]');
+        if(w){ var n=+w.dataset.wr; lgVRev.wouldReturn=(lgVRev.wouldReturn===n)?null:n; renderLgVenueRev(); return; }
+        var t=e.target.closest('.vrv-chip[data-tag]');
+        if(t){ var i=lgVRev.tags.map(function(x){ return String(x).toLowerCase(); }).indexOf(t.dataset.tag.toLowerCase());
+          if(i>=0) lgVRev.tags.splice(i,1); else lgVRev.tags.push(t.dataset.tag); renderLgVenueRev(); }
+      });
       // City change — re-run the search in the new city if there's a query.
       wireCityPicker('lg-city', function(){
         var sc=document.getElementById('lg-shint-city'); if(sc) sc.textContent=cityLabel(document.getElementById('lg-city').value);
@@ -7294,14 +7373,15 @@ body::before{
         if(!r.ok){ document.getElementById('lg-err').textContent=(j.error||'Could not save')+'.'; btn.disabled=false; return; }
         lgArtists.forEach(function(a){ picks.artists[a.slug]={name:a.name,status:'seen',t:Date.now()}; });
         savePicks(); afterPicksChanged();
-        showToast(j.updated ? 'Updated your diary' : 'Logged to your diary');
-        // Chain the venue feedback into the same flow: if this venue hasn't had
-        // your quick read yet, offer the review sheet after the log lands.
-        var rv=(lgSel&&lgSel.venue_slug)?{slug:lgSel.venue_slug,name:lgSel.venue}:null;
+        // the inline venue quick-read rides along with the same save
+        if(lgSel.venue_slug && lgVRevAnswered()){
+          authedFetch('/api/venue/review',{ method:'POST', headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({ slug:lgSel.venue_slug, sound:lgVRev.sound, crowd:lgVRev.crowd, toilets:lgVRev.toilets, wouldReturn:lgVRev.wouldReturn, tags:lgVRev.tags }) }).catch(function(){});
+          showToast((j.updated ? 'Updated your diary' : 'Logged to your diary')+' + rated '+(lgSel.venue||'the venue'));
+        } else showToast(j.updated ? 'Updated your diary' : 'Logged to your diary');
         // land on the full gig-diary page; replace #log so Back doesn't
         // return to a now-stale form.
         history.replaceState({sc:1},'','#diary'); openDiaryPage(currentUser&&currentUser.handle, true);
-        if(rv) authedFetch('/api/venue/review?slug='+encodeURIComponent(rv.slug)).then(function(r){ return r.json(); }).then(function(o){ if(!(o&&o.mine)) openVenueReview(rv); }).catch(function(){});
       }catch(_){ document.getElementById('lg-err').textContent='Network error.'; btn.disabled=false; }
     }
 
