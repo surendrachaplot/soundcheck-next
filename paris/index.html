@@ -1357,6 +1357,12 @@
     .rq-m{ flex:1; min-width:0; display:flex; flex-direction:column; }
     .rq-nm{ font:700 var(--fs-base) var(--head); letter-spacing:-.01em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     .rq-sub{ font:600 var(--fs-xs) var(--body); color:var(--muted); margin-top:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    /* inner segmented pill switcher inside merged profile tabs (My Artists / My Playlist) */
+    .pf-seg { display:inline-flex; gap:4px; margin:2px 0 16px; padding:4px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-pill); }
+    .pf-segb { appearance:none; border:0; background:none; cursor:pointer; padding:8px 16px; border-radius:var(--radius-pill); font:700 var(--fs-sm) var(--head); text-transform:lowercase; color:var(--muted); display:inline-flex; align-items:center; gap:7px; -webkit-tap-highlight-color:transparent; transition:background .15s, color .15s; }
+    .pf-segb .c { font:700 var(--fs-xs) var(--body); opacity:.7; }
+    .pf-segb:not(.on):hover { color:var(--fg); }
+    .pf-segb.on { background:var(--sel); color:var(--sel-ink); }
     /* profile DJ-set shelves (Set queue / Listened tabs) */
     .pf-setrow { display:flex; align-items:center; gap:12px; width:100%; background:none; border:0; border-top:1px solid var(--line); padding:10px 2px; cursor:pointer; text-align:left; color:var(--fg); -webkit-tap-highlight-color:transparent; }
     .pf-setrow:first-of-type { border-top:0; }
@@ -3105,7 +3111,7 @@ body::before{
 .lvr .heart.evc-heart svg{ width:17px; height:17px; }
 
 </style>
-<meta name="sc-build" content="sunsetcrt-1784054248880">
+<meta name="sc-build" content="sunsetcrt-1784054722196">
 <meta name="robots" content="noindex">
 </head>
 <body>
@@ -5848,6 +5854,12 @@ body::before{
     // Membership-card hero (avatar + MEMBER stamp + scene-passport kicker + huge handle
     // + home-city line + barcode + Share/Settings-or-Follow cells) + 4-cell stat strip.
     // The section boxes below keep their original ids so the unchanged wirePbProfile fills them.
+    // Segmented pill switcher for a merged tab: one pill per sub-shelf, one box each (all but the first hidden).
+    function pfSegHTML(segs){
+      var pills='<div class="pf-seg">'+segs.map(function(sg,i){ return '<button class="pf-segb'+(i===0?' on':'')+'" type="button" data-sub="'+sg.sub+'">'+esc(sg.label)+(sg.count!=null?'<span class="c">'+sg.count+'</span>':'')+'</button>'; }).join('')+'</div>';
+      var boxes=segs.map(function(sg,i){ return '<div class="pf-box'+(i===0?'':' hide')+'" id="'+sg.boxId+'" data-sub="'+sg.sub+'"></div>'; }).join('');
+      return pills+boxes;
+    }
     function pbProfileHTML(p){
       var isMe=p.isMe, s=p.shelves||{}, st=p.stats||{}, diary=p.diary||[];
       var nights=st.gigs||diary.length||0;
@@ -5875,13 +5887,18 @@ body::before{
       var T=[];
       if(isMe||diary.length) T.push({k:'diary',l:'Diary',c:nights,html:'<div class="diary-page" id="pf-diary"></div>'});
       if(isMe) T.push({k:'coming',l:'Upcoming',html:'<div id="pf-coming"><div id="cu-scopebar"></div><div id="cu-lensbody"><div class="empty" style="padding:8px 6px">Loading…</div></div></div>'});
-      if(isMe||seenN) T.push({k:'seen',l:'Seen live',c:seenN,html:'<div class="pf-box" id="pf-seen"></div>'});
-      if(isMe||wannaN) T.push({k:'wanna',l:'Wanna see',c:wannaN,html:'<div class="pf-box" id="pf-wanna"></div>'});
-      if(venN) T.push({k:'venues',l:'Venues',c:venN,html:'<div class="pf-box" id="pf-venues"></div>'});
+      // My Artists — Wanna see + Seen live merged behind an inner pill switcher.
+      var artSegs=[];
+      if(isMe||wannaN) artSegs.push({sub:'wanna',label:'Wanna see',count:wannaN,boxId:'pf-wanna'});
+      if(isMe||seenN)  artSegs.push({sub:'seen', label:'Seen live', count:seenN, boxId:'pf-seen'});
+      if(artSegs.length) T.push({k:'artists',l:'My Artists',c:(seenN+wannaN)||null,html:pfSegHTML(artSegs)});
       if(savedN) T.push({k:'saved',l:'Interested',c:savedN,html:'<div class="pf-box" id="pf-events"></div>'});
+      // My Playlist — Queue + Listened set-shelves merged behind an inner pill switcher.
       var setqN=(s.setQueue||[]).length, setlN=(s.setListened||[]).length;
-      if(setqN) T.push({k:'setq',l:'Set queue',c:setqN,html:'<div class="pf-box" id="pf-setq"></div>'});
-      if(setlN) T.push({k:'setl',l:'Listened',c:setlN,html:'<div class="pf-box" id="pf-setl"></div>'});
+      var plSegs=[];
+      if(setqN) plSegs.push({sub:'setq',label:'Queue',   count:setqN,boxId:'pf-setq'});
+      if(setlN) plSegs.push({sub:'setl',label:'Listened',count:setlN,boxId:'pf-setl'});
+      if(plSegs.length) T.push({k:'playlist',l:'My Playlist',c:(setqN+setlN)||null,html:pfSegHTML(plSegs)});
       var tabsBar='<div class="fp-tabs pf-tabs" role="tablist">'+T.map(function(t,i){ return '<button class="fp-tab'+(i===0?' on':'')+'" type="button" role="tab" aria-selected="'+(i===0)+'" data-tab="'+t.k+'">'+esc(t.l)+(t.c!=null?'<span class="c">'+t.c+'</span>':'')+'</button>'; }).join('')+'</div>';
       var panels=T.map(function(t,i){ return '<div class="fp-tabpanel'+(i===0?'':' hide')+'" data-panel="'+t.k+'">'+t.html+'</div>'; }).join('');
       return '<div class="pf">'+hero+pbRotationHTML(p)+(isMe?'<div id="pb-lognudge"></div>':'')+tabsBar+panels+'</div>';
@@ -5904,9 +5921,8 @@ body::before{
     function pfHead(title, count, actHtml){ return '<div class="pf-h"><span class="pf-h-t">'+esc(title)+'</span>'+(count!=null?'<span class="pf-h-ct">'+count+'</span>':'')+(actHtml||'')+'</div>'; }
     function pfShelfHTML(id, title, list, seen){
       if(seen) list=list.slice().sort(function(a,b){ return (b.count||0)-(a.count||0); });   // Seen live → most-seen artists first
-      var head=pfHead(title, list.length, '');
       var tiles=list.map(function(a){ return ptile(a.slug,a.name,seen,a.image,seen?a.count:0); }).join('');   // show ALL — no See-more cap
-      return head+'<div class="pf-grid" id="pf-grid-'+id+'">'+tiles+'</div>';
+      return '<div class="pf-grid" id="pf-grid-'+id+'">'+tiles+'</div>';   // no head — the pill labels this shelf
     }
     // Web Push opt-in: "an artist you follow announced a night in your city".
     // Requires the PWA service worker + VAPID key from the API; alerts are sent
@@ -5971,7 +5987,7 @@ body::before{
       // Seen live / Wanna see boxes (spacious grids)
       function shelfBox(id, title, list, seen){
         var el=document.getElementById(id); if(!el) return;
-        if(!list||!list.length){ if(isMe){ el.innerHTML=pfHead(title, 0, '')+'<div class="empty" style="padding:2px">Nothing here yet.</div>'; } else el.remove(); return; }
+        if(!list||!list.length){ if(isMe){ el.innerHTML='<div class="empty" style="padding:2px">Nothing here yet.</div>'; } else el.remove(); return; }
         el.innerHTML=pfShelfHTML(id, title, list, seen);
         function wireTiles(scope){ scope.querySelectorAll('.ptile[data-artist]').forEach(function(b){ b.addEventListener('click',function(){ openArtist(b.dataset.artist); }); }); }
         wireTiles(el);
@@ -5988,7 +6004,7 @@ body::before{
       function pfSetBox(id, title, list){
         var box=document.getElementById(id); if(!box) return;
         if(!list||!list.length){ box.remove(); return; }
-        box.innerHTML=pfHead(title, list.length, '')+'<div class="pf-setlist">'+list.map(function(x,i){
+        box.innerHTML='<div class="pf-setlist">'+list.map(function(x,i){
           var th='https://i.ytimg.com/vi/'+encodeURIComponent(x.video_id)+'/mqdefault.jpg';
           return '<button class="pf-setrow" type="button" data-si="'+i+'"><span class="ps-th" style="background-image:url(\''+th+'\')"></span><span class="ps-m"><span class="ps-t">'+esc(x.title||'Set')+'</span>'+(x.artist_name?'<span class="ps-a">'+esc(x.artist_name)+'</span>':'')+'</span><span class="ps-pl">&#9654;</span></button>';
         }).join('')+'</div>';
@@ -5998,6 +6014,13 @@ body::before{
       }
       pfSetBox('pf-setq','Set queue', s.setQueue);
       pfSetBox('pf-setl','Listened', s.setListened);
+      // Inner pill switchers (My Artists: Wanna see/Seen live · My Playlist: Queue/Listened)
+      document.querySelectorAll('.pf .pf-seg').forEach(function(seg){ seg.addEventListener('click',function(e){
+        var b=e.target.closest('.pf-segb'); if(!b) return;
+        seg.querySelectorAll('.pf-segb').forEach(function(x){ x.classList.toggle('on',x===b); });
+        var panel=seg.closest('.fp-tabpanel')||seg.parentNode;
+        panel.querySelectorAll('.pf-box[data-sub]').forEach(function(bx){ bx.classList.toggle('hide', bx.dataset.sub!==b.dataset.sub); });
+      }); });
     }
     async function openProfile(handle){
       setRoute('u/'+handle);
