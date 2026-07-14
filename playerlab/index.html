@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>playerlab · now-playing × profile header · soundcheck</title>
+<style>
+@font-face{ font-family:'Bricolage Grotesque'; src:url('/fonts/bricolage-latin.woff2') format('woff2'); font-weight:200 800; font-display:block; }
+:root{
+  --bg:#16102a; --surface:#211840; --surface-2:#241a48; --surface-3:#2a2050;
+  --fg:#fdf3ec; --muted:#b8a8d0; --faint:#8d7fa8;
+  --accent:#ff9a3d; --accent-weak:rgba(255,154,61,.15); --ink:#2a0d14;
+  --grad:linear-gradient(135deg,#ff5e7e,#ff9a3d);
+  --line:#2a2050; --head:'Bricolage Grotesque',system-ui,sans-serif; --body:system-ui,-apple-system,sans-serif;
+}
+*{ box-sizing:border-box; margin:0; }
+body{ background:var(--bg); color:var(--fg); font-family:var(--body); padding:40px 20px 120px; }
+body::before{ content:""; position:fixed; inset:0; z-index:3; pointer-events:none; background:linear-gradient(rgba(255,154,61,.05) 1px,transparent 1px); background-size:100% 4px; }
+.wrap{ max-width:980px; margin:0 auto; }
+h1{ font:800 2rem var(--head); letter-spacing:-.02em; }
+h1 .ac{ background:var(--grad); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+.intro{ color:var(--muted); font-size:14px; margin:10px 0 40px; max-width:640px; line-height:1.55; }
+.opt{ margin:0 0 64px; }
+.opt-k{ font:800 12px var(--body); letter-spacing:.14em; text-transform:uppercase; color:var(--accent); }
+.opt h2{ font:800 1.35rem var(--head); letter-spacing:-.01em; margin:6px 0 4px; }
+.opt .why{ color:var(--muted); font-size:13.5px; line-height:1.55; margin-bottom:18px; max-width:660px; }
+.opt .why b{ color:var(--fg); }
+
+/* ── shared mock profile hero ── */
+.pfh{ background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:22px; position:relative; overflow:hidden; }
+.pfh-top{ display:flex; align-items:center; gap:16px; }
+.av{ width:72px; height:72px; border-radius:50%; flex:none; background:radial-gradient(circle at 35% 30%,#7c5cff,#2a2050 70%); box-shadow:0 0 0 1.5px #16102a; }
+.idn{ flex:1; min-width:0; }
+.nm{ font:800 1.5rem var(--head); letter-spacing:-.02em; }
+.sub{ color:var(--muted); font-size:13px; margin-top:3px; }
+.acts{ display:flex; gap:8px; }
+.btn{ background:var(--surface-2); border:1px solid var(--line); color:var(--fg); border-radius:4px; padding:9px 15px; font:700 12px var(--body); letter-spacing:.06em; text-transform:uppercase; cursor:pointer; }
+.ribbon{ display:flex; gap:0; border-top:1px solid var(--line); margin-top:18px; padding-top:14px; }
+.ribbon .c{ flex:1; text-align:center; }
+.ribbon .c b{ display:block; font:800 1.25rem var(--head); }
+.ribbon .c span{ font-size:11px; color:var(--faint); letter-spacing:.08em; text-transform:uppercase; }
+
+/* shared bits */
+.eq{ display:inline-flex; align-items:flex-end; gap:2px; height:12px; }
+.eq i{ width:3px; background:var(--accent); border-radius:1px; animation:eq 0.9s ease-in-out infinite; }
+.eq i:nth-child(1){ height:60%; animation-delay:0s } .eq i:nth-child(2){ height:100%; animation-delay:.2s } .eq i:nth-child(3){ height:40%; animation-delay:.35s } .eq i:nth-child(4){ height:80%; animation-delay:.5s }
+@keyframes eq{ 0%,100%{ transform:scaleY(.5) } 50%{ transform:scaleY(1) } }
+.knob{ width:26px; height:26px; border-radius:999px; background:var(--grad); border:1.5px solid #16102a; color:var(--ink); display:inline-flex; align-items:center; justify-content:center; font-size:10px; flex:none; cursor:pointer; }
+.bar{ flex:1; height:5px; border-radius:999px; background:rgba(255,255,255,.14); position:relative; min-width:60px; }
+.bar b{ position:absolute; left:0; top:0; bottom:0; width:38%; border-radius:999px; background:var(--accent); }
+.bar .knob{ position:absolute; left:38%; top:50%; transform:translate(-50%,-50%); }
+.tt{ font:700 13.5px var(--head); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.ta{ font-size:11.5px; color:var(--muted); }
+
+/* ── 1 · STATUS LINE ── */
+.o1 .npline{ display:flex; align-items:center; gap:12px; margin:18px -22px -22px; padding:12px 22px; background:var(--surface-2); border-top:1px solid var(--line); }
+.o1 .npline .lab{ font:800 10px var(--body); letter-spacing:.14em; color:var(--accent); text-transform:uppercase; white-space:nowrap; }
+.o1 .npline .tt{ flex:1; min-width:0; }
+
+/* ── 2 · HERO B-SIDE ── */
+.o2 .pfh{ display:flex; gap:22px; }
+.o2 .l{ flex:1.6; min-width:0; }
+.o2 .np{ flex:1; border-left:1px solid var(--line); padding-left:22px; display:flex; flex-direction:column; gap:10px; justify-content:center; }
+.o2 .np .art{ width:100%; aspect-ratio:16/9; border-radius:5px; background:linear-gradient(120deg,#7c5cff33,#ff5e7e44),var(--surface-3); position:relative; }
+.o2 .np .art::after{ content:"▶"; position:absolute; right:8px; bottom:8px; width:30px; height:30px; border-radius:999px; background:var(--grad); color:var(--ink); display:flex; align-items:center; justify-content:center; font-size:11px; border:1.5px solid #16102a; }
+.o2 .npr{ display:flex; align-items:center; gap:10px; }
+
+/* ── 3 · RIBBON CELL ── */
+.o3 .ribbon .c.np{ flex:1.8; border-left:1px solid var(--line); text-align:left; padding-left:16px; display:flex; align-items:center; gap:10px; }
+.o3 .c.np .m{ min-width:0; flex:1; }
+
+/* ── 4 · BACKDROP TAKEOVER ── */
+.o4 .pfh{ background:linear-gradient(rgba(22,16,42,.82),rgba(22,16,42,.94)),linear-gradient(115deg,#5a2a5f,#2a2050 55%,#7c5cff44); }
+.o4 .scrail{ display:flex; align-items:center; gap:10px; margin:16px -22px -22px; padding:11px 22px 13px; background:rgba(22,16,42,.55); border-top:1px solid rgba(255,154,61,.35); }
+.o4 .onair{ font:800 10px var(--body); letter-spacing:.14em; color:var(--accent); text-transform:uppercase; white-space:nowrap; display:inline-flex; align-items:center; gap:7px; }
+
+/* ── 5 · TURNTABLE CHIP ── */
+.o5 .avwrap{ position:relative; display:inline-block; width:72px; height:72px; flex:none; }
+.o5 .avwrap .av{ display:block; }
+.o5 .disc{ position:absolute; right:-14px; bottom:-8px; width:40px; height:40px; border-radius:50%; background:repeating-radial-gradient(circle at 50% 50%, #191225 0 2px, #241a48 2px 4px); border:1.5px solid #16102a; box-shadow:0 4px 12px rgba(0,0,0,.4); animation:spin 3.4s linear infinite; }
+.o5 .disc::after{ content:""; position:absolute; inset:36%; border-radius:50%; background:var(--grad); }
+@keyframes spin{ to{ transform:rotate(360deg) } }
+.o5 .listen{ display:inline-flex; align-items:center; gap:8px; margin-top:6px; font-size:12px; color:var(--muted); }
+.o5 .listen b{ color:var(--fg); font-weight:700; }
+
+/* ── 6 · MARQUEE TICKER ── */
+.o6 .tick{ display:flex; align-items:center; gap:14px; background:var(--surface-2); border:1px solid var(--line); border-bottom:none; border-radius:8px 8px 0 0; padding:9px 16px; overflow:hidden; }
+.o6 .pfh{ border-radius:0 0 8px 8px; }
+.o6 .mq{ flex:1; min-width:0; overflow:hidden; white-space:nowrap; mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent); }
+.o6 .mq span{ display:inline-block; padding-left:100%; animation:mq 14s linear infinite; font:700 12px var(--head); letter-spacing:.06em; }
+.o6 .mq .dot{ color:var(--accent); padding:0 10px; }
+@keyframes mq{ to{ transform:translateX(-100%) } }
+.o6 .mini{ display:flex; align-items:center; gap:10px; flex:0 0 220px; }
+
+.note{ margin-top:56px; border-top:1px solid var(--line); padding-top:18px; color:var(--faint); font-size:12.5px; max-width:640px; line-height:1.6; }
+@media(max-width:700px){ .o2 .pfh{ flex-direction:column } .o2 .np{ border-left:none; border-top:1px solid var(--line); padding:16px 0 0 } .o6 .mini{ flex-basis:150px } .ribbon{ flex-wrap:wrap } .o3 .ribbon .c.np{ flex-basis:100%; border-left:none; border-top:1px solid var(--line); margin-top:10px; padding:12px 0 0 } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>player<span class="ac">lab</span></h1>
+  <p class="intro">Six ways the now-playing player can merge into the <b>profile header</b> instead of floating as the bottom dock. Every option keeps the non-negotiables: the play/pause <b>is</b> the scrubber knob, and heart/seen stay one tap away. Web layout first; each collapses cleanly on mobile.</p>
+
+  <!-- 1 -->
+  <div class="opt o1">
+    <div class="opt-k">Option 1</div><h2>Status line — the Last.fm move</h2>
+    <p class="why">A slim listening strip <b>fused to the hero's bottom edge</b>. The header stays untouched; the strip appears only while playing. Cheapest to build, quietest to look at — the profile reads "this person is listening right now" like a status.</p>
+    <div class="pfh">
+      <div class="pfh-top"><span class="av"></span><div class="idn"><div class="nm">Surendra</div><div class="sub">@surendra · London</div></div><div class="acts"><button class="btn">Share</button><button class="btn">Settings</button></div></div>
+      <div class="ribbon"><div class="c"><b>34</b><span>Nights</span></div><div class="c"><b>12</b><span>Venues</span></div><div class="c"><b>28</b><span>Seen live</span></div><div class="c"><b>41</b><span>Wanna see</span></div></div>
+      <div class="npline"><span class="eq"><i></i><i></i><i></i><i></i></span><span class="lab">Now playing</span><span class="tt">Young Marco — Essential Mix 2023</span><div class="bar"><b></b><span class="knob">❚❚</span></div><span class="ta">44:10</span></div>
+    </div>
+  </div>
+
+  <!-- 2 -->
+  <div class="opt o2">
+    <div class="opt-k">Option 2</div><h2>Hero B-side — split card</h2>
+    <p class="why">The hero becomes a two-panel card: identity on the left, a <b>proper now-playing panel on the right</b> with artwork and the knob-scrubber. Feels like the player belongs to the profile, not on top of it. Costs the most horizontal room; panel hides when idle.</p>
+    <div class="pfh">
+      <div class="l">
+        <div class="pfh-top"><span class="av"></span><div class="idn"><div class="nm">Surendra</div><div class="sub">@surendra · London</div></div></div>
+        <div class="ribbon"><div class="c"><b>34</b><span>Nights</span></div><div class="c"><b>12</b><span>Venues</span></div><div class="c"><b>28</b><span>Seen</span></div></div>
+      </div>
+      <div class="np">
+        <div class="art"></div>
+        <div><div class="tt">Dekmantel Ten — Young Marco | Radar</div><div class="ta">Young Marco · ♥ Wanna see</div></div>
+        <div class="npr"><div class="bar"><b></b><span class="knob">❚❚</span></div><span class="ta">44:10 / 1:55</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3 -->
+  <div class="opt o3">
+    <div class="opt-k">Option 3</div><h2>Ribbon cell — a fifth stat</h2>
+    <p class="why">Now-playing joins the stat ribbon as a wider cell: EQ bars, title, knob. Reads as "listening" being <b>part of your scene stats</b> — nights, venues, seen live… and what's on right now. Tightest integration with zero new bands; the cell is a taste-signal on public profiles too.</p>
+    <div class="pfh">
+      <div class="pfh-top"><span class="av"></span><div class="idn"><div class="nm">Surendra</div><div class="sub">@surendra · London</div></div><div class="acts"><button class="btn">Share</button></div></div>
+      <div class="ribbon">
+        <div class="c"><b>34</b><span>Nights</span></div><div class="c"><b>12</b><span>Venues</span></div><div class="c"><b>28</b><span>Seen live</span></div>
+        <div class="c np"><span class="eq"><i></i><i></i><i></i><i></i></span><div class="m"><div class="tt">Essential Mix 2023</div><div class="ta">Young Marco</div></div><span class="knob">❚❚</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4 -->
+  <div class="opt o4">
+    <div class="opt-k">Option 4</div><h2>Backdrop takeover — the header goes on air</h2>
+    <p class="why">While playing, the set's artwork becomes a <b>dimmed backdrop for the whole hero</b> and a scrub rail docks to its bottom edge with an ON AIR tag. Most atmospheric — the profile visibly changes state — with the CRT scanlines doing the brand work. Needs careful contrast on busy thumbnails.</p>
+    <div class="pfh">
+      <div class="pfh-top"><span class="av"></span><div class="idn"><div class="nm">Surendra</div><div class="sub">@surendra · London</div></div><div class="acts"><button class="btn">Share</button></div></div>
+      <div class="ribbon"><div class="c"><b>34</b><span>Nights</span></div><div class="c"><b>12</b><span>Venues</span></div><div class="c"><b>28</b><span>Seen live</span></div><div class="c"><b>41</b><span>Wanna see</span></div></div>
+      <div class="scrail"><span class="onair"><span class="eq"><i></i><i></i><i></i><i></i></span>On air</span><span class="tt">Young Marco — Essential Mix 2023</span><div class="bar"><b></b><span class="knob">❚❚</span></div></div>
+    </div>
+  </div>
+
+  <!-- 5 -->
+  <div class="opt o5">
+    <div class="opt-k">Option 5</div><h2>Turntable chip — the record on the avatar</h2>
+    <p class="why">A little <b>spinning record docks onto the avatar</b> (it IS the play/pause), and a one-line "Listening to…" caption sits under the handle. Smallest footprint of all six, very collectible-feeling — pairs naturally with the In-rotation record rail below. Scrubbing moves to a hover/expand state.</p>
+    <div class="pfh">
+      <div class="pfh-top">
+        <span class="avwrap"><span class="av"></span><span class="disc"></span></span>
+        <div class="idn"><div class="nm">Surendra</div><div class="sub">@surendra · London</div>
+          <div class="listen"><span class="eq"><i></i><i></i><i></i><i></i></span>Listening to <b>Essential Mix 2023</b>&nbsp;· Young Marco</div>
+        </div>
+        <div class="acts"><button class="btn">Share</button><button class="btn">Settings</button></div>
+      </div>
+      <div class="ribbon"><div class="c"><b>34</b><span>Nights</span></div><div class="c"><b>12</b><span>Venues</span></div><div class="c"><b>28</b><span>Seen live</span></div><div class="c"><b>41</b><span>Wanna see</span></div></div>
+    </div>
+  </div>
+
+  <!-- 6 -->
+  <div class="opt o6">
+    <div class="opt-k">Option 6</div><h2>Marquee ticker — CRT crawler above the card</h2>
+    <p class="why">A scrolling <b>NOW PLAYING ticker caps the hero</b> like a broadcast chyron, with a compact knob-scrubber pinned right. Leans hardest into the Sunset·CRT identity (it's basically the arcade attract-screen). Loudest of the six — great if the profile should feel like a station.</p>
+    <div>
+      <div class="tick">
+        <span class="eq"><i></i><i></i><i></i><i></i></span>
+        <div class="mq"><span>NOW PLAYING<i class="dot">◆</i>YOUNG MARCO — ESSENTIAL MIX 2023<i class="dot">◆</i>44:10 / 1:55:21<i class="dot">◆</i>NOW PLAYING<i class="dot">◆</i>YOUNG MARCO — ESSENTIAL MIX 2023</span></div>
+        <div class="mini"><div class="bar"><b></b><span class="knob">❚❚</span></div></div>
+      </div>
+      <div class="pfh">
+        <div class="pfh-top"><span class="av"></span><div class="idn"><div class="nm">Surendra</div><div class="sub">@surendra · London</div></div><div class="acts"><button class="btn">Share</button></div></div>
+        <div class="ribbon"><div class="c"><b>34</b><span>Nights</span></div><div class="c"><b>12</b><span>Venues</span></div><div class="c"><b>28</b><span>Seen live</span></div><div class="c"><b>41</b><span>Wanna see</span></div></div>
+      </div>
+    </div>
+  </div>
+
+  <p class="note">All six are states of the SAME dock player — the bottom dock stays everywhere else in the app; on the profile page it hands off to the chosen header treatment while something is playing. 1 and 5 are the cheapest to ship; 2 is the most "player-forward"; 3 treats listening as a stat; 4 and 6 change the page's mood the most. Mix-and-match is possible (e.g. 5's record + 1's status line).</p>
+</div>
+</body>
+</html>
