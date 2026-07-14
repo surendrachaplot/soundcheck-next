@@ -427,25 +427,6 @@
     .dock.expanded .bar { height:8px; }
     .dock.expanded .bar-knob { width:46px; height:46px; box-shadow:0 6px 18px rgba(0,0,0,0.45); }
     .dock.expanded .bar-knob .ic { display:block; width:22px; height:22px; }
-    /* full-screen player: additive .full on top of .expanded — swipe up from the
-       expanded dock (or the ⌃ corner button). Media on top, big title, transport,
-       then the up-next queue; swipe down (or tap the grab) drops back. */
-    .dock.full{ top:0; border-top:none; }
-    .dock.full .panel{ height:100%; overflow-y:auto; flex-direction:column; justify-content:flex-start; gap:14px; padding-top:calc(26px + env(safe-area-inset-top)); max-width:760px; margin:0 auto; }
-    .dock.full .video-wrap iframe{ width:min(680px,92vw); }
-    .dock.full .stage-art{ width:min(320px,68vw); }
-    .dock.full .main{ padding-right:0; width:100%; }
-    .dock.full .info .nm{ font-size:1.3rem; }
-    .dock.full .scrub{ width:min(560px,94%); }
-    .dock.full #dock-full-btn{ display:none; }
-    .dock.full .dock-grab{ display:flex; position:absolute; top:calc(9px + env(safe-area-inset-top)); left:50%; transform:translateX(-50%); width:120px; height:26px; align-items:center; justify-content:center; cursor:pointer; z-index:4; -webkit-tap-highlight-color:transparent; }
-    .dock.full .dock-grab span{ width:40px; height:4px; border-radius:var(--radius-pill); background:rgba(255,255,255,0.3); }
-    .dock:not(.full) .dock-queue{ display:none; }
-    .dock-queue{ width:100%; max-width:560px; margin:6px auto 0; }
-    .dq-h{ font:800 11px var(--body); letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin:0 0 4px; }
-    .dq-row{ display:flex; align-items:center; gap:10px; width:100%; background:none; border:none; border-top:1px solid rgba(255,255,255,.08); color:var(--fg); padding:12px 4px; cursor:pointer; text-align:left; font:600 var(--fs-sm) var(--body); -webkit-tap-highlight-color:transparent; }
-    .dq-row.on{ color:var(--accent); }
-    .dq-row .dq-n{ flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     /* Tracklist button (expanded dock, only when the playing video has a parsed tracklist) + sheet */
     .dock-tl { display:none; align-items:center; gap:8px; order:3; margin:2px auto 0; border:1px solid var(--border); background:var(--surface-2); color:var(--fg); border-radius:var(--radius-pill); font:600 var(--fs-sm) var(--body); padding:8px 16px; cursor:pointer; -webkit-tap-highlight-color:transparent; }
     .dock-tl svg { width:16px; height:16px; flex:none; }
@@ -574,6 +555,7 @@
     body.has-dock .fab-stack { bottom:calc(var(--dock-pad,96px) + 16px); }
     body.page-on .fab-stack, body.sheet-on .fab-stack { display:none; }
     body.has-dock:not(.radio-on) .fab-stack { display:none; } /* manual player open → hide the radio pill */
+    body:not(.radio-on) .fab-stack { display:none; } /* idle RADIO pill removed from home — radio starts from the nav pill / Tune in; the on-air bar still appears while playing */
     @media (max-width:520px){ .fab-stack { right:12px; bottom:calc(16px + env(safe-area-inset-bottom)); } }
     /* Radio as a persistent nav pill — toggles the broadcast, never a page */
     .nl-radio { display:inline-flex; align-items:center; gap:6px; border:1px solid var(--border); border-radius:var(--radius-pill); padding:6px 13px; }
@@ -1316,6 +1298,14 @@
     .vrv-stars { display:flex; gap:6px; }
     .vrv-star { background:none; border:none; padding:2px; cursor:pointer; color:#3a3742; line-height:0; -webkit-tap-highlight-color:transparent; }
     .vrv-star svg { width:30px; height:30px; }
+    /* profile DJ-set shelves (Set queue / Listened tabs) */
+    .pf-setrow { display:flex; align-items:center; gap:12px; width:100%; background:none; border:0; border-top:1px solid var(--line); padding:10px 2px; cursor:pointer; text-align:left; color:var(--fg); -webkit-tap-highlight-color:transparent; }
+    .pf-setrow:first-of-type { border-top:0; }
+    .pf-setrow .ps-th { width:86px; aspect-ratio:16/9; border-radius:var(--radius-sm); background-size:cover; background-position:center; background-color:var(--surface-3); flex:none; }
+    .pf-setrow .ps-m { flex:1; min-width:0; }
+    .pf-setrow .ps-t { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; font:700 var(--fs-sm) var(--head); line-height:1.25; }
+    .pf-setrow .ps-a { display:block; font:600 var(--fs-xs) var(--body); color:var(--muted); margin-top:2px; }
+    .pf-setrow .ps-pl { flex:none; width:34px; height:34px; border-radius:var(--radius-pill); background:var(--accent-grad); color:var(--accent-ink); display:flex; align-items:center; justify-content:center; font-size:12px; border:1.5px solid #16102a; }
     /* per-artist star rows in the log-a-gig form */
     .lg-rate { flex-basis:100%; min-width:0; }
     .lg-rate-row { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:4px 0; }
@@ -1477,6 +1467,9 @@
     .dv-venue:hover { color:var(--accent); text-decoration:underline; }
     .dv-del { flex:0 0 auto; margin-left:auto; width:28px; height:28px; border-radius:var(--radius-pill); border:1px solid var(--border); background:transparent; color:var(--muted); font-size:var(--fs-base); line-height:1; cursor:pointer; touch-action:manipulation; -webkit-tap-highlight-color:transparent; }
     .dv-del:hover { border-color:var(--accent); color:var(--accent); }
+    .dv-edit { flex:0 0 auto; margin-left:auto; width:28px; height:28px; border-radius:var(--radius-pill); border:1px solid var(--border); background:transparent; color:var(--muted); font-size:13px; line-height:1; cursor:pointer; touch-action:manipulation; -webkit-tap-highlight-color:transparent; }
+    .dv-edit:hover { border-color:var(--accent); color:var(--accent); }
+    .dv-edit + .dv-del { margin-left:6px; }
     @media (max-width:480px){ .ptiles { grid-template-columns:repeat(3,1fr); } }
 
     /* log-a-gig */
@@ -2954,7 +2947,7 @@ body::before{
 .lvr .heart.evc-heart svg{ width:17px; height:17px; }
 
 </style>
-<meta name="sc-build" content="sunsetcrt-1783998436323">
+<meta name="sc-build" content="sunsetcrt-1784000352726">
 <meta name="robots" content="noindex">
 </head>
 <body>
@@ -3033,7 +3026,6 @@ body::before{
     <div class="panel">
       <div class="dock-grab" id="dock-grab" role="button" tabindex="0" aria-label="Expand or collapse player"><span></span></div>
       <div class="corner">
-        <button class="iconbtn" id="dock-full-btn" type="button" aria-label="Full-screen player"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg></button>
         <button class="iconbtn" id="dock-close" type="button" aria-label="Stop and close"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
       </div>
       <div class="video-wrap" id="dock-media"></div>
@@ -3520,7 +3512,7 @@ body::before{
       active.button.classList.remove('playing'); setState(active.button,'▶');
       clearPlayers();
       dockMedia.innerHTML='';
-      dock.classList.remove('show','expanded','full'); document.body.classList.remove('has-dock','dock-collapsed');
+      dock.classList.remove('show','expanded'); document.body.classList.remove('has-dock','dock-collapsed');
       active=null;
     }
     function playSc(btn){
@@ -3615,59 +3607,7 @@ body::before{
       if(e.target && e.target.closest && e.target.closest('button,a,[role="button"]')) return;
       e.preventDefault(); togglePlay();
     });
-    function toggleDock(){
-      if(dock.classList.contains('full')){ setDockFull(false); return; }   // full → back to expanded
-      dock.classList.toggle('expanded'); setExpIcon(); setDockPad();
-    }
-    // Full-screen player (Spotify-style): swipe up from the expanded dock or the ⌃ button.
-    function setDockFull(on){
-      if(on){ dock.classList.add('expanded','full'); renderDockQueue(); }
-      else dock.classList.remove('full');
-      setExpIcon(); setDockPad();
-    }
-    // Up-next list in the full player — the active set queue (artist sets / event
-    // lineup / playlist) or the radio station. Tap a row to jump.
-    function renderDockQueue(){
-      if(!dock.classList.contains('full')) return;
-      var host=document.getElementById('dock-queue');
-      if(!host){ host=document.createElement('div'); host.className='dock-queue'; host.id='dock-queue'; var mn=dock.querySelector('.main'); if(!mn) return; mn.appendChild(host); }
-      var onRadio=(typeof radio!=='undefined' && radio.on);
-      var list=(scQ&&scQ.length)?scQ:(onRadio?radio.queue:[]);
-      if(!list.length){ host.innerHTML=''; return; }
-      var cur=(scQ&&scQ.length)?scQi:radio.i;
-      host.innerHTML='<div class="dq-h">Up next</div>'+list.map(function(it,i){
-        return '<button class="dq-row'+(i===cur?' on':'')+'" data-qi="'+i+'" type="button"><span class="dq-n">'+esc(it.title||it.name||it.slug||'—')+'</span>'+(i===cur?'<span>▶</span>':'')+'</button>';
-      }).join('');
-      host.querySelectorAll('[data-qi]').forEach(function(b){ b.addEventListener('click',function(){
-        var i=+b.dataset.qi;
-        if(scQ&&scQ.length) playScQ(i);
-        else if(typeof radio!=='undefined' && radio.on && i!==radio.i) radioAdvance(i-radio.i);
-        setTimeout(renderDockQueue, 300);
-      }); });
-    }
-    var fullBtn=document.getElementById('dock-full-btn');
-    if(fullBtn) fullBtn.addEventListener('click',function(e){ e.stopPropagation(); setDockFull(true); });
-    // Swipe: up = grow (collapsed → expanded → full), down = shrink. Vertical-intent
-    // only; ignores the scrubber/video, and in full mode only collapses from the top
-    // of the scroll (so scrolling the queue never closes the player).
-    (function(){
-      var panel=dock.querySelector('.panel'), sy=null, sx=null;
-      panel.addEventListener('touchstart',function(e){ var t=e.touches[0]; sy=t.clientY; sx=t.clientX; },{passive:true});
-      panel.addEventListener('touchend',function(e){
-        if(sy===null) return;
-        var t=e.changedTouches[0], dy=t.clientY-sy, dx=t.clientX-sx; sy=null;
-        if(Math.abs(dy)<60 || Math.abs(dx)>Math.abs(dy)) return;
-        if(e.target.closest('.scrub') || e.target.closest('.video-wrap')) return;
-        if(dy<0){
-          if(dock.classList.contains('full')) return;
-          if(dock.classList.contains('expanded')) setDockFull(true);
-          else { dock.classList.add('expanded'); setExpIcon(); setDockPad(); }
-        } else {
-          if(dock.classList.contains('full')){ if(panel.scrollTop<=0) setDockFull(false); }
-          else if(dock.classList.contains('expanded')){ dock.classList.remove('expanded'); setExpIcon(); setDockPad(); }
-        }
-      },{passive:true});
-    })();
+    function toggleDock(){ dock.classList.toggle('expanded'); setExpIcon(); setDockPad(); }
     if(dockGrab){
       dockGrab.addEventListener('click',function(e){ e.stopPropagation(); toggleDock(); });
       dockGrab.addEventListener('keydown',function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); toggleDock(); } });
@@ -3716,7 +3656,6 @@ body::before{
       if(!scQ || !scQ.length) return;
       scQi=((i % scQ.length)+scQ.length)%scQ.length;
       handleYtClick(synthYtBtn(scQ[scQi]));
-      if(typeof renderDockQueue==='function') renderDockQueue();   // keep the full player's up-next in sync
     }
     // prev / next — walk the visible grid lineup of the current source type
     function currentQueue(){
@@ -4223,13 +4162,18 @@ body::before{
       setArtist(slug, 'wanna_see', meta&&meta.name);
     }
     // Heart = Save. "I'm going" is the upgrade, offered on the event page button.
+    // Heart = Interested ('saved' status). "I'm going" is its own button on the event page.
     function toggleEvent(id, meta){
       if(!id) return;
-      if(isEventPicked(id)){ setEvent(id, null, meta); return; }
-      if(!hasEmail()){ ensureEmailGate().then(function(ok){ if(ok) setEvent(id,'saved',meta); }); return; }
-      setEvent(id, 'saved', meta);
+      setEventGated(id, isEventPicked(id)?null:'saved', meta);
     }
-    function evSaveLabel(st){ return st==='going' ? 'I&rsquo;m going ✓' : st==='saved' ? 'Saved · going?' : 'Save'; }
+    // Gate-aware setter: turning a state ON asks for an email first (same
+    // sign-up moment as hearts); clearing/downgrading never gates.
+    function setEventGated(id, status, meta){
+      if(!id) return;
+      if(status && !hasEmail()){ ensureEmailGate().then(function(ok){ if(ok) setEvent(id, status, meta); }); return; }
+      setEvent(id, status, meta);
+    }
     // ── DJ-set shelf (Goodreads model): videoId → {status:'queue'|'listened',…} ──
     var _setShelf=null;
     function ensureSetShelf(){
@@ -4247,14 +4191,6 @@ body::before{
       else _setShelf[videoId]={ video_id:videoId, status:status, artist_slug:meta.artistSlug||((_setShelf[videoId]||{}).artist_slug), artist_name:meta.artistName||((_setShelf[videoId]||{}).artist_name), title:meta.title||((_setShelf[videoId]||{}).title), image_url:(_setShelf[videoId]||{}).image_url };
       authedFetch('/api/sets/shelf',{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ videoId:videoId, status:status, artistSlug:meta.artistSlug, artistName:meta.artistName, title:meta.title }) })
         .catch(function(){ showToast('Couldn’t save — try again'); });
-    }
-    // Two-state event button: Save → I'm going → off.
-    function cycleEvent(id, meta){
-      if(!id) return null;
-      var st=evtStatus(id), next=(st==='saved')?'going':(st==='going')?null:'saved';
-      if(next && !hasEmail()){ ensureEmailGate().then(function(ok){ if(ok) setEvent(id,next,meta); }); return next; }
-      setEvent(id, next, meta);
-      return next;
     }
     // Seen / Not-going are account features → nudge sign-in when logged out
     function toggleSeen(slug, meta){ if(!slug) return; if(!currentUser){ openAuth(); return; }
@@ -4274,8 +4210,11 @@ body::before{
     function refreshEventButtons(id){
       var k=CSS.escape(id), on=isEventPicked(id);
       document.querySelectorAll('.heart[data-pick-evt="'+k+'"]').forEach(function(b){ b.classList.toggle('on', on); b.setAttribute('aria-pressed', on?'true':'false'); });
-      var sv=document.querySelector('#fp-ev-save[data-evt="'+k+'"]');
-      if(sv){ var st=evtStatus(id); sv.classList.toggle('on', on); sv.classList.toggle('go', st==='going'); sv.innerHTML=evSaveLabel(st); }
+      var st=evtStatus(id);
+      var ib=document.querySelector('#fp-ev-int[data-evt="'+k+'"]');
+      if(ib){ ib.classList.toggle('on', st==='saved'); ib.innerHTML=(st==='saved'?'Interested ✓':'Interested'); }
+      var gb=document.querySelector('#fp-ev-going[data-evt="'+k+'"]');
+      if(gb){ gb.classList.toggle('go', st==='going'); gb.innerHTML=(st==='going'?'I&rsquo;m going ✓':'I&rsquo;m going'); }
     }
     function afterPicksChanged(){
       // The bottom-right float is the radio now; picks live in the bottom nav
@@ -4865,11 +4804,11 @@ body::before{
       Object.keys(picks.events).forEach(function(i){ var st=evtStatus(i); if(st==='going') going.push({i:i, e:picks.events[i]}); else if(st==='saved') saved.push({i:i, e:picks.events[i]}); });
       var h='';
       if(going.length){ h+='<div class="sec-h">I&rsquo;m going<span class="ct">'+going.length+'</span></div><ul class="tray-line">'+going.map(function(g){ return meRowEvt(g.i, g.e); }).join('')+'</ul>'; }
-      if(saved.length){ h+='<div class="sec-h"'+(going.length?' style="margin-top:18px"':'')+'>Saved events<span class="ct">'+saved.length+'</span></div><ul class="tray-line">'+saved.map(function(g){ return meRowEvt(g.i, g.e); }).join('')+'</ul>'; }
+      if(saved.length){ h+='<div class="sec-h"'+(going.length?' style="margin-top:18px"':'')+'>Interested<span class="ct">'+saved.length+'</span></div><ul class="tray-line">'+saved.map(function(g){ return meRowEvt(g.i, g.e); }).join('')+'</ul>'; }
       if(wannaComing.length){ h+='<div class="sec-h" style="margin-top:18px">Wanna see · upcoming<span class="ct">'+wannaComing.length+'</span></div><ul class="tray-line">'+wannaComing.map(function(w){ return meRow(w.nm, (w.ev.venue||'')+(w.ev._day?(' · '+w.ev._day):''), 'data-rm-art="'+esc(w.s)+'"'); }).join('')+'</ul>'; }
       if(wannaList.length){ h+='<div class="sec-h" style="margin-top:18px">Wanna see · on your list<span class="ct">'+wannaList.length+'</span></div><ul class="tray-line">'+wannaList.map(function(w){ return meRow(w.nm, 'no upcoming London date yet', 'data-rm-art="'+esc(w.s)+'"'); }).join('')+'</ul>'; }
       if(seen.length){ h+='<div class="sec-h" style="margin-top:18px">Seen live<span class="ct">'+seen.length+'</span></div><ul class="tray-line">'+seen.map(function(w){ return meRow(w.nm, '', 'data-rm-art="'+esc(w.s)+'"'); }).join('')+'</ul>'; }
-      if(!h) h='<div class="empty">Nothing here yet. Heart artists you wanna see, save nights you&rsquo;re going to, and tick DJs you&rsquo;ve seen live.</div>';
+      if(!h) h='<div class="empty">Nothing here yet. Heart artists you wanna see, mark nights you&rsquo;re interested in, and tick DJs you&rsquo;ve seen live.</div>';
       return h;
     }
     function openMyPicks(){
@@ -5390,6 +5329,7 @@ body::before{
       return x;
     }
     function diaryValid(d){ return (d.artists||[]).filter(function(a){ var n=String((a&&(a.name||a.slug))||'').trim(); return a&&a.slug&&a.slug!=='-'&&n&&n!=='-'; }); }
+    var _diaryById={};   // last-rendered entries by id — feeds the edit sheet
     function diaryArts(d){ return diaryValid(d).map(function(a){ return (a.name||a.slug)+(a.rating?' ★'+a.rating:''); }).join(', '); }
     function diaryDateLabel(d){ return d.gig_date ? fmtDateLabel(String(d.gig_date).slice(0,10)) : ''; }
     // Full gig-diary page: the profile ticket-stub (.pb-ds), enriched for the full
@@ -5401,13 +5341,14 @@ body::before{
           : '<div class="empty">No gigs logged yet.</div>';
       }
       return '<div class="pb-stubs">'+diary.map(function(d){
+        if(d.id!=null) _diaryById[d.id]=d;
         var dt=d.gig_date?new Date(String(d.gig_date).slice(0,10)+'T12:00:00'):null;
         var day=dt?String(dt.getDate()).padStart(2,'0'):'&ndash;', mon=dt?dt.toLocaleDateString('en-GB',{month:'short'}):'', yr=dt?dt.getFullYear():'';
         var arts=diaryValid(d);
         var vn = d.venue ? '<button class="dv-venue" type="button" data-venue="'+esc(d.venue)+'">'+esc(d.venue)+'</button>' : 'Gig';
         var city = d.city ? '<span class="pb-ds-city">'+esc(cityLabel(d.city))+'</span>' : '';
         var ev = d.event_id ? '<a class="pb-ds-ev" data-event-id="'+esc(String(d.event_id))+'">view event &rsaquo;</a>' : '';
-        var del = (isMe && d.id!=null) ? '<button class="dv-del" type="button" data-del="'+esc(String(d.id))+'" aria-label="Remove gig">&times;</button>' : '';
+        var del = (isMe && d.id!=null) ? '<button class="dv-edit" type="button" data-edit="'+esc(String(d.id))+'" aria-label="Edit gig">✎</button><button class="dv-del" type="button" data-del="'+esc(String(d.id))+'" aria-label="Remove gig">&times;</button>' : '';
         var tiles = arts.length ? '<div class="ptiles ptiles-wide">'+arts.map(function(a){ return ptile(a.slug, (a.name||a.slug)+(a.rating?' ★'+a.rating:''), false, a.image); }).join('')+'</div>' : '';
         var note = d.note?'<div class="pb-ds-note">'+esc(d.note)+'</div>':'';
         return '<div class="pb-ds"><div class="pb-ds-date"><div class="pb-ds-d">'+day+'</div><div class="pb-ds-m">'+esc(mon)+'</div>'+(yr?'<div class="pb-ds-y">'+yr+'</div>':'')+'</div><div class="pb-ds-body"><div class="pb-ds-venue">'+vn+city+ev+del+'</div>'+tiles+note+'<div class="pb-ds-bc"></div></div></div>';
@@ -5433,11 +5374,48 @@ body::before{
     }
     // Wire a rendered diary: artist tiles → artist page, venue → venue page, and
     // (own diary only) the × → delete, then re-render via onChange.
+    // Edit sheet: note + per-artist stars + artist removal. Replaces the entry's
+    // artist list wholesale on save (that's how removals stick server-side).
+    function openDiaryEdit(d, onChange){
+      var arts=diaryValid(d).map(function(a){ return { slug:a.slug, name:a.name||a.slug, rating:a.rating||null }; });
+      var ov=document.createElement('div'); ov.className='auth-overlay show';
+      function artRows(){
+        if(!arts.length) return '<div class="empty" style="padding:4px 0">No artists on this entry.</div>';
+        return arts.map(function(a,i){
+          var stars=''; for(var s=1;s<=5;s++){ stars+='<button type="button" class="vrv-star'+(a.rating&&s<=a.rating?' on':'')+'" data-ri="'+i+'" data-rv="'+s+'" aria-label="Rate '+esc(a.name)+' '+s+' of 5">'+STAR_SVG+'</button>'; }
+          return '<div class="lg-rate-row"><span class="lg-rate-nm">'+esc(a.name)+'</span><span style="display:inline-flex;align-items:center;gap:6px"><span class="vrv-stars">'+stars+'</span><button type="button" class="dv-del" data-rma="'+i+'" aria-label="Remove '+esc(a.name)+'">&times;</button></span></div>';
+        }).join('');
+      }
+      ov.innerHTML='<div class="auth-box"><button class="auth-close" type="button" aria-label="Close">&times;</button>'+
+        '<div class="eyebrow">Edit diary entry</div>'+
+        '<h3>'+esc(d.venue||'Gig')+(diaryDateLabel(d)?' <small style="color:var(--muted);font-weight:600">'+esc(diaryDateLabel(d))+'</small>':'')+'</h3>'+
+        '<div class="vrv-q">Artists &amp; ratings</div><div class="lg-rate" id="de-arts">'+artRows()+'</div>'+
+        '<div class="vrv-q">Note</div><textarea id="de-note" style="width:100%;min-height:80px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius);color:var(--fg);padding:10px;font:inherit">'+esc(d.note||'')+'</textarea>'+
+        '<button class="go" id="de-save" type="button">Save changes</button><div class="rv-msg" id="de-msg"></div></div>';
+      document.body.appendChild(ov);
+      function close(){ ov.remove(); }
+      ov.querySelector('.auth-close').addEventListener('click',close);
+      ov.addEventListener('click',function(e){ if(e.target===ov) close(); });
+      var box=ov.querySelector('#de-arts');
+      box.addEventListener('click',function(e){
+        var st=e.target.closest('[data-ri]'); if(st){ var a=arts[+st.dataset.ri], rv=+st.dataset.rv; if(a){ a.rating=(a.rating===rv)?null:rv; box.innerHTML=artRows(); } return; }
+        var rm=e.target.closest('[data-rma]'); if(rm){ arts.splice(+rm.dataset.rma,1); box.innerHTML=artRows(); }
+      });
+      ov.querySelector('#de-save').addEventListener('click',function(){
+        var btn=ov.querySelector('#de-save'); btn.disabled=true;
+        authedFetch('/api/diary/update',{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ id:d.id, note:ov.querySelector('#de-note').value.trim(), artists:arts }) })
+          .then(function(r){ if(!r.ok) throw 0; close(); showToast('Diary updated'); if(onChange) onChange(); })
+          .catch(function(){ btn.disabled=false; ov.querySelector('#de-msg').textContent='Couldn’t save — try again.'; });
+      });
+    }
     function wireDiary(scope, isMe, onChange){
       if(!scope) return;
       scope.querySelectorAll('.ptile[data-artist]').forEach(function(b){ b.addEventListener('click',function(){ openArtist(b.dataset.artist); }); });
       scope.querySelectorAll('[data-venue]').forEach(function(b){ b.addEventListener('click',function(){ if(b.dataset.venue) openVenue(b.dataset.venue); }); });
       scope.querySelectorAll('[data-event-id]').forEach(function(b){ b.addEventListener('click',function(){ if(b.dataset.eventId) openEvent(b.dataset.eventId); }); });
+      if(isMe) scope.querySelectorAll('[data-edit]').forEach(function(b){ b.addEventListener('click',function(e){
+        e.stopPropagation(); var d=_diaryById[b.dataset.edit]; if(d) openDiaryEdit(d, onChange);
+      }); });
       if(isMe) scope.querySelectorAll('[data-del]').forEach(function(b){ b.addEventListener('click',function(e){
         e.stopPropagation(); var id=b.dataset.del; if(!id) return;
         if(!confirm('Remove this gig from your diary?')) return;
@@ -5459,7 +5437,7 @@ body::before{
       }); });
       // Saved events → poster rail; following venues → venue-card rail (city-scene look)
       var evBox=body.querySelector('#shelf-events');
-      if(evBox && s.events && s.events.length) mountEventRail(evBox, s.events.map(function(e){ return { id:e.id, title:e.title, venue:e.venue, event_date:e.day||e.event_date, poster_url:e.poster_url, lineup:e.lineup }; }), { title:'Saved events', count:s.events.length, mt:'22px' });
+      if(evBox && s.events && s.events.length) mountEventRail(evBox, s.events.map(function(e){ return { id:e.id, title:e.title, venue:e.venue, event_date:e.day||e.event_date, poster_url:e.poster_url, lineup:e.lineup }; }), { title:'Interested', count:s.events.length, mt:'22px' });
       var vnBox=body.querySelector('#shelf-venues');
       if(vnBox && s.venues && s.venues.length) mountVenueRail(vnBox, s.venues.map(function(v){ return { venue:v.name, venue_slug:v.slug, image:v.image }; }), { title:'Following venues', count:s.venues.length, mt:'22px' });
       body.querySelectorAll('[data-shelf-radio]').forEach(function(b){ b.addEventListener('click',function(e){ e.stopPropagation(); var w=b.dataset.shelfRadio; startListRadio(w==='wanna'?s.wannaSee:s.seen, 'shelf:'+handle+':'+w).then(function(){ var st='shelf:'+handle+':'+w; var sp=b.querySelector('span'); if(sp) sp.textContent=(radio.on&&radio.station===st)?'On air':'Radio'; }); }); });
@@ -5654,14 +5632,32 @@ body::before{
       // per-box empty rules the wiring uses). Boxes keep their ids so wirePbProfile fills them.
       var T=[];
       if(isMe||diary.length) T.push({k:'diary',l:'Diary',c:nights,html:'<div class="diary-page" id="pf-diary"></div>'});
-      if(isMe) T.push({k:'coming',l:'Coming soon',html:'<div id="pf-coming"><div id="cu-scopebar"></div><div id="cu-lensbody"><div class="empty" style="padding:8px 6px">Loading…</div></div></div>'});
+      if(isMe) T.push({k:'coming',l:'Upcoming',html:'<div id="pf-coming"><div id="cu-scopebar"></div><div id="cu-lensbody"><div class="empty" style="padding:8px 6px">Loading…</div></div></div>'});
       if(isMe||seenN) T.push({k:'seen',l:'Seen live',c:seenN,html:'<div class="pf-box" id="pf-seen"></div>'});
       if(isMe||wannaN) T.push({k:'wanna',l:'Wanna see',c:wannaN,html:'<div class="pf-box" id="pf-wanna"></div>'});
       if(venN) T.push({k:'venues',l:'Venues',c:venN,html:'<div class="pf-box" id="pf-venues"></div>'});
-      if(savedN) T.push({k:'saved',l:'Saved',c:savedN,html:'<div class="pf-box" id="pf-events"></div>'});
+      if(savedN) T.push({k:'saved',l:'Interested',c:savedN,html:'<div class="pf-box" id="pf-events"></div>'});
+      var setqN=(s.setQueue||[]).length, setlN=(s.setListened||[]).length;
+      if(setqN) T.push({k:'setq',l:'Set queue',c:setqN,html:'<div class="pf-box" id="pf-setq"></div>'});
+      if(setlN) T.push({k:'setl',l:'Listened',c:setlN,html:'<div class="pf-box" id="pf-setl"></div>'});
       var tabsBar='<div class="fp-tabs pf-tabs" role="tablist">'+T.map(function(t,i){ return '<button class="fp-tab'+(i===0?' on':'')+'" type="button" role="tab" aria-selected="'+(i===0)+'" data-tab="'+t.k+'">'+esc(t.l)+(t.c!=null?'<span class="c">'+t.c+'</span>':'')+'</button>'; }).join('')+'</div>';
       var panels=T.map(function(t,i){ return '<div class="fp-tabpanel'+(i===0?'':' hide')+'" data-panel="'+t.k+'">'+t.html+'</div>'; }).join('');
-      return '<div class="pf">'+hero+pbRotationHTML(p)+tabsBar+panels+'</div>';
+      return '<div class="pf">'+hero+pbRotationHTML(p)+(isMe?'<div id="pb-lognudge"></div>':'')+tabsBar+panels+'</div>';
+    }
+    // "You said you were going — how was it?" nudges: past events marked I'm-going
+    // that were never logged. Log it → the log form (event pre-selected); Didn't go →
+    // clears the RSVP so the nudge doesn't come back.
+    async function fillLogNudges(){
+      var el=document.getElementById('pb-lognudge'); if(!el) return;
+      var j; try{ var r=await authedFetch('/api/rsvp/unlogged'); j=await r.json(); }catch(_){ return; }
+      var evs=(j&&j.events)||[]; if(!document.body.contains(el)) return;
+      if(!evs.length){ el.innerHTML=''; return; }
+      el.innerHTML=evs.map(function(e,i){
+        var d=e.event_date?fmtDateLabel(String(e.event_date).slice(0,10)):'';
+        return '<div class="pb-prob" data-ni="'+i+'"><div class="pb-prob-tx"><b>How was '+esc(e.title||'that night')+'?</b><p>'+esc([e.venue,d].filter(Boolean).join(' · '))+' — you said you were going. Log it to your diary.</p></div><button class="pb-prob-btn" type="button" data-nlog="'+esc(String(e.event_id))+'">Log it</button><button class="pf-btn" type="button" data-nskip="'+esc(String(e.event_id))+'">Didn&rsquo;t go</button></div>';
+      }).join('');
+      el.querySelectorAll('[data-nlog]').forEach(function(b){ b.addEventListener('click',function(){ openLog({eventId:b.dataset.nlog}); }); });
+      el.querySelectorAll('[data-nskip]').forEach(function(b){ b.addEventListener('click',function(){ setEvent(b.dataset.nskip, null, {}); b.closest('.pb-prob').remove(); }); });
     }
     function pfHead(title, count, actHtml){ return '<div class="pf-h"><span class="pf-h-t">'+esc(title)+'</span>'+(count!=null?'<span class="pf-h-ct">'+count+'</span>':'')+(actHtml||'')+'</div>'; }
     function pfShelfHTML(id, title, list, seen){
@@ -5696,6 +5692,7 @@ body::before{
       var s=p.shelves||{}, isMe=p.isMe, diary=p.diary||[];
       wireProfile();
       wireRotation(p);
+      if(isMe) fillLogNudges();
       // In-page tabs (Diary / Coming soon / Seen / Wanna / Venues / Saved).
       // The Coming soon tab IS the full "Coming up" page — scope filters + Artists/
       // Venues/Friends sub-tabs — lazy-loaded (one /api/upcoming call) the first time it's opened.
@@ -5744,7 +5741,21 @@ body::before{
       var vb=document.getElementById('pf-venues');
       if(vb){ if(s.venues&&s.venues.length){ vb.innerHTML=pfHead('Venues you follow', s.venues.length, '')+'<div id="pf-vr"></div>'; mountVenueRail(document.getElementById('pf-vr'), s.venues.map(function(v){ return { venue:v.name, venue_slug:v.slug, image:v.image }; }), {}); } else vb.remove(); }
       var eb=document.getElementById('pf-events');
-      if(eb){ if(s.events&&s.events.length){ eb.innerHTML=pfHead('Saved events', s.events.length, '')+'<div id="pf-er"></div>'; mountEventRail(document.getElementById('pf-er'), s.events.map(function(e){ return { id:e.id, title:e.title, venue:e.venue, event_date:e.day||e.event_date, poster_url:e.poster_url, lineup:e.lineup }; }), {}); } else eb.remove(); }
+      if(eb){ if(s.events&&s.events.length){ eb.innerHTML=pfHead('Interested', s.events.length, '')+'<div id="pf-er"></div>'; mountEventRail(document.getElementById('pf-er'), s.events.map(function(e){ return { id:e.id, title:e.title, venue:e.venue, event_date:e.day||e.event_date, poster_url:e.poster_url, lineup:e.lineup }; }), {}); } else eb.remove(); }
+      // DJ-set shelves — tap a row to play it (the rest of the shelf queues behind it)
+      function pfSetBox(id, title, list){
+        var box=document.getElementById(id); if(!box) return;
+        if(!list||!list.length){ box.remove(); return; }
+        box.innerHTML=pfHead(title, list.length, '')+'<div class="pf-setlist">'+list.map(function(x,i){
+          var th='https://i.ytimg.com/vi/'+encodeURIComponent(x.video_id)+'/mqdefault.jpg';
+          return '<button class="pf-setrow" type="button" data-si="'+i+'"><span class="ps-th" style="background-image:url(\''+th+'\')"></span><span class="ps-m"><span class="ps-t">'+esc(x.title||'Set')+'</span>'+(x.artist_name?'<span class="ps-a">'+esc(x.artist_name)+'</span>':'')+'</span><span class="ps-pl">&#9654;</span></button>';
+        }).join('')+'</div>';
+        box.querySelectorAll('[data-si]').forEach(function(b){ b.addEventListener('click',function(){
+          playYtList(list.map(function(y){ return { slug:y.artist_slug||'', name:y.artist_name||'', title:y.title||'', videoId:y.video_id, poster:y.image_url||'' }; }), +b.dataset.si);
+        }); });
+      }
+      pfSetBox('pf-setq','Set queue', s.setQueue);
+      pfSetBox('pf-setl','Listened', s.setListened);
     }
     async function openProfile(handle){
       setRoute('u/'+handle);
@@ -5806,10 +5817,12 @@ body::before{
     }
     function diaryListHTML(rows, isMe){
       return '<ul class="tray-line">'+rows.map(function(d){
+        if(d.id!=null) _diaryById[d.id]=d;
         var dl=diaryDateLabel(d), arts=diaryArts(d);
         var vn = d.venue ? '<button class="dv-venue" type="button" data-venue="'+esc(d.venue)+'">'+esc(d.venue)+'</button>' : 'Gig';
+        var edit = (isMe && d.id!=null) ? '<button class="dv-edit" type="button" data-edit="'+esc(String(d.id))+'" aria-label="Edit gig">✎</button>' : '';
         var del = (isMe && d.id!=null) ? '<button class="dv-del" type="button" data-del="'+esc(String(d.id))+'" aria-label="Remove gig">&times;</button>' : '';
-        return '<li><span class="open-ev">'+vn+(dl?(' <small>'+esc(dl)+'</small>'):'')+'<br><small>'+esc(arts)+(d.note?(' — '+esc(d.note)):'')+'</small></span>'+del+'</li>';
+        return '<li><span class="open-ev">'+vn+(dl?(' <small>'+esc(dl)+'</small>'):'')+'<br><small>'+esc(arts)+(d.note?(' — '+esc(d.note)):'')+'</small></span>'+edit+del+'</li>';
       }).join('')+'</ul>';
     }
 
@@ -6880,7 +6893,8 @@ body::before{
               '<div class="fp-ev-meta">'+[ev.city?cityLabel(ev.city):'', (ev.genres||[]).slice(0,3).join(' / ')].filter(Boolean).map(esc).join(' · ')+'</div>'+
               '<div class="fp-ev-playbar">'+
                 ((ev.artists||[]).length?'<button class="fp-pb go" id="fp-ev-play" type="button">▶ Play the lineup</button>':'')+
-                (isPast?'':'<button class="fp-pb'+(evPicked?' on':'')+(evtStatus(id)==='going'?' go':'')+'" id="fp-ev-save" data-evt="'+esc(id)+'" type="button">'+evSaveLabel(evtStatus(id))+'</button>')+
+                (isPast?'':'<button class="fp-pb'+(evtStatus(id)==='saved'?' on':'')+'" id="fp-ev-int" data-evt="'+esc(id)+'" type="button">'+(evtStatus(id)==='saved'?'Interested ✓':'Interested')+'</button>'+
+                  '<button class="fp-pb'+(evtStatus(id)==='going'?' go':'')+'" id="fp-ev-going" data-evt="'+esc(id)+'" type="button">'+(evtStatus(id)==='going'?'I&rsquo;m going ✓':'I&rsquo;m going')+'</button>')+
                 (isPast?'':'<a class="fp-pb" href="https://www.google.com/search?q='+encodeURIComponent((ev.title||'')+' tickets')+'" target="_blank" rel="noopener">Tickets ↗</a>')+
                 '<button class="fp-pb" id="fp-ev-share" type="button">Share</button>'+
               '</div>'+
@@ -6908,7 +6922,11 @@ body::before{
         var _canon=location.origin+SC_BASE+eventPath(id,_who,ev.venue)+'/';
         setSeo((ev.title||'Event')+' · '+(ev.venue||'')+' | soundcheck', ev.description||'', musicEventLD(ev), _canon);   // MusicEvent JSON-LD (restored after the bespoke port dropped it)
         armEventSticky(ev.title||'');
-        var save=document.getElementById('fp-ev-save'); if(save) save.addEventListener('click',function(){ cycleEvent(id,{title:ev.title,venue:ev.venue,day:ev._day}); });
+        var evMeta={title:ev.title,venue:ev.venue,day:ev._day};
+        var intBtn=document.getElementById('fp-ev-int');
+        if(intBtn) intBtn.addEventListener('click',function(){ setEventGated(id, evtStatus(id)==='saved'?null:'saved', evMeta); });
+        var goBtn=document.getElementById('fp-ev-going');
+        if(goBtn) goBtn.addEventListener('click',function(){ setEventGated(id, evtStatus(id)==='going'?'saved':'going', evMeta); });   // un-going keeps the interest
         var shr=document.getElementById('fp-ev-share'); if(shr) shr.addEventListener('click',function(){ shareEvent(id, ev.title, ev.venue); });
         var fol=document.getElementById('fp-ev-follow'); if(fol) fol.addEventListener('click',function(){ toggleVenueFollow({slug:ev.venue_slug,name:ev.venue,following:ev.venueFollowing}, fol); });
         // Entity pages don't go through wireCard, so wire the venue links directly ("at <venue>" + "More nights at").
@@ -7485,7 +7503,7 @@ body::before{
         '<div class="evc-hero">'+
           '<button class="evc-poster" type="button" aria-label="View '+esc(ev.title)+'">'+posterHTML(ev)+'</button>'+
           genreOv+
-          (eid?'<button class="heart evc-heart'+picked+'" type="button" data-pick-evt="'+esc(eid)+'" data-title="'+esc(ev.title||'')+'" data-venue="'+esc(ev.venue||'')+'" data-day="'+esc(ev._day||'')+'" aria-pressed="'+(picked?'true':'false')+'" aria-label="Save this event">'+BOOKMARK_SVG+'</button>':'')+
+          (eid?'<button class="heart evc-heart'+picked+'" type="button" data-pick-evt="'+esc(eid)+'" data-title="'+esc(ev.title||'')+'" data-venue="'+esc(ev.venue||'')+'" data-day="'+esc(ev._day||'')+'" aria-pressed="'+(picked?'true':'false')+'" aria-label="Interested">'+BOOKMARK_SVG+'</button>':'')+
           '<div class="evc-title">'+esc(ev.title)+'</div>'+
           (canPlay?'<button class="evc-play" type="button" aria-label="Play the lineup"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>':'')+
         '</div>'+
@@ -8226,7 +8244,7 @@ body::before{
         +'</span>'
       +'</button>'
       +'<span class="lv-r">'
-        +(eid?'<button class="heart evc-heart'+picked+'" type="button" data-pick-evt="'+esc(eid)+'" data-title="'+esc(ev.title||'')+'" data-venue="'+esc(ev.venue||'')+'" data-day="'+esc(ev._day||'')+'" aria-pressed="'+(picked?'true':'false')+'" aria-label="Save this event">'+BOOKMARK_SVG+'</button>':'')
+        +(eid?'<button class="heart evc-heart'+picked+'" type="button" data-pick-evt="'+esc(eid)+'" data-title="'+esc(ev.title||'')+'" data-venue="'+esc(ev.venue||'')+'" data-day="'+esc(ev._day||'')+'" aria-pressed="'+(picked?'true':'false')+'" aria-label="Interested">'+BOOKMARK_SVG+'</button>':'')
         +(eid&&arts.length?'<button class="evc-play" type="button" aria-label="Play the lineup"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>':'')
       +'</span></article>';
   }
