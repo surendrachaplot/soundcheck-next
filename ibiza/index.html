@@ -1882,8 +1882,10 @@
     .handle-status.bad { color:#ff6b6b; }
 
     /* search page */
-    .search-box { margin-bottom:10px; }
-    .search-box input { width:100%; background:var(--surface); border:1px solid var(--border); color:var(--fg); border-radius:var(--radius); padding:15px 18px; font:500 var(--fs-md) var(--body); outline:none; }
+    .search-box { position:relative; margin-bottom:10px; }
+    .search-box .search-ic { position:absolute; left:18px; top:50%; transform:translateY(-50%); width:20px; height:20px; color:var(--muted); pointer-events:none; }
+    .search-box:focus-within .search-ic { color:var(--accent); }
+    .search-box input { width:100%; background:var(--surface); border:1px solid var(--border); color:var(--fg); border-radius:var(--radius); padding:15px 18px 15px 48px; font:500 var(--fs-md) var(--body); outline:none; }
     /* venue map */
     /* isolate traps Leaflet's high internal z-indexes (panes/controls/popups ~200–1000)
        in the map's own stacking context, so the player dock (z-index 60) always sits on top. */
@@ -3103,7 +3105,7 @@ body::before{
 .lvr .heart.evc-heart svg{ width:17px; height:17px; }
 
 </style>
-<meta name="sc-build" content="sunsetcrt-1784053676119">
+<meta name="sc-build" content="sunsetcrt-1784054248880">
 <meta name="robots" content="noindex">
 </head>
 <body>
@@ -6412,7 +6414,7 @@ body::before{
       setRoute('search');
       _dcSceneP=null; _sxDiscoverP=null; // fresh suggestions for the current city
       showPage('<h2 class="page-title">Search</h2><div class="sub" style="margin-bottom:14px">Find artists, venues, events and people &mdash; everywhere we cover.</div>'+
-        '<div class="search-box"><input type="search" id="sx-input" placeholder="Search artists, venues, events, people…" autocomplete="off" autocapitalize="off" autocorrect="off"></div>'+
+        '<div class="search-box"><svg class="search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><input type="search" id="sx-input" placeholder="Search artists, venues, events, people…" autocomplete="off" autocapitalize="off" autocorrect="off"></div>'+
         '<div id="sx-recent-top"></div>'+
         '<div id="sx-results"></div>'+
         '<div id="sx-radio-foot"></div>');
