@@ -62,8 +62,7 @@
     /* nav */
     /* Persistent header: sticks to the top on every page/view while scrolling. bg so content
        scrolls under it cleanly; z-index 50 keeps it above page content but below dock/modals. */
-    .wrap > nav { position:sticky; top:0; z-index:50; background:var(--bg); display:flex; align-items:baseline; gap:14px; padding:calc(18px + env(safe-area-inset-top)) 0 18px; border-bottom:1px solid transparent; transition:background var(--dur-2,200ms) var(--ease-standard,ease), border-color var(--dur-2,200ms) var(--ease-standard,ease); }
-    .wrap > nav > *:not(.logo):not(.hdr-city){ align-self:center; }   /* only the brand cluster baseline-aligns; controls stay centred */
+    .wrap > nav { position:sticky; top:0; z-index:50; background:var(--bg); display:flex; align-items:center; gap:14px; padding:calc(18px + env(safe-area-inset-top)) 0 18px; border-bottom:1px solid transparent; transition:background var(--dur-2,200ms) var(--ease-standard,ease), border-color var(--dur-2,200ms) var(--ease-standard,ease); }
     /* blur-on-scroll: header goes translucent + frosted once the page scrolls */
     .wrap > nav.scrolled { background:rgba(22,16,42,0.72); backdrop-filter:blur(14px) saturate(160%); -webkit-backdrop-filter:blur(14px) saturate(160%); border-bottom-color:var(--border); }
     .logo { display:inline-flex; align-items:center; gap:8px; color:var(--fg); text-decoration:none; flex:none; }
@@ -72,9 +71,10 @@
     .logo-wm .ac { color:var(--accent); }
     .logo:hover .logo-wm { color:var(--accent); }
     /* ── web header: city switcher + named nav + search box + log + account ── */
-    /* city switcher: slightly smaller than the logo, underlined, baseline-aligned to the wordmark (nav is align-items:baseline) */
-    .hdr-city { flex:none; align-self:baseline; display:inline-flex; align-items:baseline; gap:3px; background:none; border:0; padding:0 2px; cursor:pointer; font-family:var(--head); font-weight:800; font-size:calc(var(--fs-md)*1.02); letter-spacing:-0.01em; line-height:1; text-transform:lowercase; color:var(--fg); text-decoration:underline; text-decoration-color:var(--accent); text-decoration-thickness:2px; text-underline-offset:3px; -webkit-tap-highlight-color:transparent; }
-    .hdr-city .cs-chev { width:16px; height:16px; color:var(--accent); align-self:center; }
+    .hdr-city { flex:none; display:inline-flex; align-items:center; gap:4px; background:none; border:0; padding:4px 2px; cursor:pointer; font-family:var(--head); font-weight:800; font-size:calc(var(--fs-md)*1.2); letter-spacing:-0.01em; line-height:1; text-transform:lowercase; color:var(--fg); -webkit-tap-highlight-color:transparent; }
+    /* gradient underline under just the city name */
+    .hdr-city #hdr-city-name { background:var(--accent-grad) left bottom / 100% 2px no-repeat; padding-bottom:3px; }
+    .hdr-city .cs-chev { width:18px; height:18px; color:var(--accent); }
     .hdr-city:hover { color:var(--accent); }
     .nav-links { flex:none; display:flex; align-items:center; gap:20px; margin-left:6px; }
     .nl { background:none; border:0; padding:6px 0; cursor:pointer; font:600 calc(var(--fs-sm)*1.2) var(--head); letter-spacing:0; text-transform:lowercase; color:var(--muted); border-bottom:2px solid transparent; -webkit-tap-highlight-color:transparent; }
@@ -279,7 +279,9 @@
     .gcard .meta { font-size:var(--fs-xs); color:var(--muted); font-weight:600; margin-top:4px; }
     .gcard .meta b { color:var(--fg); }
     /* ── poster-led event card (PORTRAIT 3:4 — shows full posters, no crop) ── */
-    .gcard.evc { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); overflow:hidden; }
+    /* z-index:4 lifts the tile above the fixed scanline overlay (body::before, z-index:3) so lines
+       don't cross the card — the tile gets a gentle purple gradient instead (darker top → lighter bottom). */
+    .gcard.evc { position:relative; z-index:4; background:linear-gradient(to bottom, #1b1235, #251c47); border:1px solid var(--border); border-radius:var(--radius-lg); overflow:hidden; }
     .evc-hero { position:relative; aspect-ratio:3/4; }
     .evc-poster { position:absolute; inset:0; width:100%; height:100%; padding:0; border:0; background:none; cursor:pointer; }
     .evc-hero .poster { position:absolute; inset:0; width:100%; height:100%; aspect-ratio:auto; margin:0; border-radius:0; }
@@ -3101,7 +3103,7 @@ body::before{
 .lvr .heart.evc-heart svg{ width:17px; height:17px; }
 
 </style>
-<meta name="sc-build" content="sunsetcrt-1784052784893">
+<meta name="sc-build" content="sunsetcrt-1784053676119">
 <meta name="robots" content="noindex">
 </head>
 <body>
