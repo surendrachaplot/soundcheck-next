@@ -1309,6 +1309,15 @@
     .vrv-stars { display:flex; gap:6px; }
     .vrv-star { background:none; border:none; padding:2px; cursor:pointer; color:#3a3742; line-height:0; -webkit-tap-highlight-color:transparent; }
     .vrv-star svg { width:30px; height:30px; }
+    /* artist Links section (linktree replacement) — utility chips, violet hover */
+    .al-box{ border:1px solid var(--border); border-radius:var(--radius-lg); background:var(--surface); padding:14px 16px; display:flex; flex-direction:column; gap:12px; }
+    .al-row{ display:flex; gap:14px; align-items:baseline; min-width:0; }
+    .al-k{ flex:0 0 110px; font:700 10px var(--font-mono); letter-spacing:.12em; text-transform:uppercase; color:var(--muted); }
+    .al-chips{ flex:1; min-width:0; display:flex; flex-wrap:wrap; gap:8px; }
+    .al-chip{ display:inline-flex; align-items:center; gap:5px; max-width:100%; background:var(--surface-2); border:1px solid var(--line-2); border-radius:var(--radius-pill); color:var(--fg); text-decoration:none; font:600 var(--fs-sm) var(--body); padding:7px 13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; transition:border-color .14s, background .14s; }
+    .al-chip:hover{ border-color:var(--sel); background:var(--sel-weak); }
+    .al-chip i{ font-style:normal; color:var(--faint); font-size:11px; }
+    @media(max-width:620px){ .al-row{ flex-direction:column; gap:6px; } .al-k{ flex:none; } }
     /* profile DJ-set shelves (Set queue / Listened tabs) */
     .pf-setrow { display:flex; align-items:center; gap:12px; width:100%; background:none; border:0; border-top:1px solid var(--line); padding:10px 2px; cursor:pointer; text-align:left; color:var(--fg); -webkit-tap-highlight-color:transparent; }
     .pf-setrow:first-of-type { border-top:0; }
@@ -3028,7 +3037,7 @@ body::before{
 .lvr .heart.evc-heart svg{ width:17px; height:17px; }
 
 </style>
-<meta name="sc-build" content="sunsetcrt-1784006574093">
+<meta name="sc-build" content="sunsetcrt-1784037554496">
 <meta name="robots" content="noindex">
 </head>
 <body>
@@ -5255,6 +5264,29 @@ body::before{
     // un-sticks the global nav (body.has-psticky), and reveals the bar once `sentinel`
     // (the hero's play button) scrolls above the top. playFn null → hide the play button.
     var _psObs=null;
+    // Linktree replacement: the artist's own outbound links (harvested from their
+    // IG bio + linktree, verified chain), grouped by intent instead of a flat
+    // button pile. RA + ticketing links never reach the client (server-filtered).
+    function artistLinksHTML(links){
+      if(!(links||[]).length) return '';
+      var GROUPS=[['drop','Latest drops'],['listen','Listen'],['follow','Follow'],['contact','Booking &amp; contact'],['merch','Merch'],['other','More']];
+      var NICE={'open.spotify.com':'Spotify','soundcloud.com':'SoundCloud','music.apple.com':'Apple Music','bandcamp.com':'Bandcamp','mixcloud.com':'Mixcloud','beatport.com':'Beatport','youtube.com':'YouTube','youtu.be':'YouTube','instagram.com':'Instagram','tiktok.com':'TikTok','x.com':'X','twitter.com':'X','facebook.com':'Facebook','threads.net':'Threads','patreon.com':'Patreon','deezer.com':'Deezer','tidal.com':'Tidal'};
+      function label(l){
+        if(l.url.indexOf('mailto:')===0) return l.title||l.url.slice(7);
+        var host=''; try{ host=new URL(l.url).hostname.replace(/^www\./,''); }catch(_){ }
+        if(l.title && l.title.length>12) return l.title;      // descriptive button text wins
+        return NICE[host]||l.title||host;
+      }
+      var h='';
+      GROUPS.forEach(function(g){
+        var rows=links.filter(function(l){ return l.kind===g[0]; });
+        if(!rows.length) return;
+        h+='<div class="al-row"><span class="al-k">'+g[1]+'</span><span class="al-chips">'+rows.slice(0,8).map(function(l){
+          return '<a class="al-chip" href="'+esc(l.url)+'" target="_blank" rel="noopener nofollow">'+esc(String(label(l)).slice(0,48))+' <i>&#8599;</i></a>';
+        }).join('')+'</span></div>';
+      });
+      return '<div class="fp-sec"><div class="fp-sech">Links <span>from the artist&rsquo;s own bio</span></div><div class="al-box">'+h+'</div></div>';
+    }
     // Tab discovery: while more tab pills sit offscreen to the right, the row's
     // right edge fades out (mask) — an "there's more, scroll me" hint. The fade
     // lifts as soon as the user reaches the end.
@@ -6507,6 +6539,7 @@ body::before{
           h+='<div class="fp-tabs" role="tablist">'+secTabs.map(function(t){ var on=t.key===_activeTab; return '<button class="fp-tab'+(on?' on':'')+'" type="button" role="tab" aria-selected="'+on+'" data-tab="'+t.key+'">'+esc(t.label)+(t.count!=null?'<span class="c">'+t.count+'</span>':'')+'</button>'; }).join('')+'</div>'+
             secTabs.map(function(t){ return '<div class="fp-tabpanel'+(t.key===_activeTab?'':' hide')+'" data-panel="'+t.key+'">'+t.html+'</div>'; }).join('');
         } else if(secTabs.length===1){ h+=secTabs[0].html; }
+        h+=artistLinksHTML(a.links||[]);   // linktree replacement — grouped, verified outbound links
         // Owner toolkit + public updates, or a claim CTA for the act/their team.
         h+=ownerToolsHTML('artist', a)+entityUpdatesHTML('artist', a);
         if(!a.isOwner) h+='<div class="claim-banner"><div class="cb-tx"><div class="cb-h">Are you '+esc(a.name||slug)+' (or your team)?</div><div class="cb-s">Claim this page to edit your bio, confirm your tour dates and post to the people who follow you — free, always.</div></div><button class="cb-btn" id="ap-claim" type="button">Claim this page</button></div>';
