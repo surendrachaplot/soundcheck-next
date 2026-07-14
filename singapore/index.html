@@ -1476,12 +1476,12 @@
     .gig-history li.gh-row:hover .gh-venue { color:var(--accent); text-decoration:underline; }
     .gig-history li:last-child { border-bottom:none; }
     .gh-date { color:var(--muted); flex:0 0 auto; min-width:86px; font-variant-numeric:tabular-nums; }
-    .gh-venue { background:none; border:0; color:var(--fg); padding:0; font:inherit; text-align:left; cursor:pointer; flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; }
+    .gh-venue { background:none; border:0; color:var(--fg); padding:0; font:700 var(--fs-base) var(--head); letter-spacing:-.01em; text-align:left; cursor:pointer; flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; }
     .gh-venue:hover { color:var(--accent); text-decoration:underline; }
-    .gh-venue small { color:var(--muted); font-weight:500; }
+    .gh-venue small { color:var(--muted); font:500 var(--fs-xs) var(--body); }
     .gh-city { color:var(--muted); flex:0 0 auto; font-size:var(--fs-sm); }
     .gh-log { flex:0 0 auto; background:none; border:1px solid var(--border); color:var(--muted); border-radius:var(--radius-pill); padding:4px 11px; font:700 var(--fs-sm) var(--body); cursor:pointer; white-space:nowrap; -webkit-tap-highlight-color:transparent; }
-    .gh-log:hover { border-color:var(--accent); color:var(--accent); }
+    .gh-log:hover { border-color:var(--sel); color:var(--sel-text); }
     /* "Coming up" — entity row + stacked gig lines */
     .cu-list { list-style:none; margin:0; padding:0; }
     .cu-list li { display:flex; gap:11px; padding:13px 0; border-bottom:1px solid var(--border); }
@@ -1754,7 +1754,7 @@
     .bnav-tab.on { background:var(--accent-weak); color:var(--accent); }
     .bnav-tab svg { width:var(--icon-md); height:var(--icon-md); stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
     .bnav-tab.on svg { stroke-width:2.4; }
-    .bnav-l { font:600 10px/1 var(--body); letter-spacing:0.01em; }
+    .bnav-l { font:700 10px/1 var(--head); letter-spacing:0.01em; }
     .bnav-tab.on .bnav-l { font-weight:700; }
     .bnav-tab.onair svg { animation:radio-pulse 1.6s ease-in-out infinite; }
     @media (max-width:620px){
@@ -3095,7 +3095,7 @@ body::before{
 .lvr .heart.evc-heart svg{ width:17px; height:17px; }
 
 </style>
-<meta name="sc-build" content="sunsetcrt-1784044657098">
+<meta name="sc-build" content="sunsetcrt-1784045963828">
 <meta name="robots" content="noindex">
 </head>
 <body>
@@ -6634,7 +6634,7 @@ body::before{
         if(up.length) secTabs.push({ key:'upcoming', label:'Upcoming', count:up.length,
           html:'<div class="fp-sec"><div class="fp-sech">Upcoming events <span>'+up.length+' upcoming</span></div><div id="ap-upcoming-cards"></div></div>' });
         if((a.history||[]).length) secTabs.push({ key:'past', label:'Past events', count:a.history.length,
-          html:'<div class="fp-sec"><div class="fp-sech">Past events <span>logged by the scene</span></div>'+a.history.map(function(g){ return fpEventRowHTML(g, false); }).join('')+'</div>' });
+          html:'<div class="fp-sec"><div class="fp-sech">Past events <span>logged by the scene</span></div><div id="ap-past-cards"></div></div>' });
         if((a.alongside||[]).length) secTabs.push({ key:'similar', label:'Similar', count:null,
           html:'<div class="fp-sec"><div class="fp-sech">More like '+esc(a.name||slug)+' <span>similar sound · shares bills</span></div><div class="fp-more" id="fp-morelike"></div></div>' });
         // Deep-link support: /dj/<slug>/#sets opens (and is shareable to) that tab.
@@ -6665,8 +6665,9 @@ body::before{
         armSticky(a.name||slug, tuneInSets, apRadio);
         document.getElementById('ap-wanna').addEventListener('click',function(){ toggleArtist(slug,{name:a.name}); });
         document.getElementById('ap-log').addEventListener('click',function(){ openLog(); });
-        // Upcoming events → homepage card/list template (poster on desktop, .lvr list on mobile) — same everywhere
+        // Upcoming + Past events → the SAME homepage card/list template (poster on desktop, .lvr list on mobile) — consistent with every other event list
         if(up.length){ var _auc=document.getElementById('ap-upcoming-cards'); if(_auc) mountEventCards(_auc, up); }
+        if((a.history||[]).length){ var _apc=document.getElementById('ap-past-cards'); if(_apc) mountEventCards(_apc, a.history); }
         if(currentUser){
           var _anm=a.name||slug;
           authedFetch('/api/artist/seen?slug='+encodeURIComponent(slug)).then(function(r){ return r.json(); }).then(function(sd){
@@ -7120,8 +7121,7 @@ body::before{
               '</div><div class="fp-ev-map" id="fp-ev-map"></div></div></div>';
         }
         if((ev.alsoOn||[]).length){
-          h+='<div class="fp-sec"><div class="fp-sech">Also on that night <span>same city · same date</span></div>'+
-            ev.alsoOn.slice(0,4).map(function(g){ return fpEventRowHTML(g, false); }).join('')+'</div>';
+          h+='<div class="fp-sec"><div class="fp-sech">Also on that night <span>same city · same date</span></div><div id="fp-ev-alsoon"></div></div>';
         }
         if(ev.venue) h+='<button class="fp-morev venue-link" type="button" data-venue="'+esc(ev.venue)+'">More nights at '+esc(ev.venue)+' →</button>';
         h+='</div>';
@@ -7129,6 +7129,7 @@ body::before{
         var _canon=location.origin+SC_BASE+eventPath(id,_who,ev.venue)+'/';
         setSeo((ev.title||'Event')+' · '+(ev.venue||'')+' | soundcheck', ev.description||'', musicEventLD(ev), _canon);   // MusicEvent JSON-LD (restored after the bespoke port dropped it)
         armEventSticky(ev.title||'');
+        if((ev.alsoOn||[]).length){ var _ao=document.getElementById('fp-ev-alsoon'); if(_ao) mountEventCards(_ao, ev.alsoOn.slice(0,6)); }   // same card/list template as everywhere
         var evMeta={title:ev.title,venue:ev.venue,day:ev._day};
         var intBtn=document.getElementById('fp-ev-int');
         if(intBtn) intBtn.addEventListener('click',function(){ setEventGated(id, evtStatus(id)==='saved'?null:'saved', evMeta); });
