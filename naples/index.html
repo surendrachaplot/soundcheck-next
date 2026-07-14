@@ -94,7 +94,14 @@
        compact form before it can overflow — its widest (signed-in) layout needs ~965px.
        So collapse at ≤980px (the rest of the mobile system stays keyed to 620px). */
     @media (max-width:980px){
-      .nav-links, .hdr-log { display:none; }
+      /* keep ONLY the radio pill from the named nav — icon-only, so mobile
+         still has an idle radio entry point after the home fab was removed */
+      .hdr-log { display:none; }
+      .nav-links { gap:0; margin-left:2px; }
+      .nav-links .nl:not(.nl-radio) { display:none; }
+      .nl-radio span { display:none; }
+      .nl-radio { padding:0; width:38px; height:38px; justify-content:center; flex:none; }
+      .nl-radio svg { width:17px; height:17px; }
       .hdr-search { flex:none; min-width:0; width:40px; height:40px; margin-left:auto; padding:0; justify-content:center; border-radius:var(--radius-pill); }
       .hdr-search .hs-tx { display:none; }
     }
@@ -2947,7 +2954,7 @@ body::before{
 .lvr .heart.evc-heart svg{ width:17px; height:17px; }
 
 </style>
-<meta name="sc-build" content="sunsetcrt-1784000352726">
+<meta name="sc-build" content="sunsetcrt-1784000880708">
 <meta name="robots" content="noindex">
 </head>
 <body>
@@ -5390,6 +5397,7 @@ body::before{
         '<div class="eyebrow">Edit diary entry</div>'+
         '<h3>'+esc(d.venue||'Gig')+(diaryDateLabel(d)?' <small style="color:var(--muted);font-weight:600">'+esc(diaryDateLabel(d))+'</small>':'')+'</h3>'+
         '<div class="vrv-q">Artists &amp; ratings</div><div class="lg-rate" id="de-arts">'+artRows()+'</div>'+
+        '<input type="text" id="de-add" placeholder="Add an artist&hellip;" autocomplete="off" autocapitalize="off" style="width:100%;margin-top:8px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius);color:var(--fg);padding:9px 11px;font:inherit"><div class="lg-chips" id="de-sugg" style="margin-top:6px"></div>'+
         '<div class="vrv-q">Note</div><textarea id="de-note" style="width:100%;min-height:80px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius);color:var(--fg);padding:10px;font:inherit">'+esc(d.note||'')+'</textarea>'+
         '<button class="go" id="de-save" type="button">Save changes</button><div class="rv-msg" id="de-msg"></div></div>';
       document.body.appendChild(ov);
@@ -5400,6 +5408,25 @@ body::before{
       box.addEventListener('click',function(e){
         var st=e.target.closest('[data-ri]'); if(st){ var a=arts[+st.dataset.ri], rv=+st.dataset.rv; if(a){ a.rating=(a.rating===rv)?null:rv; box.innerHTML=artRows(); } return; }
         var rm=e.target.closest('[data-rma]'); if(rm){ arts.splice(+rm.dataset.rma,1); box.innerHTML=artRows(); }
+      });
+      // Add an artist — same autosuggest source as the log form (/api/artists).
+      var addIn=ov.querySelector('#de-add'), sugg=ov.querySelector('#de-sugg'), _deT=null, _deSeq=0;
+      addIn.addEventListener('input',function(){
+        clearTimeout(_deT);
+        var q=addIn.value.trim();
+        if(q.length<2){ sugg.innerHTML=''; return; }
+        _deT=setTimeout(function(){
+          var seq=++_deSeq;
+          pubGet('/api/artists?q='+encodeURIComponent(q)).then(function(j){
+            if(seq!==_deSeq) return;
+            var hits=((j&&j.artists)||[]).filter(function(a){ return !arts.some(function(x){ return x.slug===a.slug; }); }).slice(0,6);
+            sugg.innerHTML=hits.map(function(a,i){ return '<button type="button" class="lg-chip" data-add="'+esc(a.slug)+'" data-nm="'+esc(a.name)+'">+ '+esc(a.name)+'</button>'; }).join('');
+            sugg.querySelectorAll('[data-add]').forEach(function(b){ b.addEventListener('click',function(){
+              arts.push({ slug:b.dataset.add, name:b.dataset.nm, rating:null });
+              box.innerHTML=artRows(); addIn.value=''; sugg.innerHTML='';
+            }); });
+          }).catch(function(){});
+        },220);
       });
       ov.querySelector('#de-save').addEventListener('click',function(){
         var btn=ov.querySelector('#de-save'); btn.disabled=true;
@@ -5951,7 +5978,7 @@ body::before{
         var h='<h2 class="page-title">Feed</h2><div class="sub">What the people you follow are into.</div>';
         if(!rows.length){ h+='<div class="empty">Quiet so far. Follow some people from their profiles and their picks show up here.</div>'; openPanel(h); maybeSuggest(); return; }
         h+='<div style="margin-top:8px">'+rows.map(function(a){
-          var verb = a.kind==='wanna_see'?'wants to see':a.kind==='seen'?'saw':a.kind==='save_event'?'saved':a.kind==='going_event'?'is going to':a.kind==='follow'?'followed':a.kind==='diary'?'logged a gig at':'·';
+          var verb = a.kind==='wanna_see'?'wants to see':a.kind==='seen'?'saw':a.kind==='save_event'?'is interested in':a.kind==='going_event'?'is going to':a.kind==='follow'?'followed':a.kind==='diary'?'logged a gig at':'·';
           var subj = a.subject_type==='artist'?'<span class="lk" data-artist="'+esc(a.subject_id)+'">'+esc(a.subject_label||a.subject_id)+'</span>':
                      a.subject_type==='user'?'<span class="lk" data-profile="'+esc(a.subject_id)+'">u/'+esc(a.subject_id)+'</span>':esc(a.subject_label||'an event');
           return '<div class="feed-row">'+av(a.author_handle)+'<div><div class="ft"><b class="lk" data-profile="'+esc(a.author_handle)+'">u/'+esc(a.author_handle)+'</b> '+verb+' '+subj+'</div><div class="fw">'+relTime(a.created_at)+'</div></div></div>';
