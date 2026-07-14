@@ -2626,7 +2626,7 @@
     /* Sets tab — grid of the artist's full YouTube sets; tap one to play (queues the rest) */
     .fp-sets{ padding:14px 16px 18px; }
     .fp-sets-load,.fp-sets-empty{ padding:8px 2px; color:var(--muted); font:600 13px var(--body); }
-    .fp-sets-all{ display:flex; align-items:center; gap:12px; width:100%; border:0; background:var(--accent); color:var(--accent-ink); border-radius:var(--radius); padding:12px 14px; cursor:pointer; margin-bottom:14px; text-align:left; }
+    .fp-sets-all{ display:inline-flex; align-items:center; gap:12px; width:auto; max-width:100%; border:0; background:var(--accent); color:var(--accent-ink); border-radius:var(--radius); padding:11px 16px 11px 12px; cursor:pointer; margin-bottom:16px; text-align:left; }
     .fp-sets-all .fp-sets-all-ic{ flex:0 0 auto; width:34px; height:34px; border-radius:50%; display:grid; place-items:center; background:rgba(0,0,0,.16); font-size:12px; padding-left:2px; }
     .fp-sets-all .fp-sets-all-tx{ display:flex; flex-direction:column; gap:2px; line-height:1.15; font:800 14px var(--body); }
     .fp-sets-all .fp-sets-all-tx b{ font:600 11px var(--font-mono); letter-spacing:.05em; text-transform:uppercase; opacity:.82; }
@@ -3095,7 +3095,7 @@ body::before{
 .lvr .heart.evc-heart svg{ width:17px; height:17px; }
 
 </style>
-<meta name="sc-build" content="sunsetcrt-1784042103952">
+<meta name="sc-build" content="sunsetcrt-1784044657098">
 <meta name="robots" content="noindex">
 </head>
 <body>
@@ -6628,13 +6628,13 @@ body::before{
         // Sections as in-page tabs — one URL, tap swaps the panel below (no reload). Only
         // tabs with content; "More like X" merges similar-sound + shares-bills artists.
         var up=a.upcoming||[], secTabs=[];
+        // "Sets" FIRST (default tab) — the artist's full YouTube sets; lazy-loaded on first open (one YT search per artist, cached).
+        secTabs.push({ key:'sets', label:'Sets', count:null,
+          html:'<div class="fp-sec"><div class="fp-sech">Sets <span>full sets · pick one to play</span></div><div class="fp-sets" id="fp-sets"><div class="fp-sets-load">Loading sets…</div></div></div>' });
         if(up.length) secTabs.push({ key:'upcoming', label:'Upcoming', count:up.length,
           html:'<div class="fp-sec"><div class="fp-sech">Upcoming events <span>'+up.length+' upcoming</span></div><div id="ap-upcoming-cards"></div></div>' });
         if((a.history||[]).length) secTabs.push({ key:'past', label:'Past events', count:a.history.length,
           html:'<div class="fp-sec"><div class="fp-sech">Past events <span>logged by the scene</span></div>'+a.history.map(function(g){ return fpEventRowHTML(g, false); }).join('')+'</div>' });
-        // "Sets" — the artist's full YouTube sets; lazy-loaded on first tab open (one YT search per artist, cached).
-        secTabs.push({ key:'sets', label:'Sets', count:null,
-          html:'<div class="fp-sec"><div class="fp-sech">Sets <span>full sets · pick one to play</span></div><div class="fp-sets" id="fp-sets"><div class="fp-sets-load">Loading sets…</div></div></div>' });
         if((a.alongside||[]).length) secTabs.push({ key:'similar', label:'Similar', count:null,
           html:'<div class="fp-sec"><div class="fp-sech">More like '+esc(a.name||slug)+' <span>similar sound · shares bills</span></div><div class="fp-more" id="fp-morelike"></div></div>' });
         // Deep-link support: /dj/<slug>/#sets opens (and is shareable to) that tab.
