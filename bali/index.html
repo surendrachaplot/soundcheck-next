@@ -2921,7 +2921,7 @@ body::before{
 .lvr .heart.evc-heart svg{ width:17px; height:17px; }
 
 </style>
-<meta name="sc-build" content="sunsetcrt-1783989289381">
+<meta name="sc-build" content="sunsetcrt-1783989939212">
 <meta name="robots" content="noindex">
 </head>
 <body>
@@ -8021,6 +8021,7 @@ body::before{
       the sheet, .evc-play queues the line-up, .heart[data-pick-evt] saves). */
 (function(){
   try{ if(/Android/i.test(navigator.userAgent||'')) document.documentElement.style.zoom='0.9'; }catch(_){}
+  function init(){
   if(typeof cardHTML!=='function' || typeof paintCurrentGrid!=='function') return;
   var MQ=window.matchMedia('(max-width:640px)');
   var origCard=window.cardHTML, painting=false;
@@ -8058,6 +8059,12 @@ body::before{
     var onchg=function(){ try{ window.paintCurrentGrid(); }catch(_){} };
     if(MQ.addEventListener) MQ.addEventListener('change',onchg); else if(MQ.addListener) MQ.addListener(onchg);
   }catch(_){}
+  }
+  /* On prod the app script is a DEFERRED bundle that runs after this inline
+     script parses — wait for DOMContentLoaded (fires after deferred scripts).
+     On full-inline shells (next) the app already exists, so init runs now. */
+  if(typeof cardHTML==='function') init();
+  else document.addEventListener('DOMContentLoaded', init);
 })();
 </script>
 </body>
