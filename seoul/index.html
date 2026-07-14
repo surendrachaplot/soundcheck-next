@@ -17,7 +17,7 @@
   <link rel="apple-touch-icon" href="/icons/icon-192.png" />
   <!-- PWA: installable on iOS/Android, standalone, dark chrome -->
   <link rel="manifest" href="/manifest.webmanifest" />
-  <meta name="theme-color" content="#0f0f12" />
+  <meta name="theme-color" content="#16102a" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Soundcheck" />
@@ -31,12 +31,12 @@
     *,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }
     :root {
       /* DS v2 — brightness-stepped surfaces (no shadows), text-opacity hierarchy */
-      --bg:#0e0d12; --surface:#16141b; --surface-2:#1f1c26; --surface-3:#2a2633;
-      --fg:#f4efe9; --muted:#a39fab; --faint:#6d6976;
-      --accent:#ff9a3d; --accent-weak:rgba(255,154,61,0.12); --border:#322e3b; --line:#322e3b; --ink:#2a0d14; --accent-ink:#2a0d14;
-      --accent-grad:linear-gradient(140deg, #ff5e7e 0%, #ff9a3d 100%);   /* subtle salmon sheen — play buttons */
+      --bg:#16102a; --surface:#211840; --surface-2:#241a48; --surface-3:#2a2050;
+      --fg:#fdf3ec; --muted:#b8a8d0; --faint:#8d7fa8;
+      --accent:#ff9a3d; --accent-weak:rgba(255,154,61,0.15); --border:#2a2050; --line:#2a2050; --ink:#2a0d14; --accent-ink:#2a0d14;
+      --accent-grad:linear-gradient(135deg, #ff5e7e 0%, #ff9a3d 100%);   /* sunset — pink into orange */
       /* corner radius scale */
-      --radius-2xs:4px; --radius-xs:6px; --radius-sm:8px; --radius:11px; --radius-md:14px; --radius-lg:16px; --radius-xl:20px; --radius-pill:999px;
+      --radius-2xs:2px; --radius-xs:3px; --radius-sm:3px; --radius:4px; --radius-md:5px; --radius-lg:6px; --radius-xl:8px; --radius-pill:999px;
       /* type — Bricolage = display/voice, Inter = dense body/metadata */
       --head:"Bricolage Grotesque",sans-serif; --body:"Inter","Bricolage Grotesque",sans-serif; --font-mono:ui-monospace,"SFMono-Regular",Menlo,monospace;
       --icon-xs:12px; --icon-sm:16px; --icon-md:20px; --icon-lg:24px;
@@ -60,7 +60,7 @@
        scrolls under it cleanly; z-index 50 keeps it above page content but below dock/modals. */
     .wrap > nav { position:sticky; top:0; z-index:50; background:var(--bg); display:flex; align-items:center; gap:14px; padding:calc(18px + env(safe-area-inset-top)) 0 18px; border-bottom:1px solid transparent; transition:background var(--dur-2,200ms) var(--ease-standard,ease), border-color var(--dur-2,200ms) var(--ease-standard,ease); }
     /* blur-on-scroll: header goes translucent + frosted once the page scrolls */
-    .wrap > nav.scrolled { background:rgba(14,13,18,0.72); backdrop-filter:blur(14px) saturate(160%); -webkit-backdrop-filter:blur(14px) saturate(160%); border-bottom-color:var(--border); }
+    .wrap > nav.scrolled { background:rgba(22,16,42,0.72); backdrop-filter:blur(14px) saturate(160%); -webkit-backdrop-filter:blur(14px) saturate(160%); border-bottom-color:var(--border); }
     .logo { display:inline-flex; align-items:center; gap:8px; color:var(--fg); text-decoration:none; flex:none; }
     .logo-ic { width:28px; height:28px; color:var(--accent); flex:none; }
     .logo-wm { font-family:var(--head); font-weight:800; font-size:calc(var(--fs-md)*1.2); letter-spacing:-0.01em; line-height:1; }
@@ -271,7 +271,7 @@
     .evc-poster { position:absolute; inset:0; width:100%; height:100%; padding:0; border:0; background:none; cursor:pointer; }
     .evc-hero .poster { position:absolute; inset:0; width:100%; height:100%; aspect-ratio:auto; margin:0; border-radius:0; }
     .evc-hero .poster .gen .gt { display:none; }   /* generated-art title is replaced by our overlay title */
-    .evc-hero::after { content:''; position:absolute; inset:0; background:linear-gradient(to top, rgba(8,7,11,.94), rgba(8,7,11,.06) 40%, transparent 62%); pointer-events:none; }
+    .evc-hero::after { content:''; position:absolute; inset:0; background:linear-gradient(to top, rgba(22,16,42,.94), rgba(22,16,42,.06) 40%, transparent 62%); pointer-events:none; }
     .evc-heart { position:absolute; top:10px; right:10px; z-index:3; width:38px; height:38px; border-radius:var(--radius-pill); background:rgba(0,0,0,.42); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); border:0; color:#fff; display:inline-flex; align-items:center; justify-content:center; cursor:pointer; }
     .evc-heart svg { width:18px; height:18px; }
     .evc-heart.on { background:var(--accent); color:var(--accent-ink); }
@@ -2559,7 +2559,7 @@
     @media(max-width:560px){ .fp-sets-grid{ grid-template-columns:1fr 1fr; gap:14px 10px; } }
     .fp-sk{ display:flex; flex-direction:column; text-align:left; background:none; border:0; padding:0; cursor:pointer; color:var(--fg); min-width:0; }
     .fp-sk-th{ position:relative; aspect-ratio:16/9; border-radius:var(--radius-md); background-size:cover; background-position:center; background-color:var(--surface-3); overflow:hidden; }
-    .fp-sk-dur{ position:absolute; left:6px; bottom:6px; font:700 10px var(--font-mono); background:rgba(8,7,11,.82); color:#f4efe9; border-radius:var(--radius-2xs); padding:2px 6px; }
+    .fp-sk-dur{ position:absolute; left:6px; bottom:6px; font:700 10px var(--font-mono); background:rgba(22,16,42,.82); color:#f4efe9; border-radius:var(--radius-2xs); padding:2px 6px; }
     .fp-sk-pl{ position:absolute; right:6px; bottom:6px; width:34px; height:34px; border-radius:50%; background:var(--accent); color:var(--accent-ink); display:flex; align-items:center; justify-content:center; font-size:13px; border:1px solid var(--accent); }
     .fp-sk-ti{ font:700 14px var(--head); letter-spacing:-0.01em; line-height:1.2; margin-top:9px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
     .fp-sk-ch{ font:600 11px var(--font-mono); color:var(--muted); margin-top:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
@@ -2639,7 +2639,7 @@
     .fp-ev-poster{ aspect-ratio:1; background-size:cover; background-position:center; position:relative; }
     @media(max-width:720px){ .fp-ev-poster{ aspect-ratio:16/9; } }
     .fp-ev-stamp{ position:absolute; top:12px; left:12px; background:var(--accent); color:var(--accent-ink); border-radius:var(--radius-pill); font:800 10px var(--body); text-transform:uppercase; letter-spacing:.08em; padding:5px 11px; }
-    .fp-ev-price{ position:absolute; left:12px; bottom:12px; background:rgba(14,13,18,.72); color:var(--fg); border-radius:var(--radius-pill); font:700 13px var(--body); padding:6px 12px; backdrop-filter:blur(6px); }
+    .fp-ev-price{ position:absolute; left:12px; bottom:12px; background:rgba(22,16,42,.72); color:var(--fg); border-radius:var(--radius-pill); font:700 13px var(--body); padding:6px 12px; backdrop-filter:blur(6px); }
     .fp-ev-main{ padding:22px 24px; min-width:0; }
     .fp-ev-title{ font:800 clamp(28px,5.5vw,54px)/1.0 var(--head); letter-spacing:-0.02em; margin:10px 0 6px; overflow-wrap:break-word; }
     .fp-ev-venue{ font:700 24px var(--head); letter-spacing:-0.01em; margin:6px 0 2px; }
@@ -2729,6 +2729,57 @@
     .pb-rot-nm{ font-weight:700!important; max-width:none!important; margin-top:8px; }
 
     
+    /* ═══ SUNSET·CRT — promoted from next.soundcheck.club (2026-07-13) ═══ */
+    /* arcade scanlines — fixed, warm-tinted */
+    body::before{ content:""; position:fixed; inset:0; z-index:3; pointer-events:none;
+      background:linear-gradient(rgba(255,154,61,.05) 1px, transparent 1px); background-size:100% 4px; }
+    /* gradient on "check" only; hover → whole logo white; logo/city sized like event titles */
+    .logo-wm .ac{ background:var(--accent-grad); -webkit-background-clip:text; background-clip:text;
+      -webkit-text-fill-color:transparent; color:transparent; }
+    .logo-ic{ color:#ff7a4d; transition:color .15s; }
+    .logo-wm{ font-size:1.3rem; line-height:1.1; }
+    .hdr-city{ font-size:1.3rem; }
+    .logo:hover .logo-wm{ color:#fff; }
+    .logo:hover .logo-wm .ac{ background:none; -webkit-text-fill-color:#fff; color:#fff; }
+    .logo:hover .logo-ic{ color:#fff; }
+    ::selection{ background:#ff9a3d; color:#2a0d14; }
+    /* filled/primary buttons: sunset gradient + dusk edge, hover deepen, press scale */
+    .evc-play, .ev-bigplay, .bill-play, .play-main, .psticky-play, .srail-play, .card-play,
+    .fp-erow-play, .fp-ev-play, .rf-play, .vrow-play, .follow-btn, .fp-ab.go, .fp-pb.go,
+    .pf-btn.primary, .pd-follow, .pd-loggig, .pb-share, .radio-fab, .rf-go, .bt.go, .dt.on{
+      background:var(--accent-grad); color:var(--accent-ink); border:1.5px solid #16102a;
+      box-shadow:none; transition:filter .15s, transform .1s; }
+    .evc-play:hover, .ev-bigplay:hover, .bill-play:hover, .play-main:hover, .psticky-play:hover,
+    .srail-play:hover, .card-play:hover, .fp-erow-play:hover, .fp-ev-play:hover, .rf-play:hover,
+    .vrow-play:hover, .follow-btn:hover, .fp-ab.go:hover, .fp-pb.go:hover, .pf-btn.primary:hover,
+    .pd-follow:hover, .pd-loggig:hover, .pb-share:hover, .radio-fab:hover, .rf-go:hover,
+    .bt.go:hover, .dt.on:hover{ filter:brightness(.92) saturate(1.08); }
+    .evc-play:active, .ev-bigplay:active, .bill-play:active, .play-main:active, .psticky-play:active,
+    .srail-play:active, .card-play:active, .fp-erow-play:active, .fp-ev-play:active, .rf-play:active,
+    .vrow-play:active, .follow-btn:active, .fp-ab.go:active, .fp-pb.go:active, .pf-btn.primary:active,
+    .pd-follow:active, .pd-loggig:active, .pb-share:active, .radio-fab:active, .rf-go:active,
+    .bt.go:active, .dt.on:active{ transform:scale(.96); }
+    .pd-avatar, .pd-bub{ box-shadow:0 0 0 1.5px #16102a; }
+    .hdr-log:hover, .ev-radio:hover{ border-color:#ff9a3d; background:rgba(255,154,61,0.18); }
+    .evc-chip:hover{ border-color:#5a4d85; }
+    /* ── mobile LIST VIEW: home (#grid) + every mountEventCards grid (.grid) ── */
+    @media (max-width:640px){ #grid, .grid{ grid-template-columns:1fr; gap:10px; } }
+    .lvr{ display:flex; flex-direction:row; align-items:center; gap:8px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:9px 10px; }
+    .lvr .lv-main{ position:static; inset:auto; width:auto; height:auto; display:flex; align-items:center; gap:12px; flex:1; min-width:0; background:none; border:0; padding:0; margin:0; text-align:left; color:inherit; cursor:pointer; font-family:inherit; -webkit-tap-highlight-color:transparent; }
+    .lvr .lv-th{ position:relative; width:64px; height:64px; flex:none; border-radius:4px; overflow:hidden; display:block; }
+    .lvr .lv-th .poster{ position:absolute; inset:0; width:100%; height:100%; margin:0; border-radius:0; aspect-ratio:auto; }
+    .lvr .lv-th .poster .gen .gt{ display:none; }
+    .lvr .lv-bd{ flex:1; min-width:0; display:block; }
+    .lvr .lv-tt{ display:block; font-family:var(--head); font-weight:800; font-size:1rem; line-height:1.2; letter-spacing:-.01em; color:var(--fg); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .lvr .lv-m{ display:block; font-size:.78rem; color:var(--muted); margin-top:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .lvr .lv-a{ display:block; font-size:.78rem; color:var(--accent); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .lvr .lv-r{ display:flex; flex-direction:column; justify-content:center; align-items:center; gap:7px; flex:none; }
+    .lvr .evc-play{ position:static; width:38px; height:38px; box-shadow:none; border:1.5px solid #16102a; }
+    .lvr .evc-play svg{ width:20px; height:20px; margin-left:2px; }
+    .lvr .heart.evc-heart{ position:static; width:32px; height:26px; display:inline-flex; align-items:center; justify-content:center; background:transparent; border:0; padding:0; color:var(--muted); }
+    .lvr .heart.evc-heart.on{ color:var(--accent); }
+    .lvr .heart.evc-heart svg{ width:17px; height:17px; }
+
 /* ── SUNSETCRT skin (next.soundcheck.club) ── */
 /* ═══════════════════════════════════════════════════════════════════════════
    SUNSET·CRT skin — user hybrid (2026-07-13): the SUNSET colour scheme
@@ -2870,7 +2921,7 @@ body::before{
 .lvr .heart.evc-heart svg{ width:17px; height:17px; }
 
 </style>
-<meta name="sc-build" content="sunsetcrt-1783970564784">
+<meta name="sc-build" content="sunsetcrt-1783989289381">
 <meta name="robots" content="noindex">
 </head>
 <body>
@@ -7962,26 +8013,17 @@ body::before{
     }
   </script>
 <script>
-/* SUNSETCRT render overrides */
-/* ═══════════════════════════════════════════════════════════════════════════
-   SUNSET list view (next.soundcheck.club only) — on MOBILE the home grid
-   (#grid) renders LIST ROWS instead of poster cards; desktop keeps posters,
-   and every other card site (artist / venue / search) keeps posters on all
-   sizes. Injected after the main app script; wraps paintCurrentGrid so only
-   home paints are affected, and keeps every wireEvcCards hook (.evc-poster
-   opens the sheet — here it wraps the whole row — .evc-play queues the
-   line-up, .heart[data-pick-evt] saves).
-   ═══════════════════════════════════════════════════════════════════════════ */
+/* SUNSET·CRT runtime — promoted from next (2026-07-13).
+   1) Android renders rem/em larger than iOS → whole app at 90% on Android.
+   2) Mobile (≤640px) LIST VIEW for event grids: home paints + every
+      mountEventCards grid (artist/venue upcoming, search event lists).
+      Row keeps all wireEvcCards hooks (.evc-poster wraps the row and opens
+      the sheet, .evc-play queues the line-up, .heart[data-pick-evt] saves). */
 (function(){
-  /* Android renders rem/em noticeably larger than iOS (system Font/Display size
-     + Chrome text-scaling). Pull the whole app back to 90% on Android so it
-     reads like the iPhone. zoom scales text + px + icons together and keeps
-     layout flow (unlike transform:scale). */
   try{ if(/Android/i.test(navigator.userAgent||'')) document.documentElement.style.zoom='0.9'; }catch(_){}
   if(typeof cardHTML!=='function' || typeof paintCurrentGrid!=='function') return;
   var MQ=window.matchMedia('(max-width:640px)');
   var origCard=window.cardHTML, painting=false;
-
   function listRow(ev){
     var eid=ev.id!=null?String(ev.id):'';
     var arts=ev.artists||[];
@@ -8005,21 +8047,18 @@ body::before{
         +(eid&&arts.length?'<button class="evc-play" type="button" aria-label="Play the lineup"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>':'')
       +'</span></article>';
   }
-
-  window.cardHTML=function(ev){
-    return (painting && MQ.matches) ? listRow(ev) : origCard(ev);
-  };
+  window.cardHTML=function(ev){ return (painting && MQ.matches) ? listRow(ev) : origCard(ev); };
   var origPaint=window.paintCurrentGrid;
   window.paintCurrentGrid=function(){ painting=true; try{ origPaint(); } finally{ painting=false; } };
-
-  // crossing the breakpoint re-paints the grid in the right mode
+  if(typeof mountEventCards==='function'){
+    var origMount=window.mountEventCards;
+    window.mountEventCards=function(el,rows){ painting=true; try{ origMount(el,rows); } finally{ painting=false; } };
+  }
   try{
-    var mq=MQ;
     var onchg=function(){ try{ window.paintCurrentGrid(); }catch(_){} };
-    if(mq.addEventListener) mq.addEventListener('change',onchg); else if(mq.addListener) mq.addListener(onchg);
+    if(MQ.addEventListener) MQ.addEventListener('change',onchg); else if(MQ.addListener) MQ.addListener(onchg);
   }catch(_){}
 })();
-
 </script>
 </body>
 </html>
