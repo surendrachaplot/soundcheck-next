@@ -2,7 +2,13 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>soundcheck · Istanbul tonight (preview)</title>
+  <title>soundcheck · London — club nights &amp; DJ sets</title>
+  <meta name="description" content="soundcheck maps club nights and DJ line-ups across 104 cities in 40 countries. See who's playing tonight, follow the artists and venues you love, log the gigs you go to, and stream every DJ's sets." />
+  <meta property="og:site_name" content="soundcheck" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="soundcheck · club nights &amp; DJ sets" />
+  <meta property="og:description" content="soundcheck maps club nights and DJ line-ups across 104 cities in 40 countries. See who's playing tonight, follow artists and venues, log your gigs and stream every set." />
+  <meta name="twitter:card" content="summary_large_image" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <!-- Self-hosted Latin variable fonts (no third-party origin). One file per family
        serves every weight via the wght axis — preload both so first-paint text in
@@ -3112,7 +3118,7 @@ body::before{
 .lvr .heart.evc-heart svg{ width:17px; height:17px; }
 
 </style>
-<meta name="sc-build" content="sunsetcrt-1784123476520">
+<meta name="sc-build" content="sunsetcrt-1784124352240">
 <meta name="robots" content="noindex">
 </head>
 <body>
@@ -5433,8 +5439,14 @@ body::before{
       var s=document.getElementById('seo-jsonld'); if(s) s.remove();
       if(jsonld){ s=document.createElement('script'); s.type='application/ld+json'; s.id='seo-jsonld'; s.textContent=JSON.stringify(jsonld); document.head.appendChild(s); }
     }
-    // Home/city: canonical points back at the current city home (path-based).
-    function resetSeo(){ setSeo(_seoDefaultTitle, '', null, location.origin+(typeof cityPath==='function'?cityPath(currentCity):SC_BASE)); }
+    // Home/city: real description (never empty — an empty meta lets crawlers scrape body
+    // text) + canonical back at the current city home. City count is live from CITY_LIST.
+    function resetSeo(){
+      var cn=(typeof cityLabel==='function'?cityLabel(currentCity):'')||'your city';
+      var nCities=(typeof CITY_LIST!=='undefined'&&CITY_LIST.length)||104;
+      var d="See who's playing tonight in "+cn+" — club nights, DJ line-ups and venues across "+nCities+" cities on soundcheck. Follow the artists and venues you love, log your gigs and stream every DJ's sets.";
+      setSeo(_seoDefaultTitle, d, null, location.origin+(typeof cityPath==='function'?cityPath(currentCity):SC_BASE));
+    }
     // The in-app "Back" steps one level through real history (matches the
     // browser back button). At the app's first entry it lands on home.
     function goBack(){ history.back(); }
@@ -8275,7 +8287,7 @@ body::before{
     async function load(date, pick){
       mode='day'; currentDate=date; activePick=pick||(date===todayISO()?'tonight':'date'); syncChips();
       _retryLoad=function(){ load(date, pick); };
-      document.title='soundcheck '+cityMeta().name+' · '+date; history.replaceState(null,'',withCityQS('?date='+date));
+      document.title='soundcheck · '+cityMeta().name+' — club nights & DJ sets'; history.replaceState(null,'',withCityQS('?date='+date));
       setStatus('<span class="spinner"></span> Loading '+esc(fmtDateLabel(date))+'…'); skeletonGrid();
       try{
         var json=await fetchDay(date);
@@ -8297,7 +8309,7 @@ body::before{
       offset=offset||0; mode='weekend'; activePick=offset?'next':'weekend';
       _retryLoad=function(){ loadWeekend(offset); };
       var wd=weekendDatesFor(offset); currentDate=wd[1]; syncChips();
-      document.title='soundcheck '+cityMeta().name+' · '+(offset?'next weekend':'this weekend'); history.replaceState(null,'',withCityQS('?weekend='+(offset+1)));
+      document.title='soundcheck · '+cityMeta().name+' — club nights & DJ sets'; history.replaceState(null,'',withCityQS('?weekend='+(offset+1)));
       setStatus('<span class="spinner"></span> Loading '+(offset?'next':'this')+' weekend…'); skeletonGrid();
       try{
         var res=await Promise.all([fetchDay(wd[0]), fetchDay(wd[1])]);
@@ -8318,7 +8330,7 @@ body::before{
       if(span>RANGE_CAP){ var _dt=new Date(startISO+'T12:00:00'); _dt.setDate(_dt.getDate()+(RANGE_CAP-1)); endISO=isoOf(_dt); span=RANGE_CAP; }
       mode='range'; activePick='date'; currentDate=startISO; currentRange=[startISO,endISO]; syncChips();
       _retryLoad=function(){ loadRange(startISO, endISO); };
-      document.title='soundcheck by 6 Minutes · '+startISO+' to '+endISO;
+      document.title='soundcheck · '+cityMeta().name+' — club nights & DJ sets';
       history.replaceState(null,'',withCityQS('?from='+startISO+'&to='+endISO));
       setStatus('<span class="spinner"></span> Loading '+span+' days&hellip;'); skeletonGrid();
       try{
