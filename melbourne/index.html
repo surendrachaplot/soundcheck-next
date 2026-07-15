@@ -3131,7 +3131,7 @@ body::before{
 .lvr .heart.evc-heart svg{ width:17px; height:17px; }
 
 </style>
-<meta name="sc-build" content="sunsetcrt-1784140039215">
+<meta name="sc-build" content="sunsetcrt-1784155889141">
 <meta name="robots" content="noindex">
 </head>
 <body>
@@ -6298,7 +6298,10 @@ body::before{
           startTime:g.start_time, endTime:g.end_time, poster:g.poster_url,
           artists:(g.lineup||[]).map(function(x){ return {name:x.name, contentUrl:'/dj/'+x.slug}; }) };
       });
-      el.innerHTML='<div class="grid">'+evs.map(cardHTML).join('')+'</div>';
+      // List rows on mobile, cards on web — decided here (not via a late wrapper) so a
+      // direct page load can't render cards before init() runs. Rule: list view EVERYWHERE on phones.
+      var render=mqMobile()?listRow:cardHTML;
+      el.innerHTML='<div class="grid">'+evs.map(render).join('')+'</div>';
       wireCard(el);
       var rmap={}; evs.forEach(function(ev){ if(ev.id!=null) rmap[String(ev.id)]=ev; });
       wireEvcCards(el, rmap);
@@ -7809,6 +7812,33 @@ body::before{
 
     // Poster-led event card: poster hero (heart top-right, eyebrow+title+meta bottom-left,
     // salmon play half over the bottom-right) + artist chips (cap 4, then "+N more" → event).
+    // ≤640px = phone. List view for events is the rule EVERYWHERE on mobile — home,
+    // artist, venue, promoter, event "also on". Kept top-level (not in the late init()
+    // wrapper) so it can't lose a race with a direct page load.
+    function mqMobile(){ return !!(window.matchMedia && matchMedia('(max-width:640px)').matches); }
+    function listRow(ev){
+      var eid=ev.id!=null?String(ev.id):'';
+      var arts=ev.artists||[];
+      var isTon=currentDate && currentDate===todayISO();
+      var dayLab=ev._day||(isTon?'Tonight':'');
+      var tRange=formatTimeRange(ev.startTime, ev.endTime, ev._time);
+      var when=[dayLab,tRange].filter(Boolean).join(' &middot; ');
+      var names=arts.slice(0,3).map(function(a){ return esc(a.name); }).join(', ')+(arts.length>3?' +'+(arts.length-3):'');
+      var picked=eid && isEventPicked(eid)?' on':'';
+      return '<article class="gcard evc lvr"'+(eid?' data-evt="'+esc(eid)+'"':'')+'>'
+        +'<button class="evc-poster lv-main" type="button" aria-label="View '+esc(ev.title)+'">'
+          +'<span class="lv-th">'+posterHTML(ev)+'</span>'
+          +'<span class="lv-bd">'
+            +'<span class="lv-tt">'+esc(ev.title)+'</span>'
+            +'<span class="lv-m">'+(when?when+' &middot; ':'')+esc(ev.venue||'TBA')+'</span>'
+            +(names?'<span class="lv-a">'+names+'</span>':'')
+          +'</span>'
+        +'</button>'
+        +'<span class="lv-r">'
+          +(eid?'<button class="heart evc-heart'+picked+'" type="button" data-pick-evt="'+esc(eid)+'" data-title="'+esc(ev.title||'')+'" data-venue="'+esc(ev.venue||'')+'" data-day="'+esc(ev._day||'')+'" aria-pressed="'+(picked?'true':'false')+'" aria-label="Interested">'+BOOKMARK_SVG+'</button>':'')
+          +(eid&&arts.length?'<button class="evc-play" type="button" aria-label="Play the lineup"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>':'')
+        +'</span></article>';
+    }
     function cardHTML(ev){
       var eid=ev.id!=null?String(ev.id):'';
       var arts=ev.artists||[];
@@ -8565,29 +8595,8 @@ body::before{
   if(typeof cardHTML!=='function' || typeof paintCurrentGrid!=='function') return;
   var MQ=window.matchMedia('(max-width:640px)');
   var origCard=window.cardHTML, painting=false;
-  function listRow(ev){
-    var eid=ev.id!=null?String(ev.id):'';
-    var arts=ev.artists||[];
-    var isTon=currentDate && currentDate===todayISO();
-    var dayLab=ev._day||(isTon?'Tonight':'');
-    var tRange=formatTimeRange(ev.startTime, ev.endTime, ev._time);
-    var when=[dayLab,tRange].filter(Boolean).join(' &middot; ');
-    var names=arts.slice(0,3).map(function(a){ return esc(a.name); }).join(', ')+(arts.length>3?' +'+(arts.length-3):'');
-    var picked=eid && isEventPicked(eid)?' on':'';
-    return '<article class="gcard evc lvr"'+(eid?' data-evt="'+esc(eid)+'"':'')+'>'
-      +'<button class="evc-poster lv-main" type="button" aria-label="View '+esc(ev.title)+'">'
-        +'<span class="lv-th">'+posterHTML(ev)+'</span>'
-        +'<span class="lv-bd">'
-          +'<span class="lv-tt">'+esc(ev.title)+'</span>'
-          +'<span class="lv-m">'+(when?when+' &middot; ':'')+esc(ev.venue||'TBA')+'</span>'
-          +(names?'<span class="lv-a">'+names+'</span>':'')
-        +'</span>'
-      +'</button>'
-      +'<span class="lv-r">'
-        +(eid?'<button class="heart evc-heart'+picked+'" type="button" data-pick-evt="'+esc(eid)+'" data-title="'+esc(ev.title||'')+'" data-venue="'+esc(ev.venue||'')+'" data-day="'+esc(ev._day||'')+'" aria-pressed="'+(picked?'true':'false')+'" aria-label="Interested">'+BOOKMARK_SVG+'</button>':'')
-        +(eid&&arts.length?'<button class="evc-play" type="button" aria-label="Play the lineup"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>':'')
-      +'</span></article>';
-  }
+  // listRow is now defined top-level (see above) — reused here so the home grid
+  // list-view and the entity-page list-view share one row builder.
   window.cardHTML=function(ev){ return (painting && MQ.matches) ? listRow(ev) : origCard(ev); };
   var origPaint=window.paintCurrentGrid;
   window.paintCurrentGrid=function(){ painting=true; try{ origPaint(); } finally{ painting=false; } };
