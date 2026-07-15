@@ -68,9 +68,11 @@
     /* nav */
     /* Persistent header: sticks to the top on every page/view while scrolling. bg so content
        scrolls under it cleanly; z-index 50 keeps it above page content but below dock/modals. */
-    .wrap > nav { position:sticky; top:0; z-index:50; background:var(--bg); display:flex; align-items:center; gap:14px; padding:calc(18px + env(safe-area-inset-top)) 0 18px; border-bottom:1px solid transparent; transition:background var(--dur-2,200ms) var(--ease-standard,ease), border-color var(--dur-2,200ms) var(--ease-standard,ease); }
-    /* blur-on-scroll: header goes translucent + frosted once the page scrolls */
-    .wrap > nav.scrolled { background:rgba(22,16,42,0.72); backdrop-filter:blur(14px) saturate(160%); -webkit-backdrop-filter:blur(14px) saturate(160%); border-bottom-color:var(--border); }
+    /* Opaque so content scrolls under cleanly; scanlines painted right on it (the header sits
+       above the fixed body::before scanline overlay, so it carries its own copy of the lines). */
+    .wrap > nav { position:sticky; top:0; z-index:50; background:linear-gradient(rgba(255,154,61,.05) 1px, transparent 1px) 0 0 / 100% 4px, var(--bg); display:flex; align-items:center; gap:14px; padding:calc(18px + env(safe-area-inset-top)) 0 18px; border-bottom:1px solid transparent; transition:border-color var(--dur-2,200ms) var(--ease-standard,ease); }
+    /* on-scroll: keep the solid scanline bg (no frosted glass), just reveal the divider */
+    .wrap > nav.scrolled { border-bottom-color:var(--border); }
     .logo { display:inline-flex; align-items:center; gap:8px; color:var(--fg); text-decoration:none; flex:none; }
     .logo-ic { width:28px; height:28px; color:var(--accent); flex:none; }
     .logo-wm { font-family:var(--head); font-weight:800; font-size:calc(var(--fs-md)*1.2); letter-spacing:-0.01em; line-height:1; }
@@ -3135,7 +3137,7 @@ body::before{
 .lvr .heart.evc-heart svg{ width:17px; height:17px; }
 
 </style>
-<meta name="sc-build" content="sunsetcrt-1784129813467">
+<meta name="sc-build" content="sunsetcrt-1784131011220">
 <meta name="robots" content="noindex">
 </head>
 <body>
