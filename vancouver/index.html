@@ -3118,7 +3118,7 @@ body::before{
 .lvr .heart.evc-heart svg{ width:17px; height:17px; }
 
 </style>
-<meta name="sc-build" content="sunsetcrt-1784124352240">
+<meta name="sc-build" content="sunsetcrt-1784126036342">
 <meta name="robots" content="noindex">
 </head>
 <body>
@@ -6714,7 +6714,8 @@ body::before{
         wireEntityOwner('artist', slug, a.name||slug, a);
         var apClaim=document.getElementById('ap-claim'); if(apClaim) apClaim.addEventListener('click',function(){ openClaimModal('artist', a.name||slug, slug); });
         var _acanon=location.origin+SC_BASE+'dj/'+slug+'/';
-        setSeo((a.name||slug)+' — gigs & upcoming shows | soundcheck', a.description||'', { "@context":"https://schema.org","@type":"MusicGroup", name:(a.name||slug), url:_acanon, description:a.description||'' }, _acanon);
+        var _adesc=a.description||((a.name||slug)+' — upcoming shows, past gigs, the venues they play and their DJ sets on soundcheck. Follow to get alerts when they play your city.');
+        setSeo((a.name||slug)+' — gigs & upcoming shows | soundcheck', _adesc, { "@context":"https://schema.org","@type":"MusicGroup", name:(a.name||slug), url:_acanon, description:_adesc }, _acanon);
         var apRadio=document.getElementById('ap-radio');
         // Tune in = play the artist's full sets back-to-back. Warm the sets list on
         // press so the queue is ready by click-time (keeps mobile autoplay inside the gesture).
@@ -6940,7 +6941,8 @@ body::before{
         var prb=document.getElementById('pp-radio');
         if(prb && pNext) prb.addEventListener('click',function(){ playEventLineupRadio({ id:pNext.id, venue:pNext.venue, event_date:pNext.event_date, poster_url:pNext.poster_url, lineup:pNext.lineup }); });
         var _pcanon=location.origin+SC_BASE+'promoter/'+slug+'/';
-        setSeo(dispName+' — events & line-ups | soundcheck', p.description||'', { "@context":"https://schema.org","@type":"Organization", name:dispName, url:_pcanon, description:p.description||'' }, _pcanon);
+        var _pdesc=p.description||(dispName+' — upcoming events, line-ups and the club nights they put on, on soundcheck.');
+        setSeo(dispName+' — events & line-ups | soundcheck', _pdesc, { "@context":"https://schema.org","@type":"Organization", name:dispName, url:_pcanon, description:_pdesc }, _pcanon);
         var up=(p.upcoming||[]), pu=document.getElementById('pp-upcoming');
         if(pu && up.length){
           pu.innerHTML='<div class="sec-h" style="margin-top:26px">Upcoming<span class="ct">'+up.length+'</span></div><div id="pp-cards"></div>';
@@ -7026,7 +7028,8 @@ body::before{
         h+='</div>';   // close .fp-artist
         openPanel(h);
         var _vcanon=location.origin+SC_BASE+(v.city||currentCity||'london')+'/club/'+venueSlug(dispName)+'/';
-        setSeo(dispName+" — what's on & tickets | soundcheck", v.description||'', { "@context":"https://schema.org","@type":["MusicVenue","LocalBusiness"], name:dispName, url:_vcanon, description:v.description||'', address:v.address||undefined }, _vcanon);
+        var _vdesc=v.description||(dispName+" — upcoming club nights, line-ups, sound and location"+(v.city?' in '+cityLabel(v.city):'')+", on soundcheck. Follow the venue for new dates.");
+        setSeo(dispName+" — what's on & tickets | soundcheck", _vdesc, { "@context":"https://schema.org","@type":["MusicVenue","LocalBusiness"], name:dispName, url:_vcanon, description:_vdesc, address:v.address||undefined }, _vcanon);
         var vfBtn=document.getElementById('vf-btn');
         if(vfBtn) vfBtn.addEventListener('click',function(){ toggleVenueFollow(v, vfBtn); });
         var beenBtn=document.getElementById('vp-been');
@@ -7187,7 +7190,8 @@ body::before{
         h+='</div>';
         openPanel(h);
         var _canon=location.origin+SC_BASE+eventPath(id,_who,ev.venue)+'/';
-        setSeo((ev.title||'Event')+' · '+(ev.venue||'')+' | soundcheck', ev.description||'', musicEventLD(ev), _canon);   // MusicEvent JSON-LD (restored after the bespoke port dropped it)
+        var _edesc=ev.description||((ev.title||_who||'This night')+(ev.venue?' at '+ev.venue:'')+(ev.event_date?' on '+fmtDateLabel(String(ev.event_date).slice(0,10)):'')+' — full line-up, set times and tickets on soundcheck.');
+        setSeo((ev.title||'Event')+' · '+(ev.venue||'')+' | soundcheck', _edesc, musicEventLD(ev), _canon);   // MusicEvent JSON-LD (restored after the bespoke port dropped it)
         armEventSticky(ev.title||'');
         if((ev.alsoOn||[]).length){ var _ao=document.getElementById('fp-ev-alsoon'); if(_ao) mountEventCards(_ao, ev.alsoOn.slice(0,6)); }   // same card/list template as everywhere
         var evMeta={title:ev.title,venue:ev.venue,day:ev._day};
