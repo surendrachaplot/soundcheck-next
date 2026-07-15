@@ -128,18 +128,12 @@
       .logo-wm, .hdr-city { font-size:var(--fs-sm); }
     }
 
-    /* cross-site teaser banner (below nav) */
-    .teaser { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:22px 0; border-top:1px solid var(--border); flex-wrap:wrap; }
-    .teaser .tt { font-size:var(--fs-base); font-weight:500; color:var(--muted); }
-    .teaser .tt b { color:var(--fg); font-weight:700; }
-    .teaser a { font-family:var(--head); font-size:var(--fs-sm); font-weight:800; letter-spacing:0.14em; text-transform:uppercase; color:var(--accent); text-decoration:none; white-space:nowrap; }
-    .teaser a:hover { opacity:0.8; }
 
     /* hero */
     .hero { padding:26px 0 14px; display:flex; justify-content:space-between; align-items:flex-end; gap:24px; flex-wrap:wrap; }
     #home .hero h1 { display:none; }   /* "Soundcheck <city>" headline removed from the home hero (web + mobile); the city still shows in the header brand. JS keeps #hero-city-name updated harmlessly. */
     /* Crawlable home intro (SEO) — modest heading + one-line intro above the date strip. */
-    .home-seo { margin:2px 0 20px; }
+    .home-seo { margin:40px 0 8px; border-top:1px solid var(--border); padding-top:26px; }
     .home-seo-h1 { margin:0 0 7px; font:800 clamp(1.35rem,2.6vw,1.95rem)/1.08 var(--head); letter-spacing:-.02em; color:var(--fg); }
     .home-seo-h1 .hs-city { background:var(--accent-grad); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; color:transparent; }
     .home-seo-p { max-width:660px; margin:0; color:var(--muted); font:500 var(--fs-base) var(--body); line-height:1.5; }
@@ -154,7 +148,7 @@
     .home-seo-nav { display:flex; flex-wrap:wrap; gap:6px 16px; margin:0; color:var(--muted); font:600 var(--fs-sm) var(--body); }
     .home-seo-nav a { color:var(--accent); text-decoration:none; }
     .home-seo-nav a:hover { text-decoration:underline; }
-    @media (max-width:620px){ .home-seo { margin:0 0 14px; } .home-seo-more { margin:28px 0 8px; } }
+    @media (max-width:620px){ .home-seo { margin:28px 0 8px; padding-top:20px; } .home-seo-more { margin:28px 0 8px; } }
     .eyebrow { font-size:var(--fs-xs); font-weight:700; letter-spacing:0.24em; text-transform:uppercase; color:var(--accent); margin-bottom:8px; }
     h1 { font-family:var(--head); font-weight:800; font-size:clamp(2.1rem,5vw,3.4rem); line-height:0.96; letter-spacing:-0.03em; }
     /* Headings are Bricolage explicitly — page titles (Coming up, Search, Log a gig…)
@@ -3137,7 +3131,7 @@ body::before{
 .lvr .heart.evc-heart svg{ width:17px; height:17px; }
 
 </style>
-<meta name="sc-build" content="sunsetcrt-1784131011220">
+<meta name="sc-build" content="sunsetcrt-1784131490177">
 <meta name="robots" content="noindex">
 </head>
 <body>
@@ -3157,14 +3151,6 @@ body::before{
     </nav>
 
     <div id="home">
-
-    <!-- Crawlable home content (first-byte H1 + intro; the bottom section's date links
-         are injected per-city by build-club). Lives inside #home so it only shows on the
-         home view (body.page-on hides #home). SPA keeps it; setCity updates .hs-city. -->
-    <section id="home-seo" class="home-seo">
-      <h1 class="home-seo-h1">Club nights &amp; DJ sets in <span class="hs-city">London</span></h1>
-      <p class="home-seo-p">See who&rsquo;s playing tonight and this weekend across every venue in <span class="hs-city">London</span>. Preview the sets, follow the artists you love, and save the nights you want &mdash; soundcheck maps club nights and DJ line-ups across 104 cities in 40 countries.</p>
-    </section>
 
     <div class="daterow">
       <div class="daystrip" id="daystrip"></div>
@@ -3196,6 +3182,14 @@ body::before{
          /<city>/<date>/ pages). Empty in the source; hidden on client-side city switch. -->
     <section id="home-seo-more" class="home-seo-more"></section>
 
+    <!-- Crawlable home content (H1 + intro) — moved to the bottom of the page. Still a real
+         <h1> in the DOM so it's the page heading for SEO regardless of visual position.
+         Home-only (inside #home, which body.page-on hides); setCity keeps .hs-city in step. -->
+    <section id="home-seo" class="home-seo">
+      <h1 class="home-seo-h1">Club nights &amp; DJ sets in <span class="hs-city">London</span></h1>
+      <p class="home-seo-p">See who&rsquo;s playing tonight and this weekend across every venue in <span class="hs-city">London</span>. Preview the sets, follow the artists you love, and save the nights you want &mdash; soundcheck maps club nights and DJ line-ups across 104 cities in 40 countries.</p>
+    </section>
+
     </div><!-- /#home -->
 
     <div id="page-view" class="page-view" hidden></div>
@@ -3203,10 +3197,6 @@ body::before{
          any open page) so it works on the log page + every overlay, not just home. -->
     <div class="cal-overlay" id="cal-overlay"><div class="cal" id="cal" role="dialog" aria-modal="true" aria-label="Pick a date"></div></div>
     <!-- persistent footer chrome — shows below whichever view is active (all pages) -->
-    <div class="teaser">
-      <span class="tt">Come help us build the first <b>community-owned club in London.</b></span>
-      <a href="https://6minutes.club">6 Minutes &rarr;</a>
-    </div>
     <footer class="site-foot">
       <div class="foot-row">
         <a class="logo foot-logo" id="foot-home" role="button" tabindex="0" aria-label="Soundcheck — home">
@@ -3214,7 +3204,6 @@ body::before{
         <nav class="foot-links" aria-label="Footer">
           <a id="foot-discover" role="button" tabindex="0">Discover</a>
           <a id="foot-cities" role="button" tabindex="0">Cities</a>
-          <a href="https://6minutes.club">6 Minutes</a>
           <a href="#" id="foot-submit">Suggest an event</a>
         </nav>
       </div>
