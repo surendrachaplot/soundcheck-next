@@ -136,6 +136,23 @@
     /* hero */
     .hero { padding:26px 0 14px; display:flex; justify-content:space-between; align-items:flex-end; gap:24px; flex-wrap:wrap; }
     #home .hero h1 { display:none; }   /* "Soundcheck <city>" headline removed from the home hero (web + mobile); the city still shows in the header brand. JS keeps #hero-city-name updated harmlessly. */
+    /* Crawlable home intro (SEO) — modest heading + one-line intro above the date strip. */
+    .home-seo { margin:2px 0 20px; }
+    .home-seo-h1 { margin:0 0 7px; font:800 clamp(1.35rem,2.6vw,1.95rem)/1.08 var(--head); letter-spacing:-.02em; color:var(--fg); }
+    .home-seo-h1 .hs-city { background:var(--accent-grad); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; color:transparent; }
+    .home-seo-p { max-width:660px; margin:0; color:var(--muted); font:500 var(--fs-base) var(--body); line-height:1.5; }
+    /* Bottom "what's on this week" date links — canonical /<city>/<date>/ pages. */
+    .home-seo-more { margin:36px 0 10px; }
+    .home-seo-more:empty { display:none; }
+    .home-seo-more h2 { margin:0 0 13px; font:800 var(--fs-lg) var(--head); letter-spacing:-.01em; }
+    .home-seo-dates { display:flex; flex-wrap:wrap; gap:8px; margin:0 0 14px; padding:0; list-style:none; }
+    .home-seo-dates a { display:inline-flex; align-items:center; gap:7px; padding:8px 13px; border:1px solid var(--border); border-radius:var(--radius-pill); color:var(--fg); font:600 var(--fs-sm) var(--body); text-decoration:none; -webkit-tap-highlight-color:transparent; }
+    .home-seo-dates a:hover { border-color:var(--accent); }
+    .home-seo-dates a .c { color:var(--muted); font-size:var(--fs-xs); }
+    .home-seo-nav { display:flex; flex-wrap:wrap; gap:6px 16px; margin:0; color:var(--muted); font:600 var(--fs-sm) var(--body); }
+    .home-seo-nav a { color:var(--accent); text-decoration:none; }
+    .home-seo-nav a:hover { text-decoration:underline; }
+    @media (max-width:620px){ .home-seo { margin:0 0 14px; } .home-seo-more { margin:28px 0 8px; } }
     .eyebrow { font-size:var(--fs-xs); font-weight:700; letter-spacing:0.24em; text-transform:uppercase; color:var(--accent); margin-bottom:8px; }
     h1 { font-family:var(--head); font-weight:800; font-size:clamp(2.1rem,5vw,3.4rem); line-height:0.96; letter-spacing:-0.03em; }
     /* Headings are Bricolage explicitly — page titles (Coming up, Search, Log a gig…)
@@ -3118,7 +3135,7 @@ body::before{
 .lvr .heart.evc-heart svg{ width:17px; height:17px; }
 
 </style>
-<meta name="sc-build" content="sunsetcrt-1784126701804">
+<meta name="sc-build" content="sunsetcrt-1784129813467">
 <meta name="robots" content="noindex">
 </head>
 <body>
@@ -3138,6 +3155,14 @@ body::before{
     </nav>
 
     <div id="home">
+
+    <!-- Crawlable home content (first-byte H1 + intro; the bottom section's date links
+         are injected per-city by build-club). Lives inside #home so it only shows on the
+         home view (body.page-on hides #home). SPA keeps it; setCity updates .hs-city. -->
+    <section id="home-seo" class="home-seo">
+      <h1 class="home-seo-h1">Club nights &amp; DJ sets in <span class="hs-city">London</span></h1>
+      <p class="home-seo-p">See who&rsquo;s playing tonight and this weekend across every venue in <span class="hs-city">London</span>. Preview the sets, follow the artists you love, and save the nights you want &mdash; soundcheck maps club nights and DJ line-ups across 104 cities in 40 countries.</p>
+    </section>
 
     <div class="daterow">
       <div class="daystrip" id="daystrip"></div>
@@ -3165,6 +3190,9 @@ body::before{
       </div>
     </div>
     <div class="grid" id="grid"></div>
+    <!-- Per-city "what's on this week" date links, injected by build-club (canonical
+         /<city>/<date>/ pages). Empty in the source; hidden on client-side city switch. -->
+    <section id="home-seo-more" class="home-seo-more"></section>
 
     </div><!-- /#home -->
 
@@ -8174,6 +8202,10 @@ body::before{
       var hn=document.getElementById('hero-city-name'); if(hn) hn.textContent=m.name;       // home headline (plain text)
       var hcn=document.getElementById('hdr-city-name'); if(hcn) hcn.textContent=m.name;     // header city switcher
       var lg=document.querySelector('.logo'); if(lg) lg.href=cityPath(currentCity); // home URL (was href="." → broke on deep paths)
+      // SEO home intro: keep the city name in step; the baked date links are for the page's
+      // original city only, so hide them once the user switches to a different city.
+      var hsc=document.querySelectorAll('.hs-city'); for(var _i=0;_i<hsc.length;_i++) hsc[_i].textContent=m.name;
+      var more=document.getElementById('home-seo-more'); if(more) more.style.display=(more.dataset.city && more.dataset.city!==currentCity)?'none':'';
     }
     async function loadCities(){
       try{
