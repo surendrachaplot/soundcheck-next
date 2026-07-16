@@ -3159,7 +3159,7 @@ body::before{
 .lvr .heart.evc-heart svg{ width:17px; height:17px; }
 
 </style>
-<meta name="sc-build" content="sunsetcrt-1784215203488">
+<meta name="sc-build" content="sunsetcrt-1784215486040">
 <meta name="robots" content="noindex">
 </head>
 <body>
@@ -6817,12 +6817,10 @@ body::before{
             var sets=(j&&j.sets)||[];
             if(!sets.length){ box.innerHTML='<div class="fp-sets-empty">No full sets found for '+esc(a.name||slug)+' yet.</div>'; return; }
             var items=sets.map(function(s){ return { slug:slug, name:a.name||slug, title:s.title||'', videoId:s.videoId, poster:(a.image||'') }; });
-            box.innerHTML='<button class="fp-sets-all" id="fp-sets-all" type="button"><span class="fp-sets-all-ic">'+PLAY_SVG+'</span><span class="fp-sets-all-tx">Play all in order<b>'+sets.length+' sets · continuous</b></span></button>'+
-              '<div class="fp-sets-grid">'+sets.map(function(s,i){ var th='https://i.ytimg.com/vi/'+encodeURIComponent(s.videoId)+'/mqdefault.jpg'; var d=s.duration?fmtDur(s.duration):'';
+            box.innerHTML='<div class="fp-sets-grid">'+sets.map(function(s,i){ var th='https://i.ytimg.com/vi/'+encodeURIComponent(s.videoId)+'/mqdefault.jpg'; var d=s.duration?fmtDur(s.duration):'';
                 return '<div class="fp-skw"><button class="fp-sk" type="button" data-i="'+i+'"><span class="fp-sk-th" style="background-image:url(\''+th+'\')">'+(d?'<span class="fp-sk-dur">'+esc(d)+'</span>':'')+'<span class="fp-sk-pl">'+PLAY_SVG+'</span></span><span class="fp-sk-ti">'+esc(s.title||'Set')+'</span>'+(s.channel?'<span class="fp-sk-ch">'+esc(s.channel)+'</span>':'')+'</button>'+
                   '<div class="fp-sk-acts"><button class="fp-sk-act" type="button" data-shq="'+i+'">+ Queue</button><button class="fp-sk-act" type="button" data-shl="'+i+'">Listened</button></div></div>';
               }).join('')+'</div>';
-            var pa=document.getElementById('fp-sets-all'); if(pa) pa.addEventListener('click',function(){ playYtList(items,0); });
             box.querySelectorAll('.fp-sk[data-i]').forEach(function(b){ b.addEventListener('click',function(){ playYtList(items, +b.dataset.i); }); });
             // queue / listened shelf toggles — Goodreads for sets
             function paintShelf(){
