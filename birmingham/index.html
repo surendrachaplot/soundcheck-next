@@ -2651,10 +2651,10 @@
     .pfh-sub{ color:var(--muted); font-size:.85rem; }
     .pfh-acts{ display:flex; gap:9px; flex:0 0 auto; }
     .pfh-ribbon{ display:grid; grid-template-columns:repeat(4,1fr); margin-top:18px; border:1px solid var(--border); border-radius:var(--radius-md); overflow:hidden; background:var(--surface); }
-    .pfh-ribbon .c{ padding:14px 15px; border-right:1px solid var(--border); }
+    .pfh-ribbon .c{ padding:14px 9px; border-right:1px solid var(--border); }
     .pfh-ribbon .c:last-child{ border-right:0; }
     .pfh-ribbon b{ font-family:var(--head); font-weight:800; font-size:1.5rem; display:block; line-height:1; }
-    .pfh-ribbon span{ font:700 .6rem var(--font-mono); letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin-top:6px; display:block; }
+    .pfh-ribbon span{ font:700 .6rem var(--font-mono); letter-spacing:.07em; text-transform:uppercase; color:var(--muted); margin-top:6px; display:block; white-space:nowrap; }
     .pfh-tags{ display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; align-items:center; }
     .pfh-tl{ font:700 .6rem var(--font-mono); letter-spacing:.12em; text-transform:uppercase; color:var(--faint); margin-right:2px; }
     .pfh-tag{ display:inline-flex; padding:6px 13px; border-radius:var(--radius-pill); border:1px solid var(--border); background:var(--surface-2); color:var(--fg); font:700 .78rem var(--body); }
@@ -3162,7 +3162,7 @@ body::before{
 .lvr .heart.evc-heart svg{ width:17px; height:17px; }
 
 </style>
-<meta name="sc-build" content="sunsetcrt-1784223681549">
+<meta name="sc-build" content="sunsetcrt-1784223964417">
 <meta name="robots" content="noindex">
 </head>
 <body>
@@ -5937,7 +5937,7 @@ body::before{
       var isMe=p.isMe, s=p.shelves||{}, st=p.stats||{}, diary=p.diary||[];
       var nights=st.gigs||diary.length||0;
       var seenN=(s.seen||[]).length, wannaN=(s.wannaSee||[]).length, venN=(s.venues||[]).length, savedN=(s.events||[]).length;
-      var genres=st.topGenres||[], hv=(st.topVenues||[])[0];
+      var genres=st.topGenres||[];
       var acts = isMe
         ? '<button class="pf-btn" id="pb-share" type="button">Share</button><button class="pf-btn" id="pb-edit" type="button">Settings</button>'
         : '<button class="pf-btn primary follow'+(p.isFollowing?' following':'')+'" id="follow-btn" type="button" data-handle="'+esc(p.handle)+'">'+(p.isFollowing?'Following':'Follow')+'</button><button class="pf-btn" id="pb-share" type="button">Share</button>';
@@ -5953,7 +5953,7 @@ body::before{
           '<div class="c"><b>'+seenN+'</b><span>Seen live</span></div>'+
           '<div class="c"><b>'+wannaN+'</b><span>Wanna see</span></div>'+
         '</div>'+
-        ((genres.length||hv)?'<div class="pfh-tags"><span class="pfh-tl">Sound</span>'+genres.slice(0,4).map(function(g,i){ return '<span class="pfh-tag">'+esc(g)+'</span>'; }).join('')+(hv?'<span class="pfh-tag pfh-home">'+esc(hv.venue||hv)+(hv.n?' &times;'+hv.n:'')+'</span>':'')+'</div>':'')+
+        (genres.length?'<div class="pfh-tags"><span class="pfh-tl">Sound</span>'+genres.slice(0,4).map(function(g){ return '<span class="pfh-tag">'+esc(g)+'</span>'; }).join('')+'</div>':'')+
       '</div>';
       // Sections as in-page tabs (only render a tab when it has content, matching the
       // per-box empty rules the wiring uses). Boxes keep their ids so wirePbProfile fills them.
