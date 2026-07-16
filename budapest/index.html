@@ -2685,6 +2685,7 @@
     .tk-play svg{ width:15px; height:15px; margin-left:1px; }
     .tk-row:hover .tk-play{ color:var(--accent-ink); background:var(--accent-grad); }
     .fp-tracks .fp-sets-load, .fp-tracks .fp-sets-empty{ padding-left:0; padding-right:0; }   /* align with the Tracks heading */
+    .fp-skw{ min-width:0; }   /* grid item: cap auto-min so 1fr tracks stay equal (long titles/channels blew out one column) */
     .fp-sk{ display:flex; flex-direction:column; text-align:left; background:none; border:0; padding:0; cursor:pointer; color:var(--fg); min-width:0; }
     .fp-sk-th{ position:relative; aspect-ratio:16/9; border-radius:var(--radius-md); background-size:cover; background-position:center; background-color:var(--surface-3); overflow:hidden; }
     .fp-sk-dur{ position:absolute; left:6px; bottom:6px; font:700 10px var(--font-mono); background:rgba(22,16,42,.82); color:var(--fg); border-radius:var(--radius-2xs); padding:2px 6px; }
@@ -3161,7 +3162,7 @@ body::before{
 .lvr .heart.evc-heart svg{ width:17px; height:17px; }
 
 </style>
-<meta name="sc-build" content="sunsetcrt-1784218717846">
+<meta name="sc-build" content="sunsetcrt-1784223681549">
 <meta name="robots" content="noindex">
 </head>
 <body>
