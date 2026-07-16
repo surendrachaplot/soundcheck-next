@@ -3020,6 +3020,19 @@
       outline:none; box-shadow:0 0 0 3px rgba(124,92,255,.45); }
     .evc-play:focus-visible, .fp-ab.go:focus-visible, .fp-pb.go:focus-visible, .play-main:focus-visible,
     .radio-fab:focus-visible, .auth-box .go:focus-visible{ outline:none; box-shadow:0 0 0 3px rgba(255,154,61,.45); }
+    /* ── Unified micro-caption voice ──────────────────────────────────────────
+       All the small kicker / eyebrow / stat-label / field-label captions share ONE
+       treatment: monospace, uppercase, weight 600, .12em tracking (matching the
+       Tracks heading's "most played in their sets"). Colour + margin stay per-context;
+       interactive pills / badges / genre stamps / buttons are intentionally excluded.
+       The stat-ribbon labels keep their own tighter tracking so they stay one line. */
+    .eyebrow, .auth-box .eyebrow, .fp-kick, .fp-ev-meta, .fp-erow-date, .fp-sech span,
+    .pfh-tl, .ob-cl, .ob-stat span, .vp-update-d, .ee-l, .ee-box .ee-l,
+    .diary-stat span, .pb-subhead, .pb-dna-lab {
+      font-family:var(--font-mono); font-weight:600; font-size:11px;
+      letter-spacing:.12em; text-transform:uppercase;
+    }
+    .pfh-ribbon span{ font-weight:600; }   /* in-family, but keeps its fit-tuned size/tracking */
 
 /* ── SUNSETCRT skin (next.soundcheck.club) ── */
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -3162,7 +3175,7 @@ body::before{
 .lvr .heart.evc-heart svg{ width:17px; height:17px; }
 
 </style>
-<meta name="sc-build" content="sunsetcrt-1784224448103">
+<meta name="sc-build" content="sunsetcrt-1784229658748">
 <meta name="robots" content="noindex">
 </head>
 <body>
