@@ -3131,7 +3131,7 @@ body::before{
 .lvr .heart.evc-heart svg{ width:17px; height:17px; }
 
 </style>
-<meta name="sc-build" content="sunsetcrt-1784155889141">
+<meta name="sc-build" content="sunsetcrt-1784203823656">
 <meta name="robots" content="noindex">
 </head>
 <body>
@@ -6290,11 +6290,15 @@ body::before{
     // ---- artist + venue pages ----
     // Render canonical event rows (/api/artist · /api/venue · /api/search) as
     // home-style cards into `el`, each wired to open the event sheet.
-    function mountEventCards(el, rows){
+    // opts.showCity: append "· <City>" after the venue — for lists that span cities
+    // (artist gigs, promoter nights). OFF for city-scoped lists (home, venue, same-night).
+    function mountEventCards(el, rows, opts){
       if(!el) return;
+      var showCity=!!(opts&&opts.showCity);
       var evs=(rows||[]).map(function(g){
         return { id:g.id, title:g.title, venue:g.venue, genres:g.genres,
           _day:fmtDateLabel(String(g.event_date).slice(0,10)),
+          _city:(showCity&&g.city)?cityLabel(g.city):'',
           startTime:g.start_time, endTime:g.end_time, poster:g.poster_url,
           artists:(g.lineup||[]).map(function(x){ return {name:x.name, contentUrl:'/dj/'+x.slug}; }) };
       });
@@ -6749,8 +6753,8 @@ body::before{
         document.getElementById('ap-wanna').addEventListener('click',function(){ toggleArtist(slug,{name:a.name}); });
         document.getElementById('ap-log').addEventListener('click',function(){ openLog(); });
         // Upcoming + Past events → the SAME homepage card/list template (poster on desktop, .lvr list on mobile) — consistent with every other event list
-        if(up.length){ var _auc=document.getElementById('ap-upcoming-cards'); if(_auc) mountEventCards(_auc, up); }
-        if((a.history||[]).length){ var _apc=document.getElementById('ap-past-cards'); if(_apc) mountEventCards(_apc, a.history); }
+        if(up.length){ var _auc=document.getElementById('ap-upcoming-cards'); if(_auc) mountEventCards(_auc, up, {showCity:true}); }
+        if((a.history||[]).length){ var _apc=document.getElementById('ap-past-cards'); if(_apc) mountEventCards(_apc, a.history, {showCity:true}); }
         if(currentUser){
           var _anm=a.name||slug;
           authedFetch('/api/artist/seen?slug='+encodeURIComponent(slug)).then(function(r){ return r.json(); }).then(function(sd){
@@ -6968,7 +6972,7 @@ body::before{
         var up=(p.upcoming||[]), pu=document.getElementById('pp-upcoming');
         if(pu && up.length){
           pu.innerHTML='<div class="sec-h" style="margin-top:26px">Upcoming<span class="ct">'+up.length+'</span></div><div id="pp-cards"></div>';
-          mountEventCards(document.getElementById('pp-cards'), up);
+          mountEventCards(document.getElementById('pp-cards'), up, {showCity:true});
         }
         var pst=(p.past||[]), ppst=document.getElementById('pp-past');
         if(ppst && pst.length){
@@ -7830,7 +7834,7 @@ body::before{
           +'<span class="lv-th">'+posterHTML(ev)+'</span>'
           +'<span class="lv-bd">'
             +'<span class="lv-tt">'+esc(ev.title)+'</span>'
-            +'<span class="lv-m">'+(when?when+' &middot; ':'')+esc(ev.venue||'TBA')+'</span>'
+            +'<span class="lv-m">'+(when?when+' &middot; ':'')+esc(ev.venue||'TBA')+(ev._city?' &middot; '+esc(ev._city):'')+'</span>'
             +(names?'<span class="lv-a">'+names+'</span>':'')
           +'</span>'
         +'</button>'
@@ -8600,10 +8604,8 @@ body::before{
   window.cardHTML=function(ev){ return (painting && MQ.matches) ? listRow(ev) : origCard(ev); };
   var origPaint=window.paintCurrentGrid;
   window.paintCurrentGrid=function(){ painting=true; try{ origPaint(); } finally{ painting=false; } };
-  if(typeof mountEventCards==='function'){
-    var origMount=window.mountEventCards;
-    window.mountEventCards=function(el,rows){ painting=true; try{ origMount(el,rows); } finally{ painting=false; } };
-  }
+  // (No mountEventCards wrapper: the base fn now picks list/card via mqMobile() itself —
+  // wrapping it here would swallow the opts arg, e.g. {showCity:true}.)
   try{
     var onchg=function(){ try{ window.paintCurrentGrid(); }catch(_){} };
     if(MQ.addEventListener) MQ.addEventListener('change',onchg); else if(MQ.addListener) MQ.addListener(onchg);
