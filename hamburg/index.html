@@ -2814,6 +2814,21 @@
     .fp-ev-follow.on{ background:var(--surface-2); color:var(--accent); border-color:var(--accent); } .fp-ev-follow:hover{ border-color:var(--accent); }
     .fp-ev-addr{ font:600 12px var(--font-mono); letter-spacing:.04em; text-transform:uppercase; color:var(--muted); margin-bottom:10px; }
     .fp-ev-dir{ font:700 12px var(--body); letter-spacing:.05em; text-transform:uppercase; color:var(--accent); cursor:pointer; text-decoration:none; }
+    /* ── Mobile type trim (≤620px) — display headings ran desktop-scale on phones.
+       Placed after the base rules so these win when the query matches. Body sizes
+       (--fs-base/sm/xs) are left alone for legibility; only heading tokens + the big
+       display headings shrink. Event page trimmed a touch further (its own overrides). ── */
+    @media (max-width:620px){
+      :root{ --fs-lg:1.25rem; --fs-xl:1.45rem; --fs-2xl:1.72rem; }
+      .page-title{ font-size:30px; }
+      .fp-h1{ font-size:28px; }
+      .pfh-name{ font-size:1.45rem; }
+      .fp-ev-title{ font-size:21px; line-height:1.08; }
+      .fp-ev-venue{ font-size:18px; }
+      .fp-ev-blurb{ font-size:14px; line-height:1.55; }
+      .fp-ev-loc-v b{ font-size:17px; }
+      .fp-ev-meta{ font-size:11px; }
+    }
     /* isolation:isolate traps Leaflet's high internal z-indexes so the player dock (z 60) sits on top — same fix as .venue-map */
     .fp-ev-map{ min-height:200px; background:var(--surface-2); position:relative; z-index:0; isolation:isolate; }
     .fp-ev-map .leaflet-container{ height:100%; min-height:200px; }
@@ -3131,7 +3146,7 @@ body::before{
 .lvr .heart.evc-heart svg{ width:17px; height:17px; }
 
 </style>
-<meta name="sc-build" content="sunsetcrt-1784203823656">
+<meta name="sc-build" content="sunsetcrt-1784211959179">
 <meta name="robots" content="noindex">
 </head>
 <body>
