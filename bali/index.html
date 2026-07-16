@@ -3159,7 +3159,7 @@ body::before{
 .lvr .heart.evc-heart svg{ width:17px; height:17px; }
 
 </style>
-<meta name="sc-build" content="sunsetcrt-1784212872802">
+<meta name="sc-build" content="sunsetcrt-1784213317129">
 <meta name="robots" content="noindex">
 </head>
 <body>
@@ -6848,9 +6848,12 @@ body::before{
           fetch(API_BASE+'/api/artist/tracks?slug='+encodeURIComponent(slug)+'&name='+encodeURIComponent(a.name||slug)).then(function(r){ return r.ok?r.json():null; }).then(function(j){
             var tr=(j&&j.tracks)||[];
             if(!tr.length){ box.innerHTML='<div class="fp-sets-empty">No posted tracklists found in '+esc(a.name||'their')+'&rsquo;s sets yet — we can only rank what DJs or fans have written up.</div>'; return; }
+            // strip a stray leading timestamp some numbered tracklists leave in the text
+            var cleanTk=function(s){ return String(s||'').replace(/^\s*\d{1,2}:\d{2}(?::\d{2})?\s*[-–—.)\]]?\s*/,'').replace(/\s{2,}/g,' ').trim(); };
             box.innerHTML='<ol class="tk-list">'+tr.map(function(t,i){
+              var txt=cleanTk(t.text);
               var badge=(t.count>1)?'<span class="tk-ct" title="in '+t.count+' of their sets">&times;'+t.count+'</span>':'';
-              return '<li class="tk-row"'+(t.videoId?' data-vid="'+esc(t.videoId)+'"':'')+' data-sec="'+(t.sec!=null?t.sec:'')+'" data-q="'+esc(t.text)+'"><span class="tk-rank">'+(i+1)+'</span><span class="tk-tt">'+esc(t.text)+'</span>'+badge+'<span class="tk-play">'+PLAY_SVG+'</span></li>';
+              return '<li class="tk-row"'+(t.videoId?' data-vid="'+esc(t.videoId)+'"':'')+' data-sec="'+(t.sec!=null?t.sec:'')+'" data-q="'+esc(txt)+'"><span class="tk-rank">'+(i+1)+'</span><span class="tk-tt">'+esc(txt)+'</span>'+badge+'<span class="tk-play">'+PLAY_SVG+'</span></li>';
             }).join('')+'</ol>'+(j.nTracklists!=null?'<div class="tk-note">Ranked across '+j.nTracklists+' of '+j.nSets+' sets with a posted tracklist.</div>':'');
             box.querySelectorAll('.tk-row').forEach(function(row){ row.addEventListener('click',function(){
               var vid=row.dataset.vid, sec=row.dataset.sec;
