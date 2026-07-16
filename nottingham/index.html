@@ -3177,7 +3177,7 @@ body::before{
 .lvr .heart.evc-heart svg{ width:17px; height:17px; }
 
 </style>
-<meta name="sc-build" content="sunsetcrt-1784240578416">
+<meta name="sc-build" content="sunsetcrt-1784240758128">
 <meta name="robots" content="noindex">
 </head>
 <body>
@@ -7203,7 +7203,11 @@ body::before{
         var beenBtn=document.getElementById('vp-been');
         if(beenBtn) beenBtn.addEventListener('click',function(){ openLog({ venue:{ name:dispName, slug:v.slug, city:v.city } }); });
         var vrb=document.getElementById('vp-radio');
-        if(vrb && vNext) vrb.addEventListener('click',function(){ playEventLineupRadio({ id:vNext.id, venue:dispName, event_date:vNext.event_date, poster_url:vNext.poster_url, lineup:vNext.lineup }); });
+        // Normal dock queue over the next night's line-up — dock prev/next walk artist→artist.
+        if(vrb && vNext) vrb.addEventListener('click',function(){
+          var q=(vNext.lineup||[]).map(function(a){ return { slug:a.slug, name:a.name, poster:vNext.poster_url||'' }; }).filter(function(a){ return a.slug; });
+          if(q.length) playYtList(q, 0); else showToast('No line-up to play yet.');
+        });
         armSticky(dispName, (vrb&&vNext)?function(){ vrb.click(); }:null, vrb || document.querySelector('#page-body .fp-hero'));   // sticky title bar: venue name + Play next lineup (name-only if nothing upcoming)
         // Owner toolkit (audience + edit + broadcast) — the anti-RA wedge.
         wireEntityOwner('venue', v.slug, dispName, v);
