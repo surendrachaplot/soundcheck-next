@@ -3177,7 +3177,7 @@ body::before{
 .lvr .heart.evc-heart svg{ width:17px; height:17px; }
 
 </style>
-<meta name="sc-build" content="sunsetcrt-1784240758128">
+<meta name="sc-build" content="sunsetcrt-1784245047141">
 <meta name="robots" content="noindex">
 </head>
 <body>
@@ -7167,7 +7167,7 @@ body::before{
           var vFollow='<button class="fp-ab'+(v.following?' on':'')+'" id="vf-btn" type="button" aria-pressed="'+(v.following?'true':'false')+'">'+HEART_SVG+'<span>'+(v.following?'Following':'Follow')+'</span></button>';
           var vLogSvg='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
           var vBeen='<button class="fp-ab" id="vp-been" type="button">'+vLogSvg+'<span>Log a gig</span></button>';   // was "I've been" — now consistent with artist header
-          vActs='<div class="fp-acts">'+(vNext?('<button class="fp-ab go" id="vp-radio" type="button" aria-label="Play the next lineup at '+esc(dispName)+'">'+PLAY_SVG+'<span>Play</span></button>'):'')+vFollow+vBeen+'</div>';
+          vActs='<div class="fp-acts">'+(vNext?('<button class="fp-ab go" id="vp-radio" type="button" aria-label="Play the next lineup at '+esc(dispName)+'">'+PLAY_SVG+'<span>Play next night</span></button>'):'')+vFollow+vBeen+'</div>';
         }
         var h='<div class="fp-artist">'+
           '<div class="fp-hero">'+
@@ -7337,7 +7337,7 @@ body::before{
               // Equal-width action row (Play same size as its siblings — grid wraps
               // to a second row on narrow screens without stretching). Share → corner icon, Tickets → below the blurb.
               '<div class="fp-ev-playbar">'+
-                ((ev.artists||[]).length?'<button class="fp-pb go" id="fp-ev-play" type="button">'+PLAY_SVG+'<span>Play</span></button>':'')+
+                ((ev.artists||[]).length?'<button class="fp-pb go" id="fp-ev-play" type="button">'+PLAY_SVG+'<span>Play the lineup</span></button>':'')+
                 (isPast?'':'<button class="fp-pb tgl'+(evtStatus(id)==='saved'?' on':'')+'" id="fp-ev-int" data-evt="'+esc(id)+'" type="button">'+(evtStatus(id)==='saved'?'Interested ✓':'Interested')+'</button>'+
                   '<button class="fp-pb tgl'+(evtStatus(id)==='going'?' going':'')+'" id="fp-ev-going" data-evt="'+esc(id)+'" type="button">'+(evtStatus(id)==='going'?'I&rsquo;m going ✓':'I&rsquo;m going')+'</button>')+
               '</div>'+
