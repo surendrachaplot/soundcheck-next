@@ -2826,6 +2826,7 @@
     @media(max-width:720px){ .fp-ev-loc-l{ border-right:0; border-bottom:1px solid var(--border); } }
     .fp-ev-loc-v{ display:flex; align-items:center; gap:14px; margin-bottom:8px; flex-wrap:wrap; }
     .fp-ev-loc-v b{ font:700 22px var(--head); letter-spacing:-0.01em; }
+    .fp-ev-loc-v .venue-link:hover b{ color:var(--accent); }
     .fp-ev-follow{ border:1px solid var(--border); border-radius:var(--radius); background:var(--surface-2); color:var(--fg); font:700 10px var(--body); letter-spacing:.06em; text-transform:uppercase; padding:8px 13px; cursor:pointer; }
     .fp-ev-follow.on{ background:var(--surface-2); color:var(--accent); border-color:var(--accent); } .fp-ev-follow:hover{ border-color:var(--accent); }
     .fp-ev-addr{ font:600 12px var(--font-mono); letter-spacing:.04em; text-transform:uppercase; color:var(--muted); margin-bottom:10px; }
@@ -3177,7 +3178,7 @@ body::before{
 .lvr .heart.evc-heart svg{ width:17px; height:17px; }
 
 </style>
-<meta name="sc-build" content="sunsetcrt-1784245047141">
+<meta name="sc-build" content="sunsetcrt-1784245202056">
 <meta name="robots" content="noindex">
 </head>
 <body>
@@ -7351,7 +7352,7 @@ body::before{
         if(ev.venueLat!=null && ev.venueLng!=null){
           h+='<div class="fp-sec"><div class="fp-sech">Location <span>'+esc((ev.venueAddress||'').split(',').pop().trim())+'</span></div>'+
             '<div class="fp-ev-loc"><div class="fp-ev-loc-l">'+
-              '<div class="fp-ev-loc-v"><b>'+esc(ev.venue||'Venue')+'</b>'+(ev.venue_slug?'<button class="fp-ev-follow'+(ev.venueFollowing?' on':'')+'" id="fp-ev-follow" type="button" aria-pressed="'+(ev.venueFollowing?'true':'false')+'"><span>'+(ev.venueFollowing?'Following':'Follow')+'</span></button>':'')+'</div>'+
+              '<div class="fp-ev-loc-v"><a class="venue-link nav" href="'+esc(venueHref(ev.venue, ev.city))+'" data-venue="'+esc(ev.venue||'')+'"><b>'+esc(ev.venue||'Venue')+'</b></a>'+(ev.venue_slug?'<button class="fp-ev-follow'+(ev.venueFollowing?' on':'')+'" id="fp-ev-follow" type="button" aria-pressed="'+(ev.venueFollowing?'true':'false')+'"><span>'+(ev.venueFollowing?'Following':'Follow')+'</span></button>':'')+'</div>'+
               (ev.venueAddress?'<div class="fp-ev-addr">'+esc(ev.venueAddress)+'</div>':'')+
               '<a class="fp-ev-dir" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query='+ev.venueLat+','+ev.venueLng+'">Directions →</a>'+
               '</div><div class="fp-ev-map" id="fp-ev-map"></div></div></div>';
