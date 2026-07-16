@@ -2671,18 +2671,18 @@
     .fp-sets-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:16px 14px; }
     @media(max-width:560px){ .fp-sets-grid{ grid-template-columns:1fr 1fr; gap:14px 10px; } }
     /* Tracks tab — ranked "most played in their sets" list */
-    .fp-tracks{ padding:6px 2px 4px; }
+    .fp-tracks{ padding:6px 18px 12px; }   /* 18px h-padding aligns content with the .fp-sech heading */
     .tk-list{ list-style:none; margin:0; padding:0; }
-    .tk-row{ display:flex; align-items:center; gap:12px; padding:11px 6px; border-top:1px solid var(--line); cursor:pointer; border-radius:var(--radius-sm); -webkit-tap-highlight-color:transparent; }
+    .tk-row{ display:flex; align-items:center; gap:12px; padding:11px 0; border-top:1px solid var(--line); cursor:pointer; -webkit-tap-highlight-color:transparent; }
     .tk-row:first-child{ border-top:0; }
     .tk-row:hover{ background:var(--surface-2); }
-    .tk-rank{ flex:none; width:22px; text-align:right; font:700 12px var(--font-mono); color:var(--faint); }
+    .tk-rank{ flex:none; min-width:20px; text-align:left; font:700 12px var(--font-mono); color:var(--faint); }
     .tk-tt{ flex:1 1 auto; min-width:0; font:600 var(--fs-base) var(--body); color:var(--fg); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
     .tk-ct{ flex:none; font:800 11px var(--font-mono); letter-spacing:.03em; color:var(--sel-text); background:var(--sel-weak); border-radius:var(--radius-pill); padding:3px 8px; }
     .tk-play{ flex:none; width:30px; height:30px; border-radius:var(--radius-pill); display:grid; place-items:center; color:var(--accent); }
     .tk-play svg{ width:15px; height:15px; margin-left:1px; }
     .tk-row:hover .tk-play{ color:var(--accent-ink); background:var(--accent-grad); }
-    .tk-note{ margin-top:14px; font:500 var(--fs-xs) var(--body); color:var(--faint); }
+    .fp-tracks .fp-sets-load, .fp-tracks .fp-sets-empty{ padding-left:0; padding-right:0; }   /* align with the Tracks heading */
     .fp-sk{ display:flex; flex-direction:column; text-align:left; background:none; border:0; padding:0; cursor:pointer; color:var(--fg); min-width:0; }
     .fp-sk-th{ position:relative; aspect-ratio:16/9; border-radius:var(--radius-md); background-size:cover; background-position:center; background-color:var(--surface-3); overflow:hidden; }
     .fp-sk-dur{ position:absolute; left:6px; bottom:6px; font:700 10px var(--font-mono); background:rgba(22,16,42,.82); color:var(--fg); border-radius:var(--radius-2xs); padding:2px 6px; }
@@ -3159,7 +3159,7 @@ body::before{
 .lvr .heart.evc-heart svg{ width:17px; height:17px; }
 
 </style>
-<meta name="sc-build" content="sunsetcrt-1784214360204">
+<meta name="sc-build" content="sunsetcrt-1784215203488">
 <meta name="robots" content="noindex">
 </head>
 <body>
@@ -6739,7 +6739,7 @@ body::before{
               (a.bio?'<p class="fp-bio">'+esc(a.bio)+'</p>':(a.description?'<p class="fp-bio">'+esc(a.description)+'</p>':''))+
               festLine+gemLine+
               '<div class="fp-acts">'+
-                '<button class="fp-ab go" id="ap-radio" data-slug="'+esc(slug)+'" data-name="'+esc(a.name||slug)+'"'+(a.image?' data-poster="'+esc(a.image)+'"':'')+nextVenueAttr+' type="button" aria-label="Play '+esc(a.name||slug)+'&rsquo;s sets">'+YT_SVG+'<span>Play</span></button>'+
+                '<button class="fp-ab go" id="ap-radio" data-slug="'+esc(slug)+'" data-name="'+esc(a.name||slug)+'"'+(a.image?' data-poster="'+esc(a.image)+'"':'')+nextVenueAttr+' type="button" aria-label="Play '+esc(a.name||slug)+'&rsquo;s sets">'+PLAY_SVG+'<span>Play</span></button>'+
                 '<button class="fp-ab'+(mine==='wanna_see'?' on':'')+'" id="ap-wanna" data-ap-wanna="'+esc(slug)+'" type="button" aria-pressed="'+(mine==='wanna_see')+'">'+HEART_SVG+'<span>Wanna see</span></button>'+
                 '<button class="fp-ab" id="ap-log" type="button">'+logSvg+'<span>Log a gig</span></button>'+
               '</div>'+
@@ -6860,10 +6860,12 @@ body::before{
             box.innerHTML='<ol class="tk-list">'+tr.map(function(t,i){
               var txt=cleanTk(t.text);
               return '<li class="tk-row"'+(t.videoId?' data-vid="'+esc(t.videoId)+'"':'')+' data-sec="'+(t.sec!=null?t.sec:'')+'" data-q="'+esc(txt)+'"><span class="tk-rank">'+(i+1)+'</span><span class="tk-tt">'+esc(txt)+'</span><span class="tk-play">'+PLAY_SVG+'</span></li>';
-            }).join('')+'</ol>'+(j.nTracklists!=null?'<div class="tk-note">Ranked most-played first, across '+j.nTracklists+' of '+j.nSets+' sets with a posted tracklist.</div>':'');
+            }).join('')+'</ol>';
             box.querySelectorAll('.tk-row').forEach(function(row){ row.addEventListener('click',function(){
               var vid=row.dataset.vid, sec=row.dataset.sec;
-              if(vid){ var pb=row.querySelector('.tk-play'); pb.dataset.name=a.name||slug; pb.dataset.venue=row.querySelector('.tk-tt').textContent; playYt(pb, vid, sec?+sec:0); }
+              // jump to the drop ONLY when we have a real timestamp; otherwise search (no timestamp
+              // → playing the set would just land at the default 6:00 for every track).
+              if(vid && sec){ var pb=row.querySelector('.tk-play'); pb.dataset.name=a.name||slug; pb.dataset.venue=row.querySelector('.tk-tt').textContent; playYt(pb, vid, +sec); }
               else { window.open('https://www.youtube.com/results?search_query='+encodeURIComponent(row.dataset.q),'_blank','noopener'); }
             }); });
           }).catch(function(){ if(box) box.innerHTML='<div class="fp-sets-empty">Couldn’t load tracks.</div>'; });
@@ -7088,7 +7090,7 @@ body::before{
           var vFollow='<button class="fp-ab'+(v.following?' on':'')+'" id="vf-btn" type="button" aria-pressed="'+(v.following?'true':'false')+'">'+HEART_SVG+'<span>'+(v.following?'Following':'Follow')+'</span></button>';
           var vLogSvg='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
           var vBeen='<button class="fp-ab" id="vp-been" type="button">'+vLogSvg+'<span>Log a gig</span></button>';   // was "I've been" — now consistent with artist header
-          vActs='<div class="fp-acts">'+(vNext?('<button class="fp-ab go" id="vp-radio" type="button" aria-label="Play the next lineup at '+esc(dispName)+'">'+RADIO_SVG+'<span>Play</span></button>'):'')+vFollow+vBeen+'</div>';
+          vActs='<div class="fp-acts">'+(vNext?('<button class="fp-ab go" id="vp-radio" type="button" aria-label="Play the next lineup at '+esc(dispName)+'">'+PLAY_SVG+'<span>Play</span></button>'):'')+vFollow+vBeen+'</div>';
         }
         var h='<div class="fp-artist">'+
           '<div class="fp-hero">'+
