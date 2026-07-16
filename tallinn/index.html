@@ -3159,7 +3159,7 @@ body::before{
 .lvr .heart.evc-heart svg{ width:17px; height:17px; }
 
 </style>
-<meta name="sc-build" content="sunsetcrt-1784213571101">
+<meta name="sc-build" content="sunsetcrt-1784214360204">
 <meta name="robots" content="noindex">
 </head>
 <body>
@@ -5959,8 +5959,9 @@ body::before{
       if(setqN) plSegs.push({sub:'setq',label:'Queue',   count:setqN,boxId:'pf-setq'});
       if(setlN) plSegs.push({sub:'setl',label:'Listened',count:setlN,boxId:'pf-setl'});
       if(plSegs.length) T.push({k:'playlist',l:'My Playlist',c:(setqN+setlN)||null,html:pfSegHTML(plSegs)});
-      var tabsBar='<div class="fp-tabs pf-tabs" role="tablist">'+T.map(function(t,i){ return '<button class="fp-tab'+(i===0?' on':'')+'" type="button" role="tab" aria-selected="'+(i===0)+'" data-tab="'+t.k+'">'+esc(t.l)+(t.c!=null?'<span class="c">'+t.c+'</span>':'')+'</button>'; }).join('')+'</div>';
-      var panels=T.map(function(t,i){ return '<div class="fp-tabpanel'+(i===0?'':' hide')+'" data-panel="'+t.k+'">'+t.html+'</div>'; }).join('');
+      var _pWant=(p&&p._deepTab)||''; var _pActive=T.some(function(t){ return t.k===_pWant; })?_pWant:(T[0]&&T[0].k);
+      var tabsBar='<div class="fp-tabs pf-tabs" role="tablist">'+T.map(function(t){ var on=t.k===_pActive; return '<button class="fp-tab'+(on?' on':'')+'" type="button" role="tab" aria-selected="'+on+'" data-tab="'+t.k+'">'+esc(t.l)+(t.c!=null?'<span class="c">'+t.c+'</span>':'')+'</button>'; }).join('')+'</div>';
+      var panels=T.map(function(t){ return '<div class="fp-tabpanel'+(t.k===_pActive?'':' hide')+'" data-panel="'+t.k+'">'+t.html+'</div>'; }).join('');
       return '<div class="pf">'+hero+pbRotationHTML(p)+(isMe?'<div id="pb-lognudge"></div>':'')+tabsBar+panels+'</div>';
     }
     // "You said you were going — how was it?" nudges: past events marked I'm-going
@@ -6019,8 +6020,11 @@ body::before{
       document.querySelectorAll('.pf-tabs .fp-tab[data-tab]').forEach(function(b){ b.addEventListener('click',function(){ var k=b.dataset.tab;
         document.querySelectorAll('.pf-tabs .fp-tab').forEach(function(x){ var on=x===b; x.classList.toggle('on',on); x.setAttribute('aria-selected',on?'true':'false'); });
         document.querySelectorAll('.pf .fp-tabpanel').forEach(function(pn){ pn.classList.toggle('hide', pn.dataset.panel!==k); });
+        try{ history.replaceState(history.state,'','#'+k); }catch(_){}   // shareable deep-link to the tab
         if(k==='coming') loadComingTab();
       }); });
+      // Deep-link: if the initially-active tab (via #tab) is the lazy "Upcoming" one, load it now.
+      if(document.querySelector('.pf .fp-tabpanel[data-panel="coming"]:not(.hide)')) loadComingTab();
       var sh=document.getElementById('pb-share'); if(sh) sh.addEventListener('click',function(){ pbShareCard(p); });
       var ed=document.getElementById('pb-edit'); if(ed) ed.addEventListener('click',function(){ openActionSheet({ title:'Settings', items:[
         { label:'Turn on night alerts', run:function(){ enablePush(); } },
@@ -6083,6 +6087,7 @@ body::before{
       }); });
     }
     async function openProfile(handle){
+      var _deepTab=(location.hash||'').replace(/^#/,'');   // capture BEFORE setRoute may clear the hash
       setRoute('u/'+handle);
       openPanel(pageSkeleton());
       try{
@@ -6091,6 +6096,7 @@ body::before{
         var p=await r.json();
         var s=p.shelves||{wannaSee:[],seen:[],events:[],venues:[]};
         if(p.locked){ openPanel('<div class="pb-root"><div class="pb-cover"><div class="pb-brand"><b>soundcheck</b> · passport</div></div><div class="empty" style="margin-top:18px">u/'+esc(p.handle)+'’s passport is private.</div></div>'); wireProfile(); armSticky(p.displayName||('u/'+p.handle), null, (panelBody&&panelBody.querySelector('.pb-cover'))||document.getElementById('page-body')); return; }
+        p._deepTab=_deepTab;   // thread the deep-link tab into the render
         openPanel(pbProfileHTML(p));
         wirePbProfile(p);
         // entity-page sticky bar: username + back + a play button that starts the seen artists' radio
@@ -6707,6 +6713,7 @@ body::before{
       '</div>';
     }
     async function openArtist(slug){
+      var _deepTab=(location.hash||'').replace(/^#/,'');   // capture BEFORE setRoute may clear the hash
       setRoute('dj/'+slug);
       trackView('artist', slug);
       openPanel(pageSkeleton());
@@ -6754,7 +6761,7 @@ body::before{
         if((a.alongside||[]).length) secTabs.push({ key:'similar', label:'Similar', count:null,
           html:'<div class="fp-sec"><div class="fp-sech">More like '+esc(a.name||slug)+' <span>similar sound · shares bills</span></div><div class="fp-more" id="fp-morelike"></div></div>' });
         // Deep-link support: /dj/<slug>/#sets opens (and is shareable to) that tab.
-        var _wantTab=(location.hash||'').replace(/^#/,'');
+        var _wantTab=_deepTab;
         // default tab = Sets (user pref) unless a hash deep-links another tab
         var _activeTab=secTabs.some(function(t){ return t.key===_wantTab; })?_wantTab:'sets';
         if(secTabs.length>=2){
@@ -6868,8 +6875,9 @@ body::before{
           if(k==='sets') loadSetsTab();
           if(k==='tracks') loadTracksTab();
         }); });
-        // If Sets is the initially-visible panel (e.g. it's the only section), load it now.
-        if(document.getElementById('fp-sets') && !document.querySelector('#page-body .fp-tabpanel[data-panel="sets"].hide')) loadSetsTab();
+        // Lazy-load whichever tab is initially active (deep-link via #tab, or the default Sets).
+        // Upcoming/Past/Similar render synchronously; only Sets + Tracks are lazy.
+        if(_activeTab==='sets') loadSetsTab(); else if(_activeTab==='tracks') loadTracksTab();
         markTabsFade(document.querySelector('#page-body .fp-tabs'));
         document.querySelectorAll('#page-body .fp-erow[data-ev]').forEach(function(tr){ tr.addEventListener('click',function(){ openEvent(tr.dataset.ev); }); });
         document.querySelectorAll('#page-body .fp-erow-play[data-play]').forEach(function(pl){ var g=up.filter(function(x){ return String(x.id)===pl.dataset.play; })[0]; var q=(g&&g.lineup||[]).map(function(x){ return { slug:x.slug, name:x.name, poster:g.poster_url }; }).filter(function(x){ return x.slug; }); pl.addEventListener('click',function(e){ e.stopPropagation(); if(q.length) playYtList(q,0); else openEvent(pl.dataset.play); }); });
@@ -7057,6 +7065,7 @@ body::before{
       }catch(_){ openPanel('<div class="empty">Couldn&rsquo;t load that promoter.</div>'); }
     }
     async function openVenue(input, cityHint){
+      var _deepTab=(location.hash||'').replace(/^#/,'');   // capture BEFORE routing may clear the hash
       var slug=venueSlug(input);
       // Venues are city-scoped: /<city>/v/<slug>. Default to the city in the URL
       // or the one being browsed; corrected to the venue's real city after fetch.
@@ -7099,9 +7108,10 @@ body::before{
         if(vUp.length) vTabs.push({ key:'upcoming', label:'Upcoming', count:vUp.length, html:'<div id="vp-upcoming"></div>' });
         if(vPast.length) vTabs.push({ key:'past', label:'Past', count:vPast.length, html:'<div id="vp-past"></div>' });
         if(v.lat!=null && v.lng!=null) vTabs.push({ key:'location', label:'Location', count:null, html:'<div class="pf-box" style="margin-top:14px">'+(v.address?'<div class="venue-addr">'+esc(v.address)+'</div>':'')+'<div id="venue-loc" class="venue-map" style="height:320px"></div></div>' });
+        var _vActive=vTabs.some(function(t){ return t.key===_deepTab; })?_deepTab:(vTabs[0]&&vTabs[0].key);
         if(vTabs.length>=2){
-          h+='<div class="fp-tabs" role="tablist">'+vTabs.map(function(t,i){ return '<button class="fp-tab'+(i===0?' on':'')+'" type="button" role="tab" aria-selected="'+(i===0)+'" data-tab="'+t.key+'">'+esc(t.label)+(t.count!=null?'<span class="c">'+t.count+'</span>':'')+'</button>'; }).join('')+'</div>'+
-            vTabs.map(function(t,i){ return '<div class="fp-tabpanel'+(i===0?'':' hide')+'" data-panel="'+t.key+'">'+t.html+'</div>'; }).join('');
+          h+='<div class="fp-tabs" role="tablist">'+vTabs.map(function(t){ var on=t.key===_vActive; return '<button class="fp-tab'+(on?' on':'')+'" type="button" role="tab" aria-selected="'+on+'" data-tab="'+t.key+'">'+esc(t.label)+(t.count!=null?'<span class="c">'+t.count+'</span>':'')+'</button>'; }).join('')+'</div>'+
+            vTabs.map(function(t){ return '<div class="fp-tabpanel'+(t.key===_vActive?'':' hide')+'" data-panel="'+t.key+'">'+t.html+'</div>'; }).join('');
         } else if(vTabs.length===1){ h+=vTabs[0].html; }
         h+='<div class="claim-banner"><div class="cb-tx"><div class="cb-h">Do you run '+esc(dispName)+'?</div><div class="cb-s">Claim your page to keep your line-ups current and reach the people who follow you on soundcheck.</div></div><button class="cb-btn" id="vp-claim" type="button">Claim this venue</button></div>';
         h+='</div>';   // close .fp-artist
@@ -7127,6 +7137,7 @@ body::before{
         document.querySelectorAll('#page-body .fp-tab[data-tab]').forEach(function(b){ b.addEventListener('click',function(){ var k=b.dataset.tab;
           document.querySelectorAll('#page-body .fp-tab').forEach(function(x){ var on=x===b; x.classList.toggle('on',on); x.setAttribute('aria-selected',on?'true':'false'); });
           document.querySelectorAll('#page-body .fp-tabpanel').forEach(function(p){ p.classList.toggle('hide', p.dataset.panel!==k); });
+          try{ history.replaceState(history.state,'','#'+k); }catch(_){}   // shareable deep-link to the tab
           if(k==='location' && _venueMap) setTimeout(function(){ try{ _venueMap.invalidateSize(); }catch(_){} }, 60);   // map was hidden → resize on show
         }); });
         var up=(v.upcoming||[]), vu=document.getElementById('vp-upcoming');
