@@ -3033,6 +3033,8 @@
       letter-spacing:.12em; text-transform:uppercase;
     }
     .pfh-ribbon span{ font-weight:600; }   /* in-family, but keeps its fit-tuned size/tracking */
+    /* Real <a> entity links: keep the element's existing look (no underline / link-blue). */
+    a.nav{ text-decoration:none; color:inherit; -webkit-tap-highlight-color:transparent; }
 
 /* ── SUNSETCRT skin (next.soundcheck.club) ── */
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -3175,7 +3177,7 @@ body::before{
 .lvr .heart.evc-heart svg{ width:17px; height:17px; }
 
 </style>
-<meta name="sc-build" content="sunsetcrt-1784230290715">
+<meta name="sc-build" content="sunsetcrt-1784231627667">
 <meta name="robots" content="noindex">
 </head>
 <body>
@@ -4283,16 +4285,28 @@ body::before{
     document.getElementById('bnav-search').addEventListener('click',function(){ openSearch(); });
     document.getElementById('bnav-radio').addEventListener('click',function(){ openRadio(); });
     document.getElementById('bnav-profile').addEventListener('click',function(){ whenAuthKnown().then(function(){ if(currentUser) openAccount(); else openAuth(); }); });
-    // Cmd/Ctrl/middle-click on an in-app entity → open its real SEO URL in a new tab.
-    // Entity nav is JS-driven (no <a href>), so the browser has nothing to open on a
-    // modified click; this resolves the canonical /dj//club//e/ URL and opens it itself.
+    // Canonical SEO hrefs for entities — used to render real <a> links (hover URL,
+    // right-click "open in new tab", middle/cmd-click all work natively) and as the
+    // fallback resolver for any nav element that isn't yet an anchor.
+    function djHref(slug){ return slug?SC_BASE+'dj/'+encodeURIComponent(slug)+'/':''; }
+    function venueHref(name, city){ return name?SC_BASE+encodeURIComponent(city||currentCity||'london')+'/club/'+venueSlug(name)+'/':''; }
+    function evHref(id, who, venue){ return id!=null&&id!==''?SC_BASE+eventPath(id, who, venue)+'/':''; }
+    // 1) Real <a class="nav"> links: on a MODIFIED click, stop the SPA click listeners
+    //    (capture phase runs first) so the browser follows the href into a new tab. Plain
+    //    clicks fall through to the element's own listener → in-app nav, no full reload.
+    document.addEventListener('click', function(e){
+      var a=e.target.closest && e.target.closest('a.nav[href]'); if(!a) return;
+      if(e.metaKey||e.ctrlKey||e.shiftKey||e.altKey||e.button===1) e.stopPropagation();   // modified → let the browser open the href in a new tab
+      else e.preventDefault();   // plain click → block the full-page load; the element's own listener does the in-app nav
+    }, true);
+    // 2) Fallback for nav elements that are NOT anchors yet: resolve the URL and open it.
     (function(){
       function navUrl(el){
         if(!el||!el.closest) return null;
-        if(el.closest('a[href]')) return null;   // a real link → let the browser handle it natively
-        var a=el.closest('[data-artist]'); if(a&&a.dataset.artist) return SC_BASE+'dj/'+encodeURIComponent(a.dataset.artist)+'/';
-        var v=el.closest('[data-venue]'); if(v&&v.dataset.venue){ var c=v.dataset.city||currentCity||'london'; return SC_BASE+encodeURIComponent(c)+'/club/'+venueSlug(v.dataset.venue)+'/'; }
-        var ev=el.closest('[data-event-id],[data-open-evt],.gcard[data-evt]'); if(ev){ var id=ev.dataset.eventId||ev.dataset.openEvt||ev.dataset.evt; if(!id) return null; var o=(typeof lookup!=='undefined'&&lookup.byEvent)?lookup.byEvent[id]:null; var who=o&&((o.artists&&o.artists[0]&&(o.artists[0].name||o.artists[0]))||o.headliner||o.title); return SC_BASE+eventPath(id, who, o&&o.venue)+'/'; }
+        if(el.closest('a[href]')) return null;   // real link → handled above / by the browser
+        var a=el.closest('[data-artist]'); if(a&&a.dataset.artist) return djHref(a.dataset.artist);
+        var v=el.closest('[data-venue]'); if(v&&v.dataset.venue) return venueHref(v.dataset.venue, v.dataset.city);
+        var ev=el.closest('[data-event-id],[data-open-evt],.gcard[data-evt]'); if(ev){ var id=ev.dataset.eventId||ev.dataset.openEvt||ev.dataset.evt; if(!id) return null; var o=(typeof lookup!=='undefined'&&lookup.byEvent)?lookup.byEvent[id]:null; var who=o&&((o.artists&&o.artists[0]&&(o.artists[0].name||o.artists[0]))||o.headliner||o.title); return evHref(id, who, o&&o.venue); }
         return null;
       }
       function handle(e){
@@ -5642,7 +5656,7 @@ body::before{
       var img=image?'<img class="pimg" loading="lazy" decoding="async" src="'+imgUrl(image,300)+'" alt="" onerror="this.remove()">':'';
       // "×N" = times seen live (from the gig diary); only shown for repeat catches (≥2).
       var badge=(count&&count>=2)?'<span class="ptile-x" title="Seen '+count+' times">&times;'+count+'</span>':'';
-      return '<button class="ptile" data-artist="'+esc(slug)+'"><span class="ptile-imgwrap"><span class="ptile-img'+(image?' has-img':'')+'" style="background:'+artGrad(name||slug)+'">'+img+'</span>'+badge+'</span><span class="nm">'+esc(name||slug)+'</span></button>';
+      return '<a class="ptile nav" href="'+esc(djHref(slug))+'" data-artist="'+esc(slug)+'"><span class="ptile-imgwrap"><span class="ptile-img'+(image?' has-img':'')+'" style="background:'+artGrad(name||slug)+'">'+img+'</span>'+badge+'</span><span class="nm">'+esc(name||slug)+'</span></a>';
     }
 
     // Shared shelf + diary renderers — used by the public profile AND the account
@@ -6435,7 +6449,7 @@ body::before{
         } else if(a.venue){ sub='<button class="srail-art-v" data-venue="'+esc(a.venue)+'">'+esc(a.venue)+'</button>'; }
         else if(opts.emptyLabel){ sub='<span class="srail-art-v">'+esc(opts.emptyLabel)+'</span>'; }
         return '<div class="srail-art"><div class="srail-art-img" data-artist="'+esc(a.slug)+'" style="'+img+'"><span class="srail-play ctr" data-i="'+i+'" aria-label="Play '+esc(a.name)+'">&#9654;</span></div>'+
-          '<button class="srail-art-n" data-artist="'+esc(a.slug)+'">'+esc(a.name)+'</button>'+sub+'</div>';
+          '<a class="srail-art-n nav" href="'+esc(djHref(a.slug))+'" data-artist="'+esc(a.slug)+'">'+esc(a.name)+'</a>'+sub+'</div>';
       }).join('')+'</div>';
       el.querySelectorAll('.srail-art-img[data-artist], .srail-art-n[data-artist]').forEach(function(b){ b.addEventListener('click',function(e){ if(e.target.closest('.srail-play')) return; openArtist(b.dataset.artist); }); });
       el.querySelectorAll('.srail-play[data-i]').forEach(function(b){ b.addEventListener('click',function(e){ e.stopPropagation(); playYtList(list, parseInt(b.dataset.i,10)||0); }); });
@@ -6770,10 +6784,14 @@ body::before{
         var nextGig=(a.upcoming&&a.upcoming[0])||null;
         var img=a.image?'<img loading="lazy" decoding="async" src="'+imgUrl(a.image,600)+'" alt="" onerror="this.remove()">':'';
         var fmtK=function(n){ n=+n||0; return n>=1000?(n/1000).toFixed(n>=10000?0:1).replace(/\.0$/,'')+'K':(n||''); };
-        var kick=[(a.genres&&a.genres[0])||'', a.country||''].filter(Boolean).map(esc).join(' · ');
+        // Kick line = their next show (venue, city); falls back to country when nothing's booked.
+        var nextTxt=nextGig?[nextGig.venue, nextGig.city?cityLabel(nextGig.city):''].filter(Boolean).map(esc).join(', '):'';
+        var kick=nextTxt?('Playing next at '+nextTxt):esc(a.country||'');
         if(a.followers) kick+=(kick?' ':'')+'<b class="fp-foll">'+fmtK(a.followers)+' followers</b>';
         var socials=socialLinksHTML({ soundcloud:a.soundcloud, instagram:a.instagram, website:a.website });
-        var festLine=(a.festivals&&a.festivals.length)?'<p class="ah-fests" style="margin:0 0 14px"><b>Festivals</b> '+a.festivals.map(function(f){ return esc(f.name); }).join(' · ')+'</p>':'';
+        // Genre tags move below the description (pill style, as on the event page).
+        var genreTags=(a.genres&&a.genres.length)?'<div class="fp-ev-gline" style="margin:0 0 14px">'+a.genres.slice(0,4).map(function(g){ return '<span class="fp-ev-gtag">'+esc(g)+'</span>'; }).join('')+'</div>':'';
+        var festLine=(a.festivals&&a.festivals.length)?'<p class="ah-fests" style="margin:0 0 14px"><b>Played at:</b> '+a.festivals.map(function(f){ return esc(f.name); }).join(' · ')+'</p>':'';
         var gemLine=(a.hiddenGem&&a.hiddenGem.level)?'<div class="fp-gemline"><span class="gem-pill"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 2h12l3.6 6L12 22 2.4 8z"/></svg><span>'+esc(a.hiddenGem.level)+'</span>'+(a.hiddenGem.reason?'<small>'+esc(a.hiddenGem.reason)+'</small>':'')+'</span></div>':'';
         var nextVenueAttr=(nextGig&&nextGig.venue)?' data-venue="'+esc(nextGig.venue)+'" data-city="'+esc(nextGig.city||'')+'"':'';
         var logSvg='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
@@ -6784,7 +6802,7 @@ body::before{
               '<div class="fp-kick">'+kick+'</div>'+
               '<div class="fp-namerow"><h1 class="fp-h1">'+esc(a.name||slug)+'</h1>'+(socials?'<div class="fp-socials">'+socials+'</div>':'')+'</div>'+
               (a.bio?'<p class="fp-bio">'+esc(a.bio)+'</p>':(a.description?'<p class="fp-bio">'+esc(a.description)+'</p>':''))+
-              festLine+gemLine+
+              genreTags+festLine+gemLine+
               '<div class="fp-acts">'+
                 '<button class="fp-ab go" id="ap-radio" data-slug="'+esc(slug)+'" data-name="'+esc(a.name||slug)+'"'+(a.image?' data-poster="'+esc(a.image)+'"':'')+nextVenueAttr+' type="button" aria-label="Play '+esc(a.name||slug)+'&rsquo;s sets">'+PLAY_SVG+'<span>Play</span></button>'+
                 '<button class="fp-ab'+(mine==='wanna_see'?' on':'')+'" id="ap-wanna" data-ap-wanna="'+esc(slug)+'" type="button" aria-pressed="'+(mine==='wanna_see')+'">'+HEART_SVG+'<span>Wanna see</span></button>'+
@@ -6939,7 +6957,7 @@ body::before{
           var rail=document.getElementById('fp-morelike'); if(!rail) return;
           var alongsideList=(a.alongside||[]).map(function(x){ return { slug:x.slug, name:x.name, image:x.image_url, shares:true }; });
           var merge=function(sim){ var out=[], seen={}; sim.concat(alongsideList).forEach(function(x){ if(!x||!x.slug||seen[x.slug]) return; seen[x.slug]=1; out.push(x); }); return out; };   // similar first (keeps their next-date), then shares-bills artists; dedup by slug
-          var render=function(list){ if(!list.length){ var s=rail.closest('.fp-sec'); if(s) s.style.display='none'; return; } rail.innerHTML=list.slice(0,12).map(function(x){ var nd=x.nextDate?fmtDateLabel(String(x.nextDate).slice(0,10)):''; var sub=[nd, x.nextCity?cityLabel(x.nextCity):''].filter(Boolean).join(' · ')||(x.shares?'shares bills':'archive sets'); var bg=x.image?('url('+imgUrl(x.image,300)+')'):avatarBg(x.slug,null); return '<div class="fp-mk" data-artist="'+esc(x.slug)+'"><div class="fp-mph" style="background:'+bg+';background-size:cover;background-position:center"></div><i>'+esc(x.name)+'</i><s>'+esc(sub)+'</s></div>'; }).join(''); rail.querySelectorAll('.fp-mk[data-artist]').forEach(function(t){ t.addEventListener('click',function(){ openArtist(t.dataset.artist); }); }); };
+          var render=function(list){ if(!list.length){ var s=rail.closest('.fp-sec'); if(s) s.style.display='none'; return; } rail.innerHTML=list.slice(0,12).map(function(x){ var nd=x.nextDate?fmtDateLabel(String(x.nextDate).slice(0,10)):''; var sub=[nd, x.nextCity?cityLabel(x.nextCity):''].filter(Boolean).join(' · ')||(x.shares?'shares bills':'archive sets'); var bg=x.image?('url('+imgUrl(x.image,300)+')'):avatarBg(x.slug,null); return '<a class="fp-mk nav" href="'+esc(djHref(x.slug))+'" data-artist="'+esc(x.slug)+'"><div class="fp-mph" style="background:'+bg+';background-size:cover;background-position:center"></div><i>'+esc(x.name)+'</i><s>'+esc(sub)+'</s></a>'; }).join(''); rail.querySelectorAll('.fp-mk[data-artist]').forEach(function(t){ t.addEventListener('click',function(){ openArtist(t.dataset.artist); }); }); };
           authedFetch('/api/artist/similar?slug='+encodeURIComponent(slug)).then(function(r){ return r.json(); }).then(function(j){ var sim=((j&&j.similar)||[]).map(function(s){ return { slug:s.slug, name:s.name, image:s.image, nextDate:(s.next&&s.next.event_date)||null, nextCity:(s.next&&s.next.city)||null }; }); render(merge(sim)); }).catch(function(){ render(merge([])); });
         })();
       }catch(_){ openPanel('<div class="empty">Couldn’t load that artist.</div>'); }
@@ -7133,7 +7151,9 @@ body::before{
         // photo block (image or generative) + kick line + big name w/ website + acts row.
         var vNext=nextPlayableEvent(v.upcoming);
         var vImg=v.image?'<img loading="lazy" decoding="async" src="'+imgUrl(v.image,600)+'" alt="" onerror="this.remove()">':'<span class="fp-press-gen" style="background:'+avatarBg(v.slug||dispName,null)+'"></span>';
-        var vKick=[v.area?esc(v.area):'', v.city?esc(cityLabel(v.city)):''].filter(Boolean).join(' · ');
+        // Kick line = who's playing next here (their line-up); falls back to area · city.
+        var vNextArts=(vNext&&vNext.lineup)?vNext.lineup.map(function(a){ return a.name; }).filter(Boolean):[];
+        var vKick=vNextArts.length?('Playing next &middot; '+vNextArts.slice(0,6).map(esc).join(', ')):[v.area?esc(v.area):'', v.city?esc(cityLabel(v.city)):''].filter(Boolean).join(' · ');
         if(v.followers>1) vKick+=(vKick?' ':'')+'<b class="fp-foll">'+v.followers+' followers</b>';
         var vActs='';
         if(v.slug){
@@ -7301,8 +7321,8 @@ body::before{
             '<div class="fp-ev-main">'+
               '<div class="fp-kick">'+esc(when)+'</div>'+
               '<h1 class="fp-ev-title">'+esc(ev.title||'Event')+'</h1>'+
-              '<div class="fp-ev-venue">at <button class="venue-link" type="button" data-venue="'+esc(ev.venue||'')+'">'+esc(ev.venue||'TBA')+'</button></div>'+
-              '<div class="fp-ev-meta">'+[ev.city?cityLabel(ev.city):'', (ev.genres||[]).slice(0,3).join(' / ')].filter(Boolean).map(esc).join(' · ')+'</div>'+
+              '<div class="fp-ev-venue">at <a class="venue-link nav"'+(ev.venue?' href="'+esc(venueHref(ev.venue, ev.city))+'"':'')+' data-venue="'+esc(ev.venue||'')+'">'+esc(ev.venue||'TBA')+'</a></div>'+
+              (ev.city?'<div class="fp-ev-meta">'+esc(cityLabel(ev.city))+'</div>':'')+   /* genres live in the pill row below the buttons, not here */
               // Equal-width action row (Play same size as its siblings — grid wraps
               // to a second row on narrow screens without stretching). Share → corner icon, Tickets → below the blurb.
               '<div class="fp-ev-playbar">'+
@@ -7328,7 +7348,7 @@ body::before{
         if((ev.alsoOn||[]).length){
           h+='<div class="fp-sec"><div class="fp-sech">Also on that night <span>same city · same date</span></div><div id="fp-ev-alsoon"></div></div>';
         }
-        if(ev.venue) h+='<button class="fp-morev venue-link" type="button" data-venue="'+esc(ev.venue)+'">More nights at '+esc(ev.venue)+' →</button>';
+        if(ev.venue) h+='<a class="fp-morev venue-link nav" href="'+esc(venueHref(ev.venue, ev.city))+'" data-venue="'+esc(ev.venue)+'">More nights at '+esc(ev.venue)+' →</a>';
         h+='</div>';
         openPanel(h);
         var _canon=location.origin+SC_BASE+eventPath(id,_who,ev.venue)+'/';
@@ -7365,7 +7385,7 @@ body::before{
             var face=a.image?'background-image:url('+imgUrl(a.image,120)+')':'';
             var badge=a.tier?'<span class="fp-lu-tag'+(a.tier==='Do not miss'?'':' mid')+'">'+esc(a.tier)+'</span>':'';
             var why=a.reason?'<div class="fp-lu-why">'+esc(a.reason)+'</div>':'';
-            return '<div class="fp-lu"><div class="fp-lu-n">'+String(i+1).padStart(2,'0')+'</div><div class="fp-lu-face" style="'+face+'"></div><div class="fp-lu-tx" data-artist="'+esc(a.slug||'')+'"><div class="fp-lu-nm">'+esc(a.name)+'</div>'+why+'</div>'+badge+'<button class="fp-lu-pl" type="button" data-i="'+i+'">'+PLAY_SVG+'</button></div>';
+            return '<div class="fp-lu"><div class="fp-lu-n">'+String(i+1).padStart(2,'0')+'</div><div class="fp-lu-face" style="'+face+'"></div><a class="fp-lu-tx nav"'+(a.slug?' href="'+esc(djHref(a.slug))+'"':'')+' data-artist="'+esc(a.slug||'')+'"><div class="fp-lu-nm">'+esc(a.name)+'</div>'+why+'</a>'+badge+'<button class="fp-lu-pl" type="button" data-i="'+i+'">'+PLAY_SVG+'</button></div>';
           }).join('');
           var lq=items.map(function(a){ return { slug:a.slug, name:a.name, poster:a.image }; }).filter(function(x){ return x.slug; });
           lineupBox.querySelectorAll('.fp-lu-tx[data-artist]').forEach(function(t){ t.addEventListener('click',function(){ if(t.dataset.artist) openArtist(t.dataset.artist); }); });
@@ -7945,15 +7965,16 @@ body::before{
       var when=[dayLab,tRange].filter(Boolean).join(' &middot; ');
       var names=arts.slice(0,3).map(function(a){ return esc(a.name); }).join(', ')+(arts.length>3?' +'+(arts.length-3):'');
       var picked=eid && isEventPicked(eid)?' on':'';
+      var eh=evHref(eid, arts[0]&&arts[0].name, ev.venue);   // real link → hover URL + right-click "open in new tab"
       return '<article class="gcard evc lvr"'+(eid?' data-evt="'+esc(eid)+'"':'')+'>'
-        +'<button class="evc-poster lv-main" type="button" aria-label="View '+esc(ev.title)+'">'
+        +'<a class="evc-poster lv-main nav"'+(eh?' href="'+esc(eh)+'"':'')+' aria-label="View '+esc(ev.title)+'">'
           +'<span class="lv-th">'+posterHTML(ev)+'</span>'
           +'<span class="lv-bd">'
             +'<span class="lv-tt">'+esc(ev.title)+'</span>'
             +'<span class="lv-m">'+(when?when+' &middot; ':'')+esc(ev.venue||'TBA')+(ev._city?' &middot; '+esc(ev._city):'')+'</span>'
             +(names?'<span class="lv-a">'+names+'</span>':'')
           +'</span>'
-        +'</button>'
+        +'</a>'
         +'<span class="lv-r">'
           +(eid?'<button class="heart evc-heart'+picked+'" type="button" data-pick-evt="'+esc(eid)+'" data-title="'+esc(ev.title||'')+'" data-venue="'+esc(ev.venue||'')+'" data-day="'+esc(ev._day||'')+'" aria-pressed="'+(picked?'true':'false')+'" aria-label="Interested">'+BOOKMARK_SVG+'</button>':'')
           +(eid&&arts.length?'<button class="evc-play" type="button" aria-label="Play the lineup"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>':'')
@@ -7985,12 +8006,13 @@ body::before{
       // top-2 genres as a poster stamp (top-left, glass pill) — the two most important
       var gtags=(ev.genres||[]).slice(0,2);
       var genreOv = gtags.length ? '<div class="evc-genres">'+gtags.map(function(g){ return '<span class="evc-gtag">'+esc(g)+'</span>'; }).join('')+'</div>' : '';
+      var eh=evHref(eid, arts[0]&&arts[0].name, ev.venue);   // real link → hover URL + right-click "open in new tab"
       return '<article class="gcard evc"'+(eid?' data-evt="'+esc(eid)+'"':'')+'>'+
         '<div class="evc-hero">'+
-          '<button class="evc-poster" type="button" aria-label="View '+esc(ev.title)+'">'+posterHTML(ev)+'</button>'+
+          '<a class="evc-poster nav"'+(eh?' href="'+esc(eh)+'"':'')+' aria-label="View '+esc(ev.title)+'">'+posterHTML(ev)+'</a>'+
           genreOv+
           (eid?'<button class="heart evc-heart'+picked+'" type="button" data-pick-evt="'+esc(eid)+'" data-title="'+esc(ev.title||'')+'" data-venue="'+esc(ev.venue||'')+'" data-day="'+esc(ev._day||'')+'" aria-pressed="'+(picked?'true':'false')+'" aria-label="Interested">'+BOOKMARK_SVG+'</button>':'')+
-          '<div class="evc-title">'+esc(ev.title)+'</div>'+
+          '<a class="evc-title nav"'+(eh?' href="'+esc(eh)+'"':'')+'>'+esc(ev.title)+'</a>'+
           (canPlay?'<button class="evc-play" type="button" aria-label="Play the lineup"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>':'')+
         '</div>'+
         '<div class="evc-body">'+(meta?'<div class="evc-meta">'+meta+'</div>':'')+'<div class="evc-chips">'+chips+'</div></div>'+
