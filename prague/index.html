@@ -2685,6 +2685,20 @@
     .tk-play svg{ width:15px; height:15px; margin-left:1px; }
     .tk-row:hover .tk-play{ color:var(--accent-ink); background:var(--accent-grad); }
     .fp-tracks .fp-sets-load, .fp-tracks .fp-sets-empty{ padding-left:0; padding-right:0; }   /* align with the Tracks heading */
+    /* Interviews tab — outbound article links to the music press */
+    .fp-press{ padding:6px 18px 12px; }
+    .fp-press .fp-sets-load, .fp-press .fp-sets-empty{ padding-left:0; padding-right:0; }
+    .pr-list{ list-style:none; margin:0; padding:0; }
+    .pr-row{ display:flex; align-items:flex-start; gap:12px; padding:13px 0; border-top:1px solid var(--line); text-decoration:none; color:var(--fg); -webkit-tap-highlight-color:transparent; }
+    .pr-list li:first-child .pr-row{ border-top:0; }
+    .pr-row:hover .pr-tt{ color:var(--accent); }
+    .pr-src{ flex:none; min-width:96px; font:600 11px var(--font-mono); letter-spacing:.06em; text-transform:uppercase; color:var(--accent); margin-top:2px; }
+    .pr-m{ flex:1 1 auto; min-width:0; display:flex; flex-direction:column; gap:3px; }
+    .pr-tt{ font:700 var(--fs-base) var(--head); letter-spacing:-.01em; line-height:1.25; }
+    .pr-sn{ font:400 13px/1.45 var(--body); color:var(--muted); display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+    .pr-meta{ font:600 11px var(--font-mono); letter-spacing:.04em; text-transform:uppercase; color:var(--faint); margin-top:1px; }
+    .pr-go{ flex:none; color:var(--muted); font-size:15px; margin-top:2px; }
+    @media(max-width:560px){ .pr-row{ flex-wrap:wrap; } .pr-src{ min-width:0; order:0; } .pr-go{ margin-left:auto; } .pr-m{ flex-basis:100%; } }
     .fp-skw{ min-width:0; }   /* grid item: cap auto-min so 1fr tracks stay equal (long titles/channels blew out one column) */
     .fp-sk{ display:flex; flex-direction:column; text-align:left; background:none; border:0; padding:0; cursor:pointer; color:var(--fg); min-width:0; }
     .fp-sk-th{ position:relative; aspect-ratio:16/9; border-radius:var(--radius-md); background-size:cover; background-position:center; background-color:var(--surface-3); overflow:hidden; }
@@ -3178,7 +3192,7 @@ body::before{
 .lvr .heart.evc-heart svg{ width:17px; height:17px; }
 
 </style>
-<meta name="sc-build" content="sunsetcrt-1784245277225">
+<meta name="sc-build" content="sunsetcrt-1784246020751">
 <meta name="robots" content="noindex">
 </head>
 <body>
@@ -6827,6 +6841,8 @@ body::before{
           html:'<div class="fp-sec"><div class="fp-sech">Sets <span>full sets · pick one to play</span></div><div class="fp-sets" id="fp-sets"><div class="fp-sets-load">Loading sets…</div></div></div>' });
         secTabs.push({ key:'tracks', label:'Tracks', count:null,
           html:'<div class="fp-sec"><div class="fp-sech">Tracks <span>most played in their sets</span></div><div class="fp-tracks" id="ap-tracks"><div class="fp-sets-load">Reading their sets…</div></div></div>' });
+        if(a.interviewsEnabled) secTabs.push({ key:'press', label:'Interviews', count:null,
+          html:'<div class="fp-sec"><div class="fp-sech">Interviews <span>in the music press</span></div><div class="fp-press" id="ap-press"><div class="fp-sets-load">Looking for interviews…</div></div></div>' });
         if(up.length) secTabs.push({ key:'upcoming', label:'Upcoming', count:up.length,
           html:'<div class="fp-sec"><div class="fp-sech">Upcoming events <span>'+up.length+' upcoming</span></div><div id="ap-upcoming-cards"></div></div>' });
         if((a.history||[]).length) secTabs.push({ key:'past', label:'Past events', count:a.history.length,
@@ -6919,7 +6935,7 @@ body::before{
         }
         // Tracks tab — most-played tracks aggregated from their sets' parsed tracklists.
         // Tap a row to jump to that drop in the set (timestamped), else YouTube-search it.
-        var _tracksLoaded=false;
+        var _tracksLoaded=false, _pressLoaded=false;
         function loadTracksTab(){
           if(_tracksLoaded) return; var box=document.getElementById('ap-tracks'); if(!box) return; _tracksLoaded=true;
           box.innerHTML='<div class="fp-sets-load">Reading their sets… this can take a moment the first time.</div>';
@@ -6946,16 +6962,30 @@ body::before{
             }); });
           }).catch(function(){ if(box) box.innerHTML='<div class="fp-sets-empty">Couldn’t load tracks.</div>'; });
         }
+        // Interviews — articles on major music publications (real outbound links, open in a new tab).
+        function loadInterviewsTab(){
+          if(_pressLoaded) return; var box=document.getElementById('ap-press'); if(!box) return; _pressLoaded=true;
+          box.innerHTML='<div class="fp-sets-load">Looking for interviews…</div>';
+          fetch(API_BASE+'/api/artist/interviews?slug='+encodeURIComponent(slug)+'&name='+encodeURIComponent(a.name||slug)).then(function(r){ return r.ok?r.json():null; }).then(function(j){
+            var iv=(j&&j.interviews)||[];
+            if(!iv.length){ box.innerHTML='<div class="fp-sets-empty">No interviews found for '+esc(a.name||'this artist')+' on the major music press yet.</div>'; return; }
+            box.innerHTML='<ul class="pr-list">'+iv.map(function(v){
+              var meta=[v.source, v.date?fmtDateLabel(v.date):''].filter(Boolean).join(' · ');
+              return '<li><a class="pr-row" href="'+esc(v.url)+'" target="_blank" rel="noopener"><span class="pr-src">'+esc(v.source||'')+'</span><span class="pr-m"><span class="pr-tt">'+esc(v.title||'Interview')+'</span>'+(v.snippet?'<span class="pr-sn">'+esc(v.snippet)+'</span>':'')+(meta?'<span class="pr-meta">'+esc(meta)+'</span>':'')+'</span><span class="pr-go">↗</span></a></li>';
+            }).join('')+'</ul>';
+          }).catch(function(){ if(box) box.innerHTML='<div class="fp-sets-empty">Couldn’t load interviews.</div>'; });
+        }
         document.querySelectorAll('#page-body .fp-tab[data-tab]').forEach(function(b){ b.addEventListener('click',function(){ var k=b.dataset.tab;
           document.querySelectorAll('#page-body .fp-tab').forEach(function(x){ var on=x===b; x.classList.toggle('on',on); x.setAttribute('aria-selected',on?'true':'false'); });
           document.querySelectorAll('#page-body .fp-tabpanel').forEach(function(p){ p.classList.toggle('hide', p.dataset.panel!==k); });
           try{ history.replaceState(history.state,'','#'+k); }catch(_){}   // keep /dj/<slug>/ path, tag the tab so the URL is shareable
           if(k==='sets') loadSetsTab();
           if(k==='tracks') loadTracksTab();
+          if(k==='press') loadInterviewsTab();
         }); });
         // Lazy-load whichever tab is initially active (deep-link via #tab, or the default Sets).
         // Upcoming/Past/Similar render synchronously; only Sets + Tracks are lazy.
-        if(_activeTab==='sets') loadSetsTab(); else if(_activeTab==='tracks') loadTracksTab();
+        if(_activeTab==='sets') loadSetsTab(); else if(_activeTab==='tracks') loadTracksTab(); else if(_activeTab==='press') loadInterviewsTab();
         markTabsFade(document.querySelector('#page-body .fp-tabs'));
         document.querySelectorAll('#page-body .fp-erow[data-ev]').forEach(function(tr){ tr.addEventListener('click',function(){ openEvent(tr.dataset.ev); }); });
         document.querySelectorAll('#page-body .fp-erow-play[data-play]').forEach(function(pl){ var g=up.filter(function(x){ return String(x.id)===pl.dataset.play; })[0]; var q=(g&&g.lineup||[]).map(function(x){ return { slug:x.slug, name:x.name, poster:g.poster_url }; }).filter(function(x){ return x.slug; }); pl.addEventListener('click',function(e){ e.stopPropagation(); if(q.length) playYtList(q,0); else openEvent(pl.dataset.play); }); });
