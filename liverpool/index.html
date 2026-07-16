@@ -298,9 +298,11 @@
     .gcard .meta { font-size:var(--fs-xs); color:var(--muted); font-weight:600; margin-top:4px; }
     .gcard .meta b { color:var(--fg); }
     /* ── poster-led event card (PORTRAIT 3:4 — shows full posters, no crop) ── */
-    /* z-index:4 lifts the tile above the fixed scanline overlay (body::before, z-index:3) so lines
-       don't cross the card — the tile gets a gentle purple gradient instead (darker top → lighter bottom). */
-    .gcard.evc { position:relative; z-index:4; background:linear-gradient(to bottom, #140b2b, #241640); border:1px solid var(--border); border-radius:var(--radius-lg); overflow:hidden; }
+    /* The tile sits BELOW the fixed scanline overlay (body::before, z-index:3) so the CRT lines
+       cross it like every other surface — consistency. isolation:isolate keeps the card's own
+       children (title straddle, play, heart) stacking locally, and a soft shadow lifts the tile
+       off the background so it still reads as a raised panel under the same glass. */
+    .gcard.evc { position:relative; isolation:isolate; background:linear-gradient(to bottom, #140b2b, #241640); border:1px solid var(--border); border-radius:var(--radius-lg); overflow:hidden; box-shadow:0 10px 24px -6px rgba(0,0,0,.5), 0 2px 6px rgba(0,0,0,.32); }
     .evc-hero { position:relative; aspect-ratio:3/4; }
     .evc-poster { position:absolute; inset:0; width:100%; height:100%; padding:0; border:0; background:none; cursor:pointer; }
     .evc-hero .poster { position:absolute; inset:0; width:100%; height:100%; aspect-ratio:auto; margin:0; border-radius:0; }
@@ -3159,7 +3161,7 @@ body::before{
 .lvr .heart.evc-heart svg{ width:17px; height:17px; }
 
 </style>
-<meta name="sc-build" content="sunsetcrt-1784217533680">
+<meta name="sc-build" content="sunsetcrt-1784218475012">
 <meta name="robots" content="noindex">
 </head>
 <body>
