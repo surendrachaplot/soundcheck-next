@@ -3159,7 +3159,7 @@ body::before{
 .lvr .heart.evc-heart svg{ width:17px; height:17px; }
 
 </style>
-<meta name="sc-build" content="sunsetcrt-1784216834360">
+<meta name="sc-build" content="sunsetcrt-1784217533680">
 <meta name="robots" content="noindex">
 </head>
 <body>
@@ -3665,10 +3665,17 @@ body::before{
       dockName.textContent=name; dockSrc.textContent=src;
       // Make the now-playing artist + venue tappable (jump to their pages; the set keeps playing).
       var navSlug=(btn&&btn.dataset&&btn.dataset.slug)||'', navVenue=(btn&&btn.dataset&&btn.dataset.venue)||'', navCity=(btn&&btn.dataset&&btn.dataset.city)||'';
-      dockName.classList.toggle('linky', !!navSlug);
-      dockName.onclick = navSlug ? function(){ openArtist(navSlug); } : null;
-      dockSrc.classList.toggle('linky', !!navVenue);
-      dockSrc.onclick = navVenue ? function(){ openVenue(navVenue, navCity||null); } : null;
+      var isTrack=!!(btn&&btn.dataset&&btn.dataset.kind==='track');   // Tracks queue: name is a song title (no track page) — link the DJ in the sub-line instead
+      dockName.classList.toggle('linky', !!navSlug && !isTrack);
+      dockName.onclick = (navSlug && !isTrack) ? function(){ openArtist(navSlug); } : null;
+      if(isTrack){
+        dockSrc.textContent = btn.dataset.artist||'';
+        dockSrc.classList.toggle('linky', !!navSlug);
+        dockSrc.onclick = navSlug ? function(){ openArtist(navSlug); } : null;
+      } else {
+        dockSrc.classList.toggle('linky', !!navVenue);
+        dockSrc.onclick = navVenue ? function(){ openVenue(navVenue, navCity||null); } : null;
+      }
       setDockNextGig(navSlug); // expanded dock: the artist's next gig under the name
       // Heart / Seen for the playing artist — labeled, in the expanded player. Reuse the
       // .heart/.seen-btn data hooks so refreshArtistButtons() keeps them in sync everywhere.
@@ -3849,6 +3856,8 @@ body::before{
       if(item.poster) b.dataset.poster=item.poster;
       if(item.venue) b.dataset.venue=item.venue;
       if(item.sec!=null) b.dataset.sec=String(item.sec);   // Tracks queue: start each item at its drop
+      if(item.kind) b.dataset.kind=item.kind;              // 'track' → dock name is a title, not an artist link
+      if(item.artist) b.dataset.artist=item.artist;        // track queue: the DJ, shown + linked in the sub-line
       return b; // detached on purpose — handleYtClick keeps the queue for off-DOM buttons
     }
     function playYtList(list, startIdx){
@@ -6861,7 +6870,7 @@ body::before{
               return '<li class="tk-row"'+(t.videoId?' data-vid="'+esc(t.videoId)+'"':'')+' data-sec="'+(t.sec!=null?t.sec:'')+'" data-q="'+esc(txt)+'"><span class="tk-rank">'+(i+1)+'</span><span class="tk-tt">'+esc(txt)+'</span><span class="tk-play">'+PLAY_SVG+'</span></li>';
             }).join('')+'</ol>';
             // Queue of the timestamped tracks so the dock next/prev walks track→track (each jumps to its drop).
-            var tkQ=tr.filter(function(t){ return t.videoId && t.sec!=null; }).map(function(t){ return { slug:slug, name:cleanTk(t.text), videoId:t.videoId, sec:t.sec, poster:a.image||'' }; });
+            var tkQ=tr.filter(function(t){ return t.videoId && t.sec!=null; }).map(function(t){ return { slug:slug, name:cleanTk(t.text), videoId:t.videoId, sec:t.sec, poster:a.image||'', kind:'track', artist:(a.name||slug) }; });
             box.querySelectorAll('.tk-row').forEach(function(row){ row.addEventListener('click',function(){
               var vid=row.dataset.vid, sec=row.dataset.sec;
               // jump to the drop ONLY when we have a real timestamp; otherwise search (no timestamp
