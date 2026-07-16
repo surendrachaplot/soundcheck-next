@@ -3177,7 +3177,7 @@ body::before{
 .lvr .heart.evc-heart svg{ width:17px; height:17px; }
 
 </style>
-<meta name="sc-build" content="sunsetcrt-1784232407911">
+<meta name="sc-build" content="sunsetcrt-1784234021995">
 <meta name="robots" content="noindex">
 </head>
 <body>
@@ -6576,8 +6576,7 @@ body::before{
     function openSearch(){
       setRoute('search');
       _dcSceneP=null; _sxDiscoverP=null; // fresh suggestions for the current city
-      showPage('<h2 class="page-title">Search</h2><div class="sub" style="margin-bottom:14px">Find artists, venues, events and people &mdash; everywhere we cover.</div>'+
-        '<div class="search-box"><svg class="search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><input type="search" id="sx-input" placeholder="Search artists, venues, events, people…" autocomplete="off" autocapitalize="off" autocorrect="off"></div>'+
+      showPage('<div class="search-box" style="margin-top:6px"><svg class="search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><input type="search" id="sx-input" placeholder="Search artists, venues, events, people…" autocomplete="off" autocapitalize="off" autocorrect="off"></div>'+
         '<div id="sx-recent-top"></div>'+
         '<div id="sx-results"></div>'+
         '<div id="sx-radio-foot"></div>');
@@ -6587,6 +6586,8 @@ body::before{
         var b=document.getElementById('sx-radio-btn'); if(b) b.addEventListener('click',function(){ openRadio(); });
       })();
       var input=document.getElementById('sx-input'), results=document.getElementById('sx-results');
+      // Focus the field so tapping Search (a user gesture) pops the keyboard straight away.
+      try{ input.focus({preventScroll:true}); }catch(_){ try{ input.focus(); }catch(e){} }
       var lastQ='', showing='';
       // recent searches sit as plain pills below the search box (no sub-heading)
       function renderRecentTop(){ var rt=document.getElementById('sx-recent-top'); if(!rt) return; var rec=getRecent(); rt.innerHTML=rec.length?('<div class="pillrow" style="margin-bottom:14px">'+rec.map(function(t){ return '<button class="qchip" type="button" data-q="'+esc(t)+'">'+esc(t)+'</button>'; }).join('')+'</div>'):''; rt.querySelectorAll('.qchip[data-q]').forEach(function(b){ b.addEventListener('click',function(){ setSearchQuery(b.dataset.q); }); }); }
