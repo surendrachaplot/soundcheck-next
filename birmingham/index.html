@@ -3177,7 +3177,7 @@ body::before{
 .lvr .heart.evc-heart svg{ width:17px; height:17px; }
 
 </style>
-<meta name="sc-build" content="sunsetcrt-1784231627667">
+<meta name="sc-build" content="sunsetcrt-1784232407911">
 <meta name="robots" content="noindex">
 </head>
 <body>
@@ -4296,8 +4296,14 @@ body::before{
     //    clicks fall through to the element's own listener → in-app nav, no full reload.
     document.addEventListener('click', function(e){
       var a=e.target.closest && e.target.closest('a.nav[href]'); if(!a) return;
-      if(e.metaKey||e.ctrlKey||e.shiftKey||e.altKey||e.button===1) e.stopPropagation();   // modified → let the browser open the href in a new tab
-      else e.preventDefault();   // plain click → block the full-page load; the element's own listener does the in-app nav
+      if(e.metaKey||e.ctrlKey||e.shiftKey||e.altKey||e.button===1){ e.stopPropagation(); return; }   // modified → browser opens the href in a new tab
+      // plain click → in-app nav from the anchor's own data (works even for links without a bespoke listener); block the full reload
+      e.preventDefault(); e.stopPropagation();
+      if(a.dataset.artist){ openArtist(a.dataset.artist); return; }
+      if(a.dataset.venue){ openVenue(a.dataset.venue, a.dataset.city||a.dataset.vcity||null); return; }
+      var evEl=a.closest('[data-evt],[data-event-id],[data-open-evt]');
+      var id=a.dataset.evt||a.dataset.eventId||a.dataset.openEvt||(evEl&&(evEl.dataset.evt||evEl.dataset.eventId||evEl.dataset.openEvt));
+      if(id!=null&&id!==''){ var o=(typeof lookup!=='undefined'&&lookup.byEvent)?lookup.byEvent[id]:null; if(o&&typeof openSheet==='function') openSheet(o); else if(typeof openEvent==='function') openEvent(id); }
     }, true);
     // 2) Fallback for nav elements that are NOT anchors yet: resolve the URL and open it.
     (function(){
@@ -5104,7 +5110,7 @@ body::before{
     }
     function meRowEvt(id, meta){
       var hit=lookup.byEvent[id], title=hit?hit.title:(meta.title||'Event'), venue=hit?hit.venue:(meta.venue||''), day=hit?(hit._day||''):(meta.day||'');
-      return '<li><button class="open-ev" data-open-evt="'+esc(id)+'">'+esc(title)+' <small>'+esc(venue||'')+(day?(' &middot; '+esc(day)):'')+'</small></button><button class="rm" data-rm-evt="'+esc(id)+'" title="Remove">&times;</button></li>';
+      return '<li><a class="open-ev nav" href="'+esc(evHref(id,null,venue))+'" data-open-evt="'+esc(id)+'">'+esc(title)+' <small>'+esc(venue||'')+(day?(' &middot; '+esc(day)):'')+'</small></a><button class="rm" data-rm-evt="'+esc(id)+'" title="Remove">&times;</button></li>';
     }
     function picksShelvesHTML(){
       var wannaComing=[], wannaList=[], seen=[], going=[];
@@ -5588,7 +5594,7 @@ body::before{
         if(j.reviews.toilets!=null) rows+='<div class="vd-row"><span class="vd-k">Toilets</span><span>'+j.reviews.toilets+'/5</span></div>';
         if(j.reviews.goBack!=null) rows+='<div class="vd-row"><span class="vd-k">Return</span><span>'+j.reviews.goBack+'% <span style="color:var(--muted)">would go back</span></span></div>';
       }
-      if((j.similar||[]).length) rows+='<div class="vd-row"><span class="vd-k">Similar</span><span class="vd-sim">'+j.similar.map(function(s){ return '<button class="vd-vlink" type="button" data-venue="'+esc(s.venue)+'">'+esc(s.venue)+'</button>'; }).join('')+'</span></div>';
+      if((j.similar||[]).length) rows+='<div class="vd-row"><span class="vd-k">Similar</span><span class="vd-sim">'+j.similar.map(function(s){ return '<a class="vd-vlink nav" href="'+esc(venueHref(s.venue))+'" data-venue="'+esc(s.venue)+'">'+esc(s.venue)+'</a>'; }).join('')+'</span></div>';
       var dnaNote=j.reviews?'Sound, crowd &amp; vibe from people who&rsquo;ve been; genres &amp; nights from what plays here.':'Derived from what plays here — sound &amp; crowd come from people who&rsquo;ve been.';
       return '<div class="sec-h" style="margin-top:26px">Venue DNA</div><div class="vd-box">'+rows+'<div class="vd-note">'+dnaNote+'</div></div>';
     }
@@ -5694,9 +5700,9 @@ body::before{
         var dt=d.gig_date?new Date(String(d.gig_date).slice(0,10)+'T12:00:00'):null;
         var day=dt?String(dt.getDate()).padStart(2,'0'):'&ndash;', mon=dt?dt.toLocaleDateString('en-GB',{month:'short'}):'', yr=dt?dt.getFullYear():'';
         var arts=diaryValid(d);
-        var vn = d.venue ? '<button class="dv-venue" type="button" data-venue="'+esc(d.venue)+'">'+esc(d.venue)+'</button>' : 'Gig';
+        var vn = d.venue ? '<a class="dv-venue nav" href="'+esc(venueHref(d.venue))+'" data-venue="'+esc(d.venue)+'">'+esc(d.venue)+'</a>' : 'Gig';
         var city = d.city ? '<span class="pb-ds-city">'+esc(cityLabel(d.city))+'</span>' : '';
-        var ev = d.event_id ? '<a class="pb-ds-ev" data-event-id="'+esc(String(d.event_id))+'">view event &rsaquo;</a>' : '';
+        var ev = d.event_id ? '<a class="pb-ds-ev nav" href="'+esc(evHref(d.event_id,null,d.venue))+'" data-event-id="'+esc(String(d.event_id))+'">view event &rsaquo;</a>' : '';
         var del = (isMe && d.id!=null) ? '<button class="dv-edit" type="button" data-edit="'+esc(String(d.id))+'" aria-label="Edit gig">✎</button><button class="dv-del" type="button" data-del="'+esc(String(d.id))+'" aria-label="Remove gig">&times;</button>' : '';
         var tiles = arts.length ? '<div class="ptiles ptiles-wide">'+arts.map(function(a){ return ptile(a.slug, (a.name||a.slug)+(a.rating?' ★'+a.rating:''), false, a.image); }).join('')+'</div>' : '';
         var note = d.note?'<div class="pb-ds-note">'+esc(d.note)+'</div>':'';
@@ -5851,7 +5857,7 @@ body::before{
       var day=dt?String(dt.getDate()).padStart(2,'0'):'–', mon=dt?dt.toLocaleDateString('en-GB',{month:'short'}):'';
       var arts=(typeof diaryValid==='function')?diaryValid(d):(d.artists||[]);
       var names=arts.slice(0,4).map(function(a){return a.name||a.slug;}).join(' · ')+(arts.length>4?' +'+(arts.length-4):'');
-      var evl = d.event_id ? '<a class="pb-ds-ev" data-event-id="'+esc(String(d.event_id))+'">view event ›</a>' : '';
+      var evl = d.event_id ? '<a class="pb-ds-ev nav" href="'+esc(evHref(d.event_id,null,d.venue))+'" data-event-id="'+esc(String(d.event_id))+'">view event ›</a>' : '';
       var cty = d.city ? '<span class="pb-ds-city">'+esc(cityLabel(d.city))+'</span>' : '';
       return '<div class="pb-ds"'+(d.venue?' data-venue="'+esc(d.venue)+'"':'')+'><div class="pb-ds-date"><div class="pb-ds-d">'+day+'</div><div class="pb-ds-m">'+esc(mon)+'</div></div><div class="pb-ds-body"><div class="pb-ds-venue">'+(d.venue?esc(d.venue):'Gig')+cty+evl+'</div><div class="pb-ds-line">'+esc(names||'—')+'</div></div></div>';
     }
@@ -6211,7 +6217,7 @@ body::before{
       return '<ul class="tray-line">'+rows.map(function(d){
         if(d.id!=null) _diaryById[d.id]=d;
         var dl=diaryDateLabel(d), arts=diaryArts(d);
-        var vn = d.venue ? '<button class="dv-venue" type="button" data-venue="'+esc(d.venue)+'">'+esc(d.venue)+'</button>' : 'Gig';
+        var vn = d.venue ? '<a class="dv-venue nav" href="'+esc(venueHref(d.venue))+'" data-venue="'+esc(d.venue)+'">'+esc(d.venue)+'</a>' : 'Gig';
         var edit = (isMe && d.id!=null) ? '<button class="dv-edit" type="button" data-edit="'+esc(String(d.id))+'" aria-label="Edit gig">✎</button>' : '';
         var del = (isMe && d.id!=null) ? '<button class="dv-del" type="button" data-del="'+esc(String(d.id))+'" aria-label="Remove gig">&times;</button>' : '';
         return '<li><span class="open-ev">'+vn+(dl?(' <small>'+esc(dl)+'</small>'):'')+'<br><small>'+esc(arts)+(d.note?(' — '+esc(d.note)):'')+'</small></span>'+edit+del+'</li>';
@@ -6344,7 +6350,7 @@ body::before{
         if(!rows.length){ h+='<div class="empty">Quiet so far. Follow some people from their profiles and their picks show up here.</div>'; openPanel(h); maybeSuggest(); return; }
         h+='<div style="margin-top:8px">'+rows.map(function(a){
           var verb = a.kind==='wanna_see'?'wants to see':a.kind==='seen'?'saw':a.kind==='save_event'?'is interested in':a.kind==='going_event'?'is going to':a.kind==='follow'?'followed':a.kind==='diary'?'logged a gig at':'·';
-          var subj = a.subject_type==='artist'?'<span class="lk" data-artist="'+esc(a.subject_id)+'">'+esc(a.subject_label||a.subject_id)+'</span>':
+          var subj = a.subject_type==='artist'?'<a class="lk nav" href="'+esc(djHref(a.subject_id))+'" data-artist="'+esc(a.subject_id)+'">'+esc(a.subject_label||a.subject_id)+'</a>':
                      a.subject_type==='user'?'<span class="lk" data-profile="'+esc(a.subject_id)+'">u/'+esc(a.subject_id)+'</span>':esc(a.subject_label||'an event');
           return '<div class="feed-row">'+av(a.author_handle)+'<div><div class="ft"><b class="lk" data-profile="'+esc(a.author_handle)+'">u/'+esc(a.author_handle)+'</b> '+verb+' '+subj+'</div><div class="fw">'+relTime(a.created_at)+'</div></div></div>';
         }).join('')+'</div>';
@@ -6445,7 +6451,7 @@ body::before{
         if(a.nextDate){
           var loc=[a.nextVenue, a.nextCity?cityLabel(a.nextCity):''].filter(Boolean).join(' · ');
           sub='<span class="srail-art-d">'+esc(fmtDateLabel(String(a.nextDate).slice(0,10)))+'</span>'+
-              (a.nextVenue?'<button class="srail-art-v" data-venue="'+esc(a.nextVenue)+'" data-city="'+esc(a.nextCity||'')+'">'+esc(loc)+'</button>':(loc?'<span class="srail-art-v">'+esc(loc)+'</span>':''));
+              (a.nextVenue?'<a class="srail-art-v nav" href="'+esc(venueHref(a.nextVenue,a.nextCity))+'" data-venue="'+esc(a.nextVenue)+'" data-city="'+esc(a.nextCity||'')+'">'+esc(loc)+'</a>':(loc?'<span class="srail-art-v">'+esc(loc)+'</span>':''));
         } else if(a.venue){ sub='<button class="srail-art-v" data-venue="'+esc(a.venue)+'">'+esc(a.venue)+'</button>'; }
         else if(opts.emptyLabel){ sub='<span class="srail-art-v">'+esc(opts.emptyLabel)+'</span>'; }
         return '<div class="srail-art"><div class="srail-art-img" data-artist="'+esc(a.slug)+'" style="'+img+'"><span class="srail-play ctr" data-i="'+i+'" aria-label="Play '+esc(a.name)+'">&#9654;</span></div>'+
@@ -6688,7 +6694,7 @@ body::before{
         var j; try{ j=await pubGet(qs); }catch(_){ j={}; }
         var vs=(j.venues||[]), pts=[];
         function pinDate(iso){ if(!iso) return ''; var d=new Date(String(iso).slice(0,10)+'T12:00:00'); return d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric'}); }
-        function popupHTML(v){ var up=v.upcoming?(v.upcoming+' upcoming night'+(v.upcoming===1?'':'s')):'no dates yet'; return '<b>'+esc(v.name)+'</b><br><span style="color:var(--muted)">'+esc(up)+'</span><br><span class="map-link" data-venue="'+esc(v.name)+'">View venue &rsaquo;</span>'; }
+        function popupHTML(v){ var up=v.upcoming?(v.upcoming+' upcoming night'+(v.upcoming===1?'':'s')):'no dates yet'; return '<b>'+esc(v.name)+'</b><br><span style="color:var(--muted)">'+esc(up)+'</span><br><a class="map-link nav" href="'+esc(venueHref(v.name))+'" data-venue="'+esc(v.name)+'">View venue &rsaquo;</a>'; }
         // Popularity heat: a venue's upcoming-night count vs the busiest in the city →
         // hottest = bright red + big + bright halo, quietest = dim slate + small. No legend.
         var maxUp=vs.reduce(function(m,v){ return Math.max(m, v.upcoming||0); }, 0) || 1;
@@ -6864,7 +6870,7 @@ body::before{
             var c=sd.count||0, nights=sd.nights||[];
             if(c>0){
               box.innerHTML='<div class="ap-seen"><div class="ap-seen-top"><div class="ap-seen-num">'+c+'<span>×</span></div><div class="ap-seen-lbl">night'+(c===1?'':'s')+' you’ve caught<br><b>'+esc(_anm)+'</b></div></div>'+
-                nights.map(function(g){ var d=g.gig_date?fmtDateLabel(String(g.gig_date).slice(0,10)):''; var ev=g.event_id?'<a class="ap-seen-ev" data-event-id="'+esc(String(g.event_id))+'">view event ›</a>':''; return '<div class="ap-seen-row"><span class="ap-seen-d">'+esc(d)+'</span><span class="ap-seen-v"'+(g.venue?' data-venue="'+esc(g.venue)+'"':'')+'>'+esc(g.venue||'Gig')+'</span>'+ev+'</div>'; }).join('')+
+                nights.map(function(g){ var d=g.gig_date?fmtDateLabel(String(g.gig_date).slice(0,10)):''; var ev=g.event_id?'<a class="ap-seen-ev nav" href="'+esc(evHref(g.event_id,null,g.venue))+'" data-event-id="'+esc(String(g.event_id))+'">view event ›</a>':''; return '<div class="ap-seen-row"><span class="ap-seen-d">'+esc(d)+'</span><a class="ap-seen-v nav"'+(g.venue?' href="'+esc(venueHref(g.venue))+'" data-venue="'+esc(g.venue)+'"':'')+'>'+esc(g.venue||'Gig')+'</a>'+ev+'</div>'; }).join('')+
                 '<button class="ap-seen-log" id="ap-seen-log" type="button">＋ Log another night</button></div>';
             } else { box.innerHTML=''; }   // no empty-state nudge — Log a gig already lives in the header actions
             var lg=document.getElementById('ap-seen-log'); if(lg) lg.addEventListener('click',function(){ openLog({ artist:{ slug:slug, name:_anm } }); });
@@ -7031,7 +7037,7 @@ body::before{
     // open the venue. No play button, no artist hook — just "if you like X, go to these venues".
     function sceneRouteHTML(routes){
       return routes.map(function(rt){
-        var vch=rt.venues.map(function(v){ return '<button class="rf-venue" type="button" data-venue="'+esc(v.name)+'">'+esc(v.name)+'</button>'; }).join('');
+        var vch=rt.venues.map(function(v){ return '<a class="rf-venue nav" href="'+esc(venueHref(v.name))+'" data-venue="'+esc(v.name)+'">'+esc(v.name)+'</a>'; }).join('');
         return '<div class="rf-card rf-card-simple"><div class="rf-genre">'+esc(rt.genre)+'</div><div class="rf-venues">'+vch+'</div></div>';
       }).join('');
     }
@@ -7225,7 +7231,7 @@ body::before{
             var line=(g.lineup||[]).map(function(a){ return a.name; }).filter(Boolean).slice(0,3).join(', ');
             var label=g.title||line||'Event';
             return '<li class="gh-row" data-open-evt="'+esc(String(g.id))+'"><span class="gh-date">'+esc(d)+'</span>'+
-              '<button class="gh-venue" type="button" data-open-evt="'+esc(String(g.id))+'">'+esc(label)+(line && line!==label ? ' <small>'+esc(line)+'</small>' : '')+'</button>'+
+              '<a class="gh-venue nav" href="'+esc(evHref(g.id))+'" data-open-evt="'+esc(String(g.id))+'">'+esc(label)+(line && line!==label ? ' <small>'+esc(line)+'</small>' : '')+'</a>'+
               '<button class="gh-log" type="button" data-log-evt="'+esc(String(g.id))+'" title="Log this gig">+ Log</button></li>';
           }).join('')+'</ul></div>';
           vpst.querySelectorAll('.gh-row[data-open-evt]').forEach(function(li){ li.addEventListener('click',function(){ openEvent(li.dataset.openEvt); }); });
