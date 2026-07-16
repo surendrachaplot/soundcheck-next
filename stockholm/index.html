@@ -3175,7 +3175,7 @@ body::before{
 .lvr .heart.evc-heart svg{ width:17px; height:17px; }
 
 </style>
-<meta name="sc-build" content="sunsetcrt-1784229658748">
+<meta name="sc-build" content="sunsetcrt-1784230290715">
 <meta name="robots" content="noindex">
 </head>
 <body>
@@ -4283,6 +4283,27 @@ body::before{
     document.getElementById('bnav-search').addEventListener('click',function(){ openSearch(); });
     document.getElementById('bnav-radio').addEventListener('click',function(){ openRadio(); });
     document.getElementById('bnav-profile').addEventListener('click',function(){ whenAuthKnown().then(function(){ if(currentUser) openAccount(); else openAuth(); }); });
+    // Cmd/Ctrl/middle-click on an in-app entity → open its real SEO URL in a new tab.
+    // Entity nav is JS-driven (no <a href>), so the browser has nothing to open on a
+    // modified click; this resolves the canonical /dj//club//e/ URL and opens it itself.
+    (function(){
+      function navUrl(el){
+        if(!el||!el.closest) return null;
+        if(el.closest('a[href]')) return null;   // a real link → let the browser handle it natively
+        var a=el.closest('[data-artist]'); if(a&&a.dataset.artist) return SC_BASE+'dj/'+encodeURIComponent(a.dataset.artist)+'/';
+        var v=el.closest('[data-venue]'); if(v&&v.dataset.venue){ var c=v.dataset.city||currentCity||'london'; return SC_BASE+encodeURIComponent(c)+'/club/'+venueSlug(v.dataset.venue)+'/'; }
+        var ev=el.closest('[data-event-id],[data-open-evt],.gcard[data-evt]'); if(ev){ var id=ev.dataset.eventId||ev.dataset.openEvt||ev.dataset.evt; if(!id) return null; var o=(typeof lookup!=='undefined'&&lookup.byEvent)?lookup.byEvent[id]:null; var who=o&&((o.artists&&o.artists[0]&&(o.artists[0].name||o.artists[0]))||o.headliner||o.title); return SC_BASE+eventPath(id, who, o&&o.venue)+'/'; }
+        return null;
+      }
+      function handle(e){
+        if(!(e.metaKey||e.ctrlKey||e.button===1)) return;   // only new-tab intent
+        var url=navUrl(e.target); if(!url) return;
+        e.preventDefault(); e.stopPropagation();
+        window.open(location.origin+url, '_blank', 'noopener');
+      }
+      document.addEventListener('click', handle, true);
+      document.addEventListener('auxclick', handle, true);
+    })();
     // Logo → home grid (SPA). href stays a real home URL for cmd/middle-click + SEO.
     (function(){ var lg=document.querySelector('.logo'); if(!lg) return; lg.addEventListener('click',function(e){
       if(e.metaKey||e.ctrlKey||e.shiftKey||e.altKey) return;   // let new-tab/window through
