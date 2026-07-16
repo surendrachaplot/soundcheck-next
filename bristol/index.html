@@ -2670,6 +2670,19 @@
     .fp-sets-all:active{ transform:translateY(1px); }
     .fp-sets-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:16px 14px; }
     @media(max-width:560px){ .fp-sets-grid{ grid-template-columns:1fr 1fr; gap:14px 10px; } }
+    /* Tracks tab — ranked "most played in their sets" list */
+    .fp-tracks{ padding:6px 2px 4px; }
+    .tk-list{ list-style:none; margin:0; padding:0; }
+    .tk-row{ display:flex; align-items:center; gap:12px; padding:11px 6px; border-top:1px solid var(--line); cursor:pointer; border-radius:var(--radius-sm); -webkit-tap-highlight-color:transparent; }
+    .tk-row:first-child{ border-top:0; }
+    .tk-row:hover{ background:var(--surface-2); }
+    .tk-rank{ flex:none; width:22px; text-align:right; font:700 12px var(--font-mono); color:var(--faint); }
+    .tk-tt{ flex:1 1 auto; min-width:0; font:600 var(--fs-base) var(--body); color:var(--fg); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .tk-ct{ flex:none; font:800 11px var(--font-mono); letter-spacing:.03em; color:var(--sel-text); background:var(--sel-weak); border-radius:var(--radius-pill); padding:3px 8px; }
+    .tk-play{ flex:none; width:30px; height:30px; border-radius:var(--radius-pill); display:grid; place-items:center; color:var(--accent); }
+    .tk-play svg{ width:15px; height:15px; margin-left:1px; }
+    .tk-row:hover .tk-play{ color:var(--accent-ink); background:var(--accent-grad); }
+    .tk-note{ margin-top:14px; font:500 var(--fs-xs) var(--body); color:var(--faint); }
     .fp-sk{ display:flex; flex-direction:column; text-align:left; background:none; border:0; padding:0; cursor:pointer; color:var(--fg); min-width:0; }
     .fp-sk-th{ position:relative; aspect-ratio:16/9; border-radius:var(--radius-md); background-size:cover; background-position:center; background-color:var(--surface-3); overflow:hidden; }
     .fp-sk-dur{ position:absolute; left:6px; bottom:6px; font:700 10px var(--font-mono); background:rgba(22,16,42,.82); color:var(--fg); border-radius:var(--radius-2xs); padding:2px 6px; }
@@ -3146,7 +3159,7 @@ body::before{
 .lvr .heart.evc-heart svg{ width:17px; height:17px; }
 
 </style>
-<meta name="sc-build" content="sunsetcrt-1784211959179">
+<meta name="sc-build" content="sunsetcrt-1784212872802">
 <meta name="robots" content="noindex">
 </head>
 <body>
@@ -6732,6 +6745,8 @@ body::before{
         // "Sets" FIRST (default tab) — the artist's full YouTube sets; lazy-loaded on first open (one YT search per artist, cached).
         secTabs.push({ key:'sets', label:'Sets', count:null,
           html:'<div class="fp-sec"><div class="fp-sech">Sets <span>full sets · pick one to play</span></div><div class="fp-sets" id="fp-sets"><div class="fp-sets-load">Loading sets…</div></div></div>' });
+        secTabs.push({ key:'tracks', label:'Tracks', count:null,
+          html:'<div class="fp-sec"><div class="fp-sech">Tracks <span>most played in their sets</span></div><div class="fp-tracks" id="ap-tracks"><div class="fp-sets-load">Reading their sets…</div></div></div>' });
         if(up.length) secTabs.push({ key:'upcoming', label:'Upcoming', count:up.length,
           html:'<div class="fp-sec"><div class="fp-sech">Upcoming events <span>'+up.length+' upcoming</span></div><div id="ap-upcoming-cards"></div></div>' });
         if((a.history||[]).length) secTabs.push({ key:'past', label:'Past events', count:a.history.length,
@@ -6824,11 +6839,32 @@ body::before{
             box.querySelectorAll('[data-shl]').forEach(function(b){ b.addEventListener('click',function(){ shelfClick(+b.dataset.shl,'listened'); }); });
           }).catch(function(){ if(box) box.innerHTML='<div class="fp-sets-empty">Couldn’t load sets.</div>'; });
         }
+        // Tracks tab — most-played tracks aggregated from their sets' parsed tracklists.
+        // Tap a row to jump to that drop in the set (timestamped), else YouTube-search it.
+        var _tracksLoaded=false;
+        function loadTracksTab(){
+          if(_tracksLoaded) return; var box=document.getElementById('ap-tracks'); if(!box) return; _tracksLoaded=true;
+          box.innerHTML='<div class="fp-sets-load">Reading their sets… this can take a moment the first time.</div>';
+          fetch(API_BASE+'/api/artist/tracks?slug='+encodeURIComponent(slug)+'&name='+encodeURIComponent(a.name||slug)).then(function(r){ return r.ok?r.json():null; }).then(function(j){
+            var tr=(j&&j.tracks)||[];
+            if(!tr.length){ box.innerHTML='<div class="fp-sets-empty">No posted tracklists found in '+esc(a.name||'their')+'&rsquo;s sets yet — we can only rank what DJs or fans have written up.</div>'; return; }
+            box.innerHTML='<ol class="tk-list">'+tr.map(function(t,i){
+              var badge=(t.count>1)?'<span class="tk-ct" title="in '+t.count+' of their sets">&times;'+t.count+'</span>':'';
+              return '<li class="tk-row"'+(t.videoId?' data-vid="'+esc(t.videoId)+'"':'')+' data-sec="'+(t.sec!=null?t.sec:'')+'" data-q="'+esc(t.text)+'"><span class="tk-rank">'+(i+1)+'</span><span class="tk-tt">'+esc(t.text)+'</span>'+badge+'<span class="tk-play">'+PLAY_SVG+'</span></li>';
+            }).join('')+'</ol>'+(j.nTracklists!=null?'<div class="tk-note">Ranked across '+j.nTracklists+' of '+j.nSets+' sets with a posted tracklist.</div>':'');
+            box.querySelectorAll('.tk-row').forEach(function(row){ row.addEventListener('click',function(){
+              var vid=row.dataset.vid, sec=row.dataset.sec;
+              if(vid){ var pb=row.querySelector('.tk-play'); pb.dataset.name=a.name||slug; pb.dataset.venue=row.querySelector('.tk-tt').textContent; playYt(pb, vid, sec?+sec:0); }
+              else { window.open('https://www.youtube.com/results?search_query='+encodeURIComponent(row.dataset.q),'_blank','noopener'); }
+            }); });
+          }).catch(function(){ if(box) box.innerHTML='<div class="fp-sets-empty">Couldn’t load tracks.</div>'; });
+        }
         document.querySelectorAll('#page-body .fp-tab[data-tab]').forEach(function(b){ b.addEventListener('click',function(){ var k=b.dataset.tab;
           document.querySelectorAll('#page-body .fp-tab').forEach(function(x){ var on=x===b; x.classList.toggle('on',on); x.setAttribute('aria-selected',on?'true':'false'); });
           document.querySelectorAll('#page-body .fp-tabpanel').forEach(function(p){ p.classList.toggle('hide', p.dataset.panel!==k); });
           try{ history.replaceState(history.state,'','#'+k); }catch(_){}   // keep /dj/<slug>/ path, tag the tab so the URL is shareable
           if(k==='sets') loadSetsTab();
+          if(k==='tracks') loadTracksTab();
         }); });
         // If Sets is the initially-visible panel (e.g. it's the only section), load it now.
         if(document.getElementById('fp-sets') && !document.querySelector('#page-body .fp-tabpanel[data-panel="sets"].hide')) loadSetsTab();
