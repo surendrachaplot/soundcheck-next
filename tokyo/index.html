@@ -2,12 +2,12 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>soundcheck · London — club nights &amp; DJ sets</title>
-  <meta name="description" content="soundcheck maps club nights and DJ line-ups across 104 cities in 40 countries. See who's playing tonight, follow the artists and venues you love, log the gigs you go to, and stream every DJ's sets." />
+  <title>soundcheck · London — club nights &amp; artist sets</title>
+  <meta name="description" content="soundcheck maps club nights and artist line-ups across 104 cities in 40 countries. See who's playing tonight, follow the artists and venues you love, log the gigs you go to, and stream every artist's sets." />
   <meta property="og:site_name" content="soundcheck" />
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="soundcheck · club nights &amp; DJ sets" />
-  <meta property="og:description" content="soundcheck maps club nights and DJ line-ups across 104 cities in 40 countries. See who's playing tonight, follow artists and venues, log your gigs and stream every set." />
+  <meta property="og:title" content="soundcheck · club nights &amp; artist sets" />
+  <meta property="og:description" content="soundcheck maps club nights and artist line-ups across 104 cities in 40 countries. See who's playing tonight, follow artists and venues, log your gigs and stream every set." />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <!-- Self-hosted Latin variable fonts (no third-party origin). One file per family
@@ -1433,7 +1433,7 @@
     /* external link pills (artist socials / venue website) */
     .slinks { display:flex; gap:10px; margin:14px 0 2px; flex-wrap:wrap; }
     .ah-namerow { display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
-    .ah-namerow .slinks { margin:0; }
+    .ah-namerow .slinks, .fp-namerow .slinks { margin:0; }   /* in the name row the icons align to the name — drop the standalone top/bottom margin */
     .slink { display:inline-flex; align-items:center; justify-content:center; width:38px; height:38px; border-radius:var(--radius-pill); border:1px solid var(--border); color:var(--muted); -webkit-tap-highlight-color:transparent; }
     .slink:hover { border-color:var(--accent); color:var(--accent); }
     .slink svg { width:var(--icon-md); height:var(--icon-md); fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
@@ -2714,11 +2714,11 @@
     .fp-hx{ padding:22px 24px; min-width:0; }
     .fp-kick{ font:600 12px var(--font-mono); letter-spacing:.1em; text-transform:uppercase; color:var(--accent); }
     .fp-kick .fp-foll{ background:var(--accent-weak); color:var(--accent); padding:2px 8px; border-radius:var(--radius-pill); margin-left:8px; white-space:nowrap; display:inline-block; }
-    .fp-namerow{ display:flex; align-items:flex-end; gap:6px 16px; flex-wrap:wrap; margin:10px 0 10px; }
+    .fp-namerow{ display:flex; align-items:center; gap:6px 16px; flex-wrap:wrap; margin:10px 0 10px; }
     .fp-h1{ font:800 clamp(34px,6.5vw,72px)/0.98 var(--head); letter-spacing:-0.03em; margin:0; overflow-wrap:break-word; }
     .fp-bio{ font:400 14px/1.55 var(--body); color:var(--muted); max-width:none; margin:0 0 16px; }
     .fp-socials{ display:flex; gap:12px; margin-bottom:16px; align-items:center; }
-    .fp-namerow .fp-socials{ margin:0 0 6px; }
+    .fp-namerow .fp-socials{ margin:0; }
     .fp-gemline{ margin:0 0 14px; }
     /* equal-width action buttons — a grid keeps every column identical and wraps
        cleanly (a wrapped button stays its column width, never stretches full) */
@@ -3162,7 +3162,7 @@ body::before{
 .lvr .heart.evc-heart svg{ width:17px; height:17px; }
 
 </style>
-<meta name="sc-build" content="sunsetcrt-1784223964417">
+<meta name="sc-build" content="sunsetcrt-1784224448103">
 <meta name="robots" content="noindex">
 </head>
 <body>
@@ -3217,8 +3217,8 @@ body::before{
          <h1> in the DOM so it's the page heading for SEO regardless of visual position.
          Home-only (inside #home, which body.page-on hides); setCity keeps .hs-city in step. -->
     <section id="home-seo" class="home-seo">
-      <h1 class="home-seo-h1">Club nights &amp; DJ sets in <span class="hs-city">London</span></h1>
-      <p class="home-seo-p">See who&rsquo;s playing tonight and this weekend across every venue in <span class="hs-city">London</span>. Preview the sets, follow the artists you love, and save the nights you want &mdash; soundcheck maps club nights and DJ line-ups across 104 cities in 40 countries.</p>
+      <h1 class="home-seo-h1">Club nights &amp; artist sets in <span class="hs-city">London</span></h1>
+      <p class="home-seo-p">See who&rsquo;s playing tonight and this weekend across every venue in <span class="hs-city">London</span>. Preview the sets, follow the artists you love, and save the nights you want &mdash; soundcheck maps club nights and artist line-ups across 104 cities in 40 countries.</p>
     </section>
 
     </div><!-- /#home -->
@@ -3975,7 +3975,7 @@ body::before{
       var hb=document.getElementById('hero-radio'); if(!hb) return;
       hb.classList.remove('on'); hb.disabled=false;
       hb.querySelector('.hr-t').textContent='Weekend radio';
-      hb.querySelector('.hr-sub').textContent='6 minutes with every DJ playing this weekend';
+      hb.querySelector('.hr-sub').textContent='6 minutes with every artist playing this weekend';
     }
     function radioStop(){
       if(radio.tick){ clearInterval(radio.tick); radio.tick=null; }
@@ -4216,7 +4216,7 @@ body::before{
     async function openRadio(){
       setRoute('radio');
       var cm=cityMeta();
-      showPage('<h2 class="page-title">Weekend radio</h2><div class="sub" style="margin-bottom:16px">Every DJ playing '+esc(cm.name)+' this weekend &mdash; shuffled into one non-stop station.</div>'+
+      showPage('<h2 class="page-title">Weekend radio</h2><div class="sub" style="margin-bottom:16px">Every artist playing '+esc(cm.name)+' this weekend &mdash; shuffled into one non-stop station.</div>'+
         '<div id="radio-page-hd"></div><div id="radio-page-q"><div class="empty" style="padding:16px 0"><span class="spinner"></span> Building the station…</div></div>');
       var q=[];
       try{
@@ -4355,7 +4355,7 @@ body::before{
       if(document.body.classList.contains('page-on')) return;   // only on the home grid
       var btn=gridEl.querySelector('.play'); if(!btn) return;
       coachEl=document.createElement('div'); coachEl.className='coach';
-      coachEl.innerHTML='Tap to <b>preview</b> tonight&rsquo;s DJs';
+      coachEl.innerHTML='Tap to <b>preview</b> tonight&rsquo;s artists';
       document.body.appendChild(coachEl);
       placeCoach();
       window.addEventListener('scroll',placeCoach,true);
@@ -5012,14 +5012,14 @@ body::before{
     }
     function shareArtist(slug, name){
       var url=shareUrl({artist:slug, d:currentDate||null});
-      doShare({ title:name||'Listen on soundcheck', text:'Listen to '+(name||'this DJ')+' on soundcheck', url:url });
+      doShare({ title:name||'Listen on soundcheck', text:'Listen to '+(name||'this artist')+' on soundcheck', url:url });
     }
     function shareEvent(id, title, venue){
       // Canonical, descriptive event path — NOT location.pathname+#hash (which pinned
       // the event to whatever page you were on and broke under path routing).
       var url=location.origin+SC_BASE+eventPath(eventIdOf(id), title, venue)+'/';
       var t=(title||'Event')+(venue?(' · '+venue):'');
-      doShare({ title:t, text:t+' — preview every DJ on soundcheck', url:url });
+      doShare({ title:t, text:t+' — preview every artist on soundcheck', url:url });
     }
     function sharePicks(){
       if(!pickCount()) return;
@@ -5073,7 +5073,7 @@ body::before{
       if(wannaComing.length){ h+='<div class="sec-h" style="margin-top:18px">Wanna see · upcoming<span class="ct">'+wannaComing.length+'</span></div><ul class="tray-line">'+wannaComing.map(function(w){ return meRow(w.nm, (w.ev.venue||'')+(w.ev._day?(' · '+w.ev._day):''), 'data-rm-art="'+esc(w.s)+'"'); }).join('')+'</ul>'; }
       if(wannaList.length){ h+='<div class="sec-h" style="margin-top:18px">Wanna see · on your list<span class="ct">'+wannaList.length+'</span></div><ul class="tray-line">'+wannaList.map(function(w){ return meRow(w.nm, 'no upcoming London date yet', 'data-rm-art="'+esc(w.s)+'"'); }).join('')+'</ul>'; }
       if(seen.length){ h+='<div class="sec-h" style="margin-top:18px">Seen live<span class="ct">'+seen.length+'</span></div><ul class="tray-line">'+seen.map(function(w){ return meRow(w.nm, '', 'data-rm-art="'+esc(w.s)+'"'); }).join('')+'</ul>'; }
-      if(!h) h='<div class="empty">Nothing here yet. Heart artists you wanna see, mark nights you&rsquo;re interested in, and tick DJs you&rsquo;ve seen live.</div>';
+      if(!h) h='<div class="empty">Nothing here yet. Heart artists you wanna see, mark nights you&rsquo;re interested in, and tick artists you&rsquo;ve seen live.</div>';
       return h;
     }
     function openMyPicks(){
@@ -5504,7 +5504,7 @@ body::before{
     function resetSeo(){
       var cn=(typeof cityLabel==='function'?cityLabel(currentCity):'')||'your city';
       var nCities=(typeof CITY_LIST!=='undefined'&&CITY_LIST.length)||104;
-      var d="See who's playing tonight in "+cn+" — club nights, DJ line-ups and venues across "+nCities+" cities on soundcheck. Follow the artists and venues you love, log your gigs and stream every DJ's sets.";
+      var d="See who's playing tonight in "+cn+" — club nights, artist line-ups and venues across "+nCities+" cities on soundcheck. Follow the artists and venues you love, log your gigs and stream every artist's sets.";
       setSeo(_seoDefaultTitle, d, null, location.origin+(typeof cityPath==='function'?cityPath(currentCity):SC_BASE));
     }
     // The in-app "Back" steps one level through real history (matches the
@@ -5829,7 +5829,7 @@ body::before{
       var who=isMe?'you’re':(esc(p.displayName||('u/'+p.handle))+'’s ears are');
       var head='<div class="pb-rot-head"><div class="pb-rot-tt"><h3 class="pb-rot-title">Now Playing</h3><p class="pb-rot-sub">Who '+who+' listening to right now</p></div><div class="pb-rot-acts">'+
         (rot.length?'<button class="pb-rot-btn pb-rot-acc" id="pb-rot-playall" type="button">'+PLAY_SVG+'Play all</button>':'')+
-        (isMe?'<button class="pb-rot-btn gh" id="pb-rot-add" type="button">+ Add DJ</button>':'')+
+        (isMe?'<button class="pb-rot-btn gh" id="pb-rot-add" type="button">+ Add artist</button>':'')+
         '<button class="pb-rot-btn gh" id="pb-rot-share" type="button">Share</button>'+
       '</div></div>';
       return '<div class="pb-rot" id="pb-rot"><div class="pb-rot-inner">'+head+'<div class="pb-rot-rail" id="pb-rot-rail"></div></div></div>';
@@ -5843,7 +5843,7 @@ body::before{
     function renderRotRail(){
       var rail=document.getElementById('pb-rot-rail'); if(!rail) return;
       if(!pbRot.length){
-        rail.innerHTML = pbRotMe ? '<div class="pb-rot-empty"><div><b>Start your Now Playing list</b><span>Add the DJs you’re into &mdash; friends can play their sets from your profile.</span></div><button class="pb-rot-btn pb-rot-acc" id="pb-rot-add2" type="button">+ Add a DJ</button></div>' : '';
+        rail.innerHTML = pbRotMe ? '<div class="pb-rot-empty"><div><b>Start your Now Playing list</b><span>Add the artists you’re into &mdash; friends can play their sets from your profile.</span></div><button class="pb-rot-btn pb-rot-acc" id="pb-rot-add2" type="button">+ Add an artist</button></div>' : '';
         var a2=document.getElementById('pb-rot-add2'); if(a2) a2.addEventListener('click',function(){ openRotationAdd(); });
         return;
       }
@@ -5868,7 +5868,7 @@ body::before{
     async function rotationPlayAll(list){
       list=(list||pbRot).filter(function(x){ return x&&x.slug; });
       if(!list.length) return;
-      showToast('Cueing up '+list.length+' DJ'+(list.length>1?'s':'')+'…');
+      showToast('Cueing up '+list.length+' artist'+(list.length>1?'s':'')+'…');
       var lists=await Promise.all(list.map(function(v){ return fetch(API_BASE+'/api/youtube/sets?slug='+encodeURIComponent(v.slug)+'&name='+encodeURIComponent(v.name||v.slug)).then(function(r){return r.json();}).then(function(j){ return ((j&&j.sets)||[]).slice(0,2).map(function(s){ return {slug:v.slug,name:v.name||v.slug,videoId:s.videoId}; }); }).catch(function(){ return []; }); }));
       var q=[].concat.apply([],lists);
       if(!q.length){ showToast('No sets found.'); return; }
@@ -5878,7 +5878,7 @@ body::before{
       if(!currentUser){ openAuth(); return; }
       var ov=document.createElement('div'); ov.className='auth-overlay show';
       ov.innerHTML='<div class="auth-box" style="max-width:440px"><button class="auth-close" type="button" aria-label="Close">&times;</button>'+
-        '<div class="eyebrow">Now Playing</div><h3>Add a DJ</h3><p style="margin:6px 0 14px;color:var(--muted)">Search the DJs you&rsquo;re listening to &mdash; they show on your profile with their sets ready to play.</p>'+
+        '<div class="eyebrow">Now Playing</div><h3>Add an artist</h3><p style="margin:6px 0 14px;color:var(--muted)">Search the artists you&rsquo;re listening to &mdash; they show on your profile with their sets ready to play.</p>'+
         '<div class="sg-wrap"><input id="rota-in" type="text" placeholder="Search artists&hellip;" autocomplete="off" autocapitalize="off"><div class="sg-drop" id="rota-drop"></div></div>'+
         '<div class="to-chips" id="rota-chips" style="margin-top:14px"></div>'+
         '<button class="go" id="rota-done" type="button" style="margin-top:16px">Done</button></div>';
@@ -5902,7 +5902,7 @@ body::before{
       var discs=rot.slice(0,9).map(function(v){ var img=v.image?('background-image:url('+imgUrl(v.image,180)+')'):('background:'+sceneTone(v.slug)); return '<div class="rc-disc"><span class="rc-av" style="'+img+'"></span><span class="rc-nm">'+esc(v.name||v.slug)+'</span></div>'; }).join('');
       return '<div class="rc-card" id="rc-card">'+
         '<div class="rc-top"><span class="rc-me" style="background-image:'+avbg+';background-size:cover;background-position:center"></span><div class="rc-hid"><div class="rc-eyebrow">Now Playing</div><div class="rc-name">'+name+'</div></div><span class="rc-brand">soundcheck</span></div>'+
-        (rot.length?'<div class="rc-grid">'+discs+'</div>':'<div class="empty" style="padding:14px 0">No DJs in rotation yet.</div>')+
+        (rot.length?'<div class="rc-grid">'+discs+'</div>':'<div class="empty" style="padding:14px 0">No artists in rotation yet.</div>')+
         '<div class="rc-foot"><span class="rc-qr"><img src="'+qr+'" alt=""></span><div class="rc-ftx"><b>Scan to follow</b><span>soundcheck.club/u/'+esc(handle)+'</span></div></div>'+
       '</div>';
     }
@@ -6529,7 +6529,7 @@ body::before{
         '<div id="sx-radio-foot"></div>');
       // Weekend radio pinned at the bottom of the search page (user pref)
       (function(){ var rf=document.getElementById('sx-radio-foot'); if(!rf) return;
-        rf.innerHTML='<button class="sx-radio-row" id="sx-radio-btn" type="button"><span class="sx-radio-ic">'+RADIO_SVG+'</span><span class="sx-radio-tx"><b>Weekend radio</b><span>Every DJ playing this weekend, shuffled</span></span>'+PLAY_SVG+'</button>';
+        rf.innerHTML='<button class="sx-radio-row" id="sx-radio-btn" type="button"><span class="sx-radio-ic">'+RADIO_SVG+'</span><span class="sx-radio-tx"><b>Weekend radio</b><span>Every artist playing this weekend, shuffled</span></span>'+PLAY_SVG+'</button>';
         var b=document.getElementById('sx-radio-btn'); if(b) b.addEventListener('click',function(){ openRadio(); });
       })();
       var input=document.getElementById('sx-input'), results=document.getElementById('sx-results');
@@ -6583,7 +6583,7 @@ body::before{
           if(ms<=2) items.push({ type:'city', name:'Switch to soundcheck '+c.name, citySlug:c.slug, score:-10+ms, sub:'Change city' });
         });
       }
-      if(!items.length){ el.innerHTML='<div class="empty" style="padding:20px 0">No matches for &ldquo;'+esc(q)+'&rdquo; — try a DJ, venue or city.</div>'; return; }
+      if(!items.length){ el.innerHTML='<div class="empty" style="padding:20px 0">No matches for &ldquo;'+esc(q)+'&rdquo; — try an artist, venue or city.</div>'; return; }
       items.sort(function(a,b){ return a.score-b.score || String(a.name||'').length-String(b.name||'').length; });
       var TYPEICON={ artist:'♪', venue:'▮', event:'✦', person:'@' };
       var GLOBE='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg>';
@@ -6790,7 +6790,7 @@ body::before{
         wireEntityOwner('artist', slug, a.name||slug, a);
         var apClaim=document.getElementById('ap-claim'); if(apClaim) apClaim.addEventListener('click',function(){ openClaimModal('artist', a.name||slug, slug); });
         var _acanon=location.origin+SC_BASE+'dj/'+slug+'/';
-        var _adesc=a.description||((a.name||slug)+' — upcoming shows, past gigs, the venues they play and their DJ sets on soundcheck. Follow to get alerts when they play your city.');
+        var _adesc=a.description||((a.name||slug)+' — upcoming shows, past gigs, the venues they play and their sets on soundcheck. Follow to get alerts when they play your city.');
         setSeo((a.name||slug)+' — gigs & upcoming shows | soundcheck', _adesc, { "@context":"https://schema.org","@type":"MusicGroup", name:(a.name||slug), url:_acanon, description:_adesc }, _acanon);
         var apRadio=document.getElementById('ap-radio');
         // Tune in = play the artist's full sets back-to-back. Warm the sets list on
@@ -6865,7 +6865,7 @@ body::before{
           box.innerHTML='<div class="fp-sets-load">Reading their sets… this can take a moment the first time.</div>';
           fetch(API_BASE+'/api/artist/tracks?slug='+encodeURIComponent(slug)+'&name='+encodeURIComponent(a.name||slug)).then(function(r){ return r.ok?r.json():null; }).then(function(j){
             var tr=(j&&j.tracks)||[];
-            if(!tr.length){ box.innerHTML='<div class="fp-sets-empty">No posted tracklists found in '+esc(a.name||'their')+'&rsquo;s sets yet — we can only rank what DJs or fans have written up.</div>'; return; }
+            if(!tr.length){ box.innerHTML='<div class="fp-sets-empty">No posted tracklists found in '+esc(a.name||'their')+'&rsquo;s sets yet — we can only rank what artists or fans have written up.</div>'; return; }
             // strip a stray leading timestamp some numbered tracklists leave in the text
             var cleanTk=function(s){ return String(s||'').replace(/^\s*\d{1,2}:\d{2}(?::\d{2})?\s*[-–—.)\]]?\s*/,'').replace(/\s{2,}/g,' ').trim(); };
             box.innerHTML='<ol class="tk-list">'+tr.map(function(t,i){
@@ -7432,7 +7432,7 @@ body::before{
           '<div class="pf-box">'+
             '<div class="lg-field" style="margin-bottom:12px"><label>City</label>'+cityPickerHTML('lg-city', currentCity)+'</div>'+
             '<div class="lg-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg><input type="text" id="lg-q" placeholder="Search by club, artist, or date…" autocomplete="off" autocapitalize="off"></div>'+
-            '<div class="lg-shint" id="lg-shint">Type in the name of the DJ, or the venue, or both. Pick the one that matches to log it.</div>'+
+            '<div class="lg-shint" id="lg-shint">Type in the name of the artist, or the venue, or both. Pick the one that matches to log it.</div>'+
             '<div class="lg-events" id="lg-events"></div>'+
           '</div>'+
           '<div id="lg-extra" style="display:none">'+
@@ -7716,7 +7716,7 @@ body::before{
           '<div class="lg-field"><label>Venue</label><input type="text" id="im-venue" placeholder="Where"></div>'+
           '<div class="lg-field"><label>City</label>'+cityPickerHTML('im-city', currentCity)+'</div>'+
           '<div class="lg-field" style="display:flex;gap:12px"><div style="flex:1"><label>Date</label><input type="date" id="im-date"></div><div style="flex:0 0 130px"><label>Start <small style="text-transform:none;letter-spacing:0;color:var(--muted)">(opt)</small></label><input type="time" id="im-time"></div></div>'+
-          '<div class="lg-field"><label>Line-up</label><input type="text" id="im-art-in" placeholder="Type a DJ, hit enter…" autocomplete="off" autocapitalize="off"><div class="to-chips" id="im-art-chips"></div></div>'+
+          '<div class="lg-field"><label>Line-up</label><input type="text" id="im-art-in" placeholder="Type an artist, hit enter…" autocomplete="off" autocapitalize="off"><div class="to-chips" id="im-art-chips"></div></div>'+
           '<div class="lg-field"><label>Poster URL <small style="text-transform:none;letter-spacing:0;color:var(--muted)">(optional)</small></label><input type="url" id="im-poster" placeholder="https://…"></div>'+
           '<button id="im-save" type="button" style="width:100%;background:var(--accent);color:var(--accent-ink);border:none;border-radius:var(--radius);padding:14px;font:700 var(--fs-xs) var(--body);letter-spacing:0.14em;text-transform:uppercase;cursor:pointer">Add event</button>'+
           '<div class="err" id="im-err" style="color:var(--accent);font-size:var(--fs-sm);min-height:1em;margin-top:8px"></div>'+
@@ -8430,7 +8430,7 @@ body::before{
     async function load(date, pick){
       mode='day'; currentDate=date; activePick=pick||(date===todayISO()?'tonight':'date'); syncChips();
       _retryLoad=function(){ load(date, pick); };
-      document.title='soundcheck · '+cityMeta().name+' — club nights & DJ sets'; history.replaceState(null,'',withCityQS('?date='+date));
+      document.title='soundcheck · '+cityMeta().name+' — club nights & artist sets'; history.replaceState(null,'',withCityQS('?date='+date));
       setStatus('<span class="spinner"></span> Loading '+esc(fmtDateLabel(date))+'…'); skeletonGrid();
       try{
         var json=await fetchDay(date);
@@ -8452,7 +8452,7 @@ body::before{
       offset=offset||0; mode='weekend'; activePick=offset?'next':'weekend';
       _retryLoad=function(){ loadWeekend(offset); };
       var wd=weekendDatesFor(offset); currentDate=wd[1]; syncChips();
-      document.title='soundcheck · '+cityMeta().name+' — club nights & DJ sets'; history.replaceState(null,'',withCityQS('?weekend='+(offset+1)));
+      document.title='soundcheck · '+cityMeta().name+' — club nights & artist sets'; history.replaceState(null,'',withCityQS('?weekend='+(offset+1)));
       setStatus('<span class="spinner"></span> Loading '+(offset?'next':'this')+' weekend…'); skeletonGrid();
       try{
         var res=await Promise.all([fetchDay(wd[0]), fetchDay(wd[1])]);
@@ -8473,7 +8473,7 @@ body::before{
       if(span>RANGE_CAP){ var _dt=new Date(startISO+'T12:00:00'); _dt.setDate(_dt.getDate()+(RANGE_CAP-1)); endISO=isoOf(_dt); span=RANGE_CAP; }
       mode='range'; activePick='date'; currentDate=startISO; currentRange=[startISO,endISO]; syncChips();
       _retryLoad=function(){ loadRange(startISO, endISO); };
-      document.title='soundcheck · '+cityMeta().name+' — club nights & DJ sets';
+      document.title='soundcheck · '+cityMeta().name+' — club nights & artist sets';
       history.replaceState(null,'',withCityQS('?from='+startISO+'&to='+endISO));
       setStatus('<span class="spinner"></span> Loading '+span+' days&hellip;'); skeletonGrid();
       try{
