@@ -2519,6 +2519,7 @@
 .diary-page .pb-ds-venue{flex-wrap:wrap}
 .diary-page .pb-ds-body .ptiles{margin-top:12px;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:16px 12px;max-width:none}
 .diary-page .pb-ds-body .ptile .nm{white-space:normal;overflow:visible;text-overflow:clip;line-height:1.25;font-size:.74rem}
+.diary-page .pb-ds-body .ptile .ptile-img{border-radius:var(--radius-md)}   /* squarish artist photos in the diary */
 /* edit + delete sit TOGETHER on the right of the stub (was: two margin-left:auto pushed them apart) */
 .diary-page .pb-ds .dv-edit{margin-left:auto;width:26px;height:26px;font-size:13px}
 .diary-page .pb-ds .dv-del{margin-left:0;width:26px;height:26px;font-size:14px}
@@ -2786,6 +2787,9 @@
     .fp-mk i{ display:block; font:700 13px var(--head); font-style:normal; letter-spacing:-0.01em; padding:9px 2px 2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     .fp-mk s{ display:block; text-decoration:none; font:500 10px var(--font-mono); letter-spacing:.06em; text-transform:uppercase; color:var(--accent); }
     .fp-mk:hover i{ color:var(--accent); }
+    .fp-mk .fp-mph{ position:relative; }
+    .fp-mk-x{ position:absolute; top:6px; right:6px; font:800 10px var(--body); letter-spacing:.02em; color:var(--accent-ink); background:var(--accent); border-radius:var(--radius-pill); padding:2px 7px; }
+    .shelf-more{ padding:16px 0 4px; }   /* the profile panel already has side padding */
 
     
     /* EVENT (dark) */
@@ -3192,7 +3196,7 @@ body::before{
 .lvr .heart.evc-heart svg{ width:17px; height:17px; }
 
 </style>
-<meta name="sc-build" content="sunsetcrt-1784246020751">
+<meta name="sc-build" content="sunsetcrt-1784246778718">
 <meta name="robots" content="noindex">
 </head>
 <body>
@@ -5685,10 +5689,17 @@ body::before{
     function shelfSecHTML(s, handle){
       function radBtn(which){ var st='shelf:'+handle+':'+which; var on=(typeof radio!=='undefined'&&radio.on&&radio.station===st); return '<button class="ev-radio sec-radio" type="button" data-shelf-radio="'+which+'">'+RADIO_SVG+'<span>'+(on?'On air':'Radio')+'</span></button>'; }
       // show ALL tiles — no See-more cap (user pref: Seen live / Wanna see in full)
+      // Same card as the artist page's "Similar" rail: squarish photo + name + orange next-gig line.
       function grid(list, seen, key){
         if(!list.length) return '<div class="empty" style="padding:0 0 4px">Nothing yet.</div>';
-        var tiles=list.map(function(a){ return ptile(a.slug,a.name,seen,a.image); }).join('');
-        return '<div class="ptiles ptiles-wide" id="shelf-grid-'+key+'">'+tiles+'</div>';
+        var tiles=list.map(function(a){
+          var bg=a.image?('url('+imgUrl(a.image,300)+')'):avatarBg(a.slug,null);
+          var nd=a.nextDate?fmtDateLabel(String(a.nextDate).slice(0,10)):'';
+          var sub=[nd, a.nextCity?cityLabel(a.nextCity):''].filter(Boolean).join(' · ');
+          var xb=(seen&&a.count&&a.count>=2)?'<span class="fp-mk-x">&times;'+a.count+'</span>':'';
+          return '<a class="fp-mk nav" href="'+esc(djHref(a.slug))+'" data-artist="'+esc(a.slug)+'"><div class="fp-mph" style="background:'+bg+';background-size:cover;background-position:center">'+xb+'</div><i>'+esc(a.name||a.slug)+'</i>'+(sub?'<s>'+esc(sub)+'</s>':'')+'</a>';
+        }).join('');
+        return '<div class="fp-more shelf-more" id="shelf-grid-'+key+'">'+tiles+'</div>';
       }
       var x='<div class="sec-h">Wanna see<span class="ct">'+s.wannaSee.length+'</span>'+(s.wannaSee.length?radBtn('wanna'):'')+'</div>'+grid(s.wannaSee,false,'wanna');
       x+='<div class="sec-h" style="margin-top:26px">Seen live<span class="ct">'+s.seen.length+'</span>'+(s.seen.length?radBtn('seen'):'')+'</div>'+grid(s.seen,true,'seen');
@@ -6064,8 +6075,15 @@ body::before{
     function pfHead(title, count, actHtml){ return '<div class="pf-h"><span class="pf-h-t">'+esc(title)+'</span>'+(count!=null?'<span class="pf-h-ct">'+count+'</span>':'')+(actHtml||'')+'</div>'; }
     function pfShelfHTML(id, title, list, seen){
       if(seen) list=list.slice().sort(function(a,b){ return (b.count||0)-(a.count||0); });   // Seen live → most-seen artists first
-      var tiles=list.map(function(a){ return ptile(a.slug,a.name,seen,a.image,seen?a.count:0); }).join('');   // show ALL — no See-more cap
-      return '<div class="pf-grid" id="pf-grid-'+id+'">'+tiles+'</div>';   // no head — the pill labels this shelf
+      // Same card as the artist page's "Similar" rail: squarish photo + name + orange next-gig line.
+      var tiles=list.map(function(a){
+        var bg=a.image?('url('+imgUrl(a.image,300)+')'):avatarBg(a.slug,null);
+        var nd=a.nextDate?fmtDateLabel(String(a.nextDate).slice(0,10)):'';
+        var sub=[nd, a.nextCity?cityLabel(a.nextCity):''].filter(Boolean).join(' · ');
+        var xb=(seen&&a.count&&a.count>=2)?'<span class="fp-mk-x">&times;'+a.count+'</span>':'';
+        return '<a class="fp-mk nav" href="'+esc(djHref(a.slug))+'" data-artist="'+esc(a.slug)+'"><div class="fp-mph" style="background:'+bg+';background-size:cover;background-position:center">'+xb+'</div><i>'+esc(a.name||a.slug)+'</i>'+(sub?'<s>'+esc(sub)+'</s>':'')+'</a>';
+      }).join('');   // show ALL — no See-more cap
+      return '<div class="fp-more shelf-more" id="pf-grid-'+id+'">'+tiles+'</div>';   // no head — the pill labels this shelf
     }
     // Web Push opt-in: "an artist you follow announced a night in your city".
     // Requires the PWA service worker + VAPID key from the API; alerts are sent
@@ -6807,8 +6825,9 @@ body::before{
         var img=a.image?'<img loading="lazy" decoding="async" src="'+imgUrl(a.image,600)+'" alt="" onerror="this.remove()">':'';
         var fmtK=function(n){ n=+n||0; return n>=1000?(n/1000).toFixed(n>=10000?0:1).replace(/\.0$/,'')+'K':(n||''); };
         // Kick line = their next show (venue, city); falls back to country when nothing's booked.
-        var nextTxt=nextGig?[nextGig.venue, nextGig.city?cityLabel(nextGig.city):''].filter(Boolean).map(esc).join(', '):'';
-        var kick=nextTxt?('Playing next at '+nextTxt):esc(a.country||'');
+        var _ndl=(nextGig&&nextGig.event_date)?fmtDateLabel(String(nextGig.event_date).slice(0,10)):'';
+        var nextTxt=nextGig?('Next · '+[_ndl, nextGig.venue, nextGig.city?cityLabel(nextGig.city):''].filter(Boolean).map(esc).join(' · ')):'';
+        var kick=nextTxt||esc(a.country||'');
         if(a.followers) kick+=(kick?' ':'')+'<b class="fp-foll">'+fmtK(a.followers)+' followers</b>';
         var socials=socialLinksHTML({ soundcloud:a.soundcloud, instagram:a.instagram, website:a.website });
         // Genre tags move below the description (pill style, as on the event page).
@@ -6949,7 +6968,7 @@ body::before{
               return '<li class="tk-row"'+(t.videoId?' data-vid="'+esc(t.videoId)+'"':'')+' data-sec="'+(t.sec!=null?t.sec:'')+'" data-q="'+esc(txt)+'"><span class="tk-rank">'+(i+1)+'</span><span class="tk-tt">'+esc(txt)+'</span><span class="tk-play">'+PLAY_SVG+'</span></li>';
             }).join('')+'</ol>';
             // Queue of the timestamped tracks so the dock next/prev walks track→track (each jumps to its drop).
-            var tkQ=tr.filter(function(t){ return t.videoId && t.sec!=null; }).map(function(t){ return { slug:slug, name:cleanTk(t.text), videoId:t.videoId, sec:t.sec, poster:a.image||'', kind:'track', artist:(a.name||slug) }; });
+            var tkQ=tr.filter(function(t){ return t.videoId && t.sec!=null; }).map(function(t){ return { slug:slug, name:(a.name||slug), videoId:t.videoId, sec:t.sec, poster:a.image||'' }; });   // dock shows the artist name; prev/next still jump to each track's drop
             box.querySelectorAll('.tk-row').forEach(function(row){ row.addEventListener('click',function(){
               var vid=row.dataset.vid, sec=row.dataset.sec;
               // jump to the drop ONLY when we have a real timestamp; otherwise search (no timestamp
@@ -7191,7 +7210,8 @@ body::before{
         var vImg=v.image?'<img loading="lazy" decoding="async" src="'+imgUrl(v.image,600)+'" alt="" onerror="this.remove()">':'<span class="fp-press-gen" style="background:'+avatarBg(v.slug||dispName,null)+'"></span>';
         // Kick line = who's playing next here (their line-up); falls back to area · city.
         var vNextArts=(vNext&&vNext.lineup)?vNext.lineup.map(function(a){ return a.name; }).filter(Boolean):[];
-        var vKick=vNextArts.length?('Playing next &middot; '+vNextArts.slice(0,6).map(esc).join(', ')):[v.area?esc(v.area):'', v.city?esc(cityLabel(v.city)):''].filter(Boolean).join(' · ');
+        var _vndl=(vNext&&vNext.event_date)?fmtDateLabel(String(vNext.event_date).slice(0,10)):'';
+        var vKick=vNextArts.length?('Next · '+[_vndl, vNextArts.slice(0,6).map(esc).join(', ')].filter(Boolean).join(' · ')):[v.area?esc(v.area):'', v.city?esc(cityLabel(v.city)):''].filter(Boolean).join(' · ');
         if(v.followers>1) vKick+=(vKick?' ':'')+'<b class="fp-foll">'+v.followers+' followers</b>';
         var vActs='';
         if(v.slug){
